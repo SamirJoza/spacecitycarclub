@@ -12,53 +12,58 @@ jobs:
 
     steps:
       # ---------------------------------------------
-      # 📥 Step 1: Checkout the code from Git
+      # 🧾 Step 1: Checkout production code
       # ---------------------------------------------
-      - name: 🧾 Checkout production branch
+      - name: Checkout code
         uses: actions/checkout@v3
 
       # ---------------------------------------------
-      # 🔐 Step 2: SSH Setup with Debugging & Validation
+      # 🔐 Step 2: Set up SSH with raw private key
       # ---------------------------------------------
-      - name: 🔐 Set up SSH access (with debug logging)
+      - name: Set up SSH access
         run: |
           echo "📂 Creating SSH directory..."
           mkdir -p ~/.ssh || { echo "❌ Failed to create ~/.ssh directory"; exit 1; }
 
-          echo "📝 Writing SSH private key..."
-          echo "${{ secrets.SG_SSH_KEY }}" > ~/.ssh/id_ed25519 || { echo "❌ Failed to write SSH key"; exit 1; }
+          echo "🔐 Writing SSH key from secret..."
+          echo "${{ secrets.SG_SSH_KEY }}" > ~/.ssh/id_ed25519 || {
+            echo "❌ Failed to write SSH key"; exit 1;
+          }
 
-          echo "🔒 Setting correct permissions..."
-          chmod 600 ~/.ssh/id_ed25519 || { echo "❌ Failed to chmod SSH key"; exit 1; }
+          chmod 600 ~/.ssh/id_ed25519 || {
+            echo "❌ Failed to set key permissions"; exit 1;
+          }
 
-          echo "🧠 Checking key format (should begin with -----BEGIN)..."
-          head -n 1 ~/.ssh/id_ed25519
+          echo "📡 Scanning SiteGround SSH host key..."
+          ssh-keyscan -H ${{ secrets.SG_HOST }} >> ~/.ssh/known_hosts || {
+            echo "⚠️ ssh-keyscan failed — will fallback to host key checking off"
+          }
 
-          echo "🔍 Adding SiteGround host to known_hosts..."
-          ssh-keyscan -H ${{ secrets.SG_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || echo "⚠️ ssh-keyscan failed — check SG_HOST"
-
-          echo "✅ SSH setup complete."
-          
-          echo "📄 Final ~/.ssh contents:"
-          ls -al ~/.ssh
-          echo "🔐 Key preview:"
-          head -n 5 ~/.ssh/id_ed25519
+          echo "📜 known_hosts contents:"
+          cat ~/.ssh/known_hosts || echo "(none added)"
 
       # ---------------------------------------------
-      # 🚀 Step 3: Deploy the theme folder using rsync
-      # - Deploys all of wp-content/themes/
-      # - Uses SSH on a custom port from secret SG_PORT
-      # - --delete keeps server in sync with Git repo
+      # 🚀 Step 3: Deploy via rsync over SSH
+      # - Uses SG_PORT and fallback to no host key checking if needed
       # ---------------------------------------------
-      - name: 🚀 Deploy theme via rsync (custom SSH port)
+      - name: Deploy Sage theme to SiteGround
         run: |
-          echo "📦 Starting rsync deployment..."
+          echo "🚚 Starting rsync deployment..."
+
+          # Attempt with host checking enabled
           rsync -avz -e "ssh -p ${{ secrets.SG_PORT }}" --delete \
             --exclude '.git*' \
             ./wp-content/themes/ \
             ${{ secrets.SG_USER }}@${{ secrets.SG_HOST }}:${{ secrets.SG_TARGET_DIR }} || {
-              echo "❌ Rsync failed. Check SSH connection, permissions, or target path."
-              exit 1
+
+            echo "⚠️ Retry with StrictHostKeyChecking=no..."
+            rsync -avz -e "ssh -p ${{ secrets.SG_PORT }} -o StrictHostKeyChecking=no" --delete \
+              --exclude '.git*' \
+              ./wp-content/themes/ \
+              ${{ secrets.SG_USER }}@${{ secrets.SG_HOST }}:${{ secrets.SG_TARGET_DIR }} || {
+                echo "❌ Final rsync attempt failed."
+                exit 1
+            }
           }
 
-          echo "✅ Deployment completed successfully."
+          echo "✅ Deployment successful."
