@@ -1,0 +1,57 @@
+# ---------------------------------------------------------
+# 🚀 GitHub Action: Deploy WordPress Theme to SiteGround
+# Triggered on push to 'production' branch
+# Uses SSH + rsync to sync your wp-content/themes/ directory
+# ---------------------------------------------------------
+
+name: 🚀 Deploy Sage Theme to SiteGround
+
+# ---------------------------------------------------------
+# 🟡 Trigger this workflow only when pushing to 'production'
+# ---------------------------------------------------------
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    name: Deploy via SSH to SiteGround
+    runs-on: ubuntu-latest  # Use latest Ubuntu VM for the runner
+
+    steps:
+      # ---------------------------------------------
+      # 📥 Step 1: Checkout the code from the repo
+      # Only files tracked by Git (per your .gitignore) will be included
+      # ---------------------------------------------
+      - name: 🧾 Checkout production branch
+        uses: actions/checkout@v3
+
+      # ---------------------------------------------
+      # 🔐 Step 2: Set up SSH for connecting to SiteGround
+      # - Creates .ssh directory
+      # - Adds your SSH private key from GitHub secrets
+      # - Sets correct permissions
+      # - Adds SiteGround's SSH host to known_hosts to avoid prompts
+      # ---------------------------------------------
+      - name: 🔐 Set up SSH access
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SG_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SG_HOST }} >> ~/.ssh/known_hosts
+
+      # ---------------------------------------------
+      # 🚀 Step 3: Deploy the theme via rsync over SSH
+      # - Uses rsync to transfer files efficiently
+      # - Uses SSH with a custom port defined in secrets
+      # - --delete ensures remote dir matches repo exactly (careful!)
+      # - --exclude '.git*' prevents .gitignore, .git/, etc. from being uploaded
+      # - Deploys everything under wp-content/themes/ (all themes)
+      # ---------------------------------------------
+      - name: 🚀 Deploy theme via rsync (custom SSH port)
+        run: |
+          rsync -avz -e "ssh -p ${{ secrets.SG_PORT }}" --delete \
+            --exclude '.git*' \
+            ./wp-content/themes/ \
+            ${{ secrets.SG_USER }}@${{ secrets.SG_HOST }}:${{ secrets.SG_TARGET_DIR }}
