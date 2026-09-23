@@ -1,0 +1,128 @@
+# ---------------------------------------------------------------------------
+# Deploy the Space City Car Club theme to SiteGround
+#
+# Trigger: every push to the `production` branch (or manual "Run workflow").
+# What it does:
+#   1. Checks out the repo (vendor/ and public/build/ are committed, so no
+#      build step is needed on the runner or the server).
+#   2. Loads the SiteGround SSH key (SiteGround keys are passphrase-protected,
+#      so the passphrase is stripped inside the throwaway runner only).
+#   3. rsyncs the theme into wp-content/themes/spacecitycarclub on the server.
+#   4. Purges the SiteGround cache with `wp sg purge` (Speed Optimizer plugin).
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   SG_SSH_HOST         SiteGround SSH hostname (from SSH Credentials)
+#   SG_SSH_USER         SiteGround SSH username, e.g. u123-abcdefgh1234
+#   SG_SSH_PORT         SSH port (SiteGround default: 18765)
+#   SG_SSH_PRIVATE_KEY  Full private key text from SSH Keys Manager
+#   SG_SSH_PASSPHRASE   Passphrase chosen when the key was generated
+#   SG_WP_PATH          WordPress root, e.g. /home/customer/www/spacecitycarclub.com/public_html
+# ---------------------------------------------------------------------------
+name: Deploy to production (SiteGround)
+
+on:
+  push:
+    branches: [production]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (show what would change, copy nothing)'
+        type: boolean
+        default: true
+
+# Never run two deploys at the same time.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      THEME_DIR: spacecitycarclub
+      SG_SSH_HOST: ${{ secrets.SG_SSH_HOST }}
+      SG_SSH_USER: ${{ secrets.SG_SSH_USER }}
+      SG_SSH_PORT: ${{ secrets.SG_SSH_PORT }}
+      SG_WP_PATH: ${{ secrets.SG_WP_PATH }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+
+    steps:
+      - name: Check secrets are configured
+        id: guard
+        run: |
+          missing=""
+          for v in SG_SSH_HOST SG_SSH_USER SG_WP_PATH; do
+            [ -z "${!v}" ] && missing="$missing $v"
+          done
+          if [ -n "$missing" ]; then
+            echo "::warning::Deploy skipped — missing secrets:$missing"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.guard.outputs.ready == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        if: steps.guard.outputs.ready == 'true'
+        env:
+          SG_SSH_PRIVATE_KEY: ${{ secrets.SG_SSH_PRIVATE_KEY }}
+          SG_SSH_PASSPHRASE: ${{ secrets.SG_SSH_PASSPHRASE }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SG_SSH_PRIVATE_KEY" > ~/.ssh/sg_key
+          chmod 600 ~/.ssh/sg_key
+          # Remove the passphrase on the runner copy so rsync/ssh run non-interactively.
+          if [ -n "$SG_SSH_PASSPHRASE" ]; then
+            ssh-keygen -p -P "$SG_SSH_PASSPHRASE" -N "" -f ~/.ssh/sg_key >/dev/null
+          fi
+          PORT="${SG_SSH_PORT:-18765}"
+          ssh-keyscan -p "$PORT" -H "$SG_SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          cat > ~/.ssh/config <<CFG
+          Host siteground
+            HostName $SG_SSH_HOST
+            User $SG_SSH_USER
+            Port $PORT
+            IdentityFile ~/.ssh/sg_key
+            IdentitiesOnly yes
+          CFG
+
+      - name: Verify remote theme folder
+        if: steps.guard.outputs.ready == 'true'
+        run: |
+          # Safety net: refuse to deploy unless the target is an existing
+          # WordPress install with this theme folder already present.
+          ssh siteground "test -f '$SG_WP_PATH/wp-config.php' && test -d '$SG_WP_PATH/wp-content/themes/$THEME_DIR'" \
+            || { echo "::error::Remote path check failed: $SG_WP_PATH/wp-content/themes/$THEME_DIR"; exit 1; }
+
+      - name: Rsync theme
+        if: steps.guard.outputs.ready == 'true'
+        run: |
+          FLAGS="-az --delete --itemize-changes"
+          [ "$DRY_RUN" = "true" ] && FLAGS="$FLAGS --dry-run" && echo "DRY RUN — nothing will be copied"
+          rsync $FLAGS \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.cursor/' \
+            --exclude='.cursorignore' \
+            --exclude='.editorconfig' \
+            --exclude='.gitignore' \
+            --exclude='node_modules/' \
+            --exclude='public/hot' \
+            --exclude='.DS_Store' \
+            --exclude='seed-members.php' \
+            --exclude='TODO.md' \
+            --exclude='TAILWIND_*.md' \
+            ./ "siteground:$SG_WP_PATH/wp-content/themes/$THEME_DIR/"
+
+      - name: Purge SiteGround cache
+        if: steps.guard.outputs.ready == 'true' && env.DRY_RUN != 'true'
+        run: |
+          ssh siteground "cd '$SG_WP_PATH' && (wp sg purge || true) && (wp cache flush || true)"
+
+      - name: Clean up key
+        if: always()
+        run: rm -f ~/.ssh/sg_key
