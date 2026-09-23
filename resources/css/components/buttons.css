@@ -1,0 +1,616 @@
+/* --------------------------------------------------------- */
+/* Button tokens (theme-aware)                               */
+/* --------------------------------------------------------- */
+
+/*
+ * Neon glass colours are defined alongside the existing tokens
+ * so all variants can reference them without hardcoding values.
+ *
+ * --btn-glass-fill-*   — the semi-transparent fill layer
+ * --btn-neon-*         — the gradient border + bloom colours
+ */
+ :root, [data-theme="light"] {
+  --btn-surface: var(--color-surface, #fff);
+
+  /* brand */
+  --btn-primary:        var(--color-primary-500, #135bec);
+  --btn-primary-shadow: rgba(19, 91, 236, .45);
+  --btn-primary-ring:   color-mix(in srgb, var(--btn-primary) 35%, transparent);
+
+  /* accent (outline) */
+  --btn-accent:          var(--color-accent-500, #64748b);
+  --btn-accent-hover-bg: color-mix(in srgb, var(--btn-accent) 18%, transparent);
+  --btn-accent-ring:     color-mix(in srgb, var(--btn-accent) 35%, transparent);
+
+  /* quiet text */
+  --btn-muted: var(--color-muted, #64748b);
+
+  /*
+   * Neon glass — light theme.
+   * Fill: translucent white so the gradient border reads against
+   * a bright background without overwhelming it.
+   * Bloom: toned down (~40% of dark intensity) because neon glow
+   * washes out on white backgrounds.
+   */
+  --btn-glass-fill:         rgba(255, 255, 255, 0.70);
+  --btn-glass-fill-hover:   rgba(255, 255, 255, 0.88);
+  --btn-glass-fill-active:  rgba(0, 18, 38, 0.85);  /* dark fill for active state */
+
+  --btn-neon-from:           rgba(0, 200, 255, 0.55);
+  --btn-neon-mid:            rgba(19, 100, 236, 0.50);
+  --btn-neon-to:             rgba(160, 92, 255, 0.55);
+
+  --btn-neon-from-hover:     rgba(0, 210, 255, 0.80);
+  --btn-neon-mid-hover:      rgba(19, 100, 236, 0.75);
+  --btn-neon-to-hover:       rgba(160, 92, 255, 0.80);
+
+  /* Active state uses full saturation border regardless of theme */
+  --btn-neon-from-active:   #00d2ff;
+  --btn-neon-mid-active:    #1364ec;
+  --btn-neon-to-active:     #a05cff;
+
+  /* Bloom shadows */
+  --btn-bloom-default:
+    0 2px 10px rgba(19, 100, 236, 0.10),
+    0 1px 3px  rgba(160, 92, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.80);
+
+  --btn-bloom-hover:
+    0 0 12px rgba(0, 210, 255, 0.22),
+    0 0 20px rgba(19, 100, 236, 0.18),
+    0 0 28px rgba(160, 92, 255, 0.14),
+    0 4px 14px rgba(19, 100, 236, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.90);
+
+  --btn-bloom-active:
+    0 0  8px rgba(0, 210, 255, 0.55),
+    0 0 18px rgba(0, 210, 255, 0.35),
+    0 0 32px rgba(0, 210, 255, 0.20),
+    0 0  8px rgba(160, 92, 255, 0.50),
+    0 0 18px rgba(160, 92, 255, 0.30),
+    0 0 34px rgba(160, 92, 255, 0.18),
+    0 8px 24px rgba(19, 100, 236, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 16px rgba(0, 210, 255, 0.08);
+}
+
+.dark, [data-theme="dark"] {
+  --btn-surface: var(--color-surface, #1a2233);
+
+  --btn-primary:        var(--color-primary-500, #135bec);
+  --btn-primary-shadow: rgba(19, 91, 236, .55);
+  --btn-primary-ring:   color-mix(in srgb, var(--color-primary-300, var(--btn-primary)) 45%, transparent);
+
+  --btn-accent:          var(--color-accent-500, #94a3b8);
+  --btn-accent-hover-bg: color-mix(in srgb, var(--btn-accent) 28%, transparent);
+  --btn-accent-ring:     color-mix(in srgb, var(--btn-accent) 45%, transparent);
+
+  --btn-muted: var(--color-muted, #94a3b8);
+
+  /*
+   * Neon glass — dark theme.
+   * Fill flips to deep dark glass so the gradient border glows
+   * against the dark background. Full bloom intensity is appropriate
+   * here — the dark canvas makes it readable without washing out.
+   */
+  --btn-glass-fill:         rgba(10, 18, 30, 0.68);
+  --btn-glass-fill-hover:   rgba(10, 18, 30, 0.82);
+  --btn-glass-fill-active:  rgba(0, 14, 32, 0.92);
+
+  --btn-neon-from:           rgba(0, 210, 255, 0.50);
+  --btn-neon-mid:            rgba(19, 100, 236, 0.45);
+  --btn-neon-to:             rgba(160, 92, 255, 0.50);
+
+  --btn-neon-from-hover:     rgba(0, 210, 255, 0.85);
+  --btn-neon-mid-hover:      rgba(19, 100, 236, 0.80);
+  --btn-neon-to-hover:       rgba(160, 92, 255, 0.85);
+
+  /* Active uses same full-saturation border as light */
+  --btn-neon-from-active:   #00d2ff;
+  --btn-neon-mid-active:    #1364ec;
+  --btn-neon-to-active:     #a05cff;
+
+  --btn-bloom-default:
+    0 0  6px rgba(0, 210, 255, 0.20),
+    0 0 12px rgba(160, 92, 255, 0.14),
+    0 3px 10px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+
+  --btn-bloom-hover:
+    0 0 10px rgba(0, 210, 255, 0.45),
+    0 0 20px rgba(0, 210, 255, 0.28),
+    0 0 35px rgba(0, 210, 255, 0.14),
+    0 0 10px rgba(160, 92, 255, 0.40),
+    0 0 20px rgba(160, 92, 255, 0.24),
+    0 0 36px rgba(160, 92, 255, 0.12),
+    0 6px 18px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+
+  --btn-bloom-active:
+    0 0  8px rgba(0, 210, 255, 0.70),
+    0 0 18px rgba(0, 210, 255, 0.48),
+    0 0 36px rgba(0, 210, 255, 0.28),
+    0 0 60px rgba(0, 210, 255, 0.12),
+    0 0  8px rgba(160, 92, 255, 0.65),
+    0 0 18px rgba(160, 92, 255, 0.42),
+    0 0 36px rgba(160, 92, 255, 0.24),
+    0 0 60px rgba(160, 92, 255, 0.10),
+    0 10px 28px rgba(0, 0, 0, 0.50),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30),
+    inset 0 0 18px rgba(0, 210, 255, 0.10);
+}
+
+
+/* --------------------------------------------------------- */
+/* Buttons                                                   */
+/* --------------------------------------------------------- */
+@layer components {
+
+  /* ─── Base ─────────────────────────────────────────────────
+   * All geometry, typography, and the neon glass treatment
+   * live here. Variants override only fill, border, and bloom.
+   *
+   * Gradient border technique:
+   *   padding-box layer → the glass fill (clipped inside border)
+   *   border-box  layer → the gradient that paints the border ring
+   *   border: 1.5px solid transparent → creates the slot for the
+   *   gradient to show through
+   ─────────────────────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-full py-0 px-6 font-bold;
+    @apply transition-[box-shadow,transform,filter,background-color,color,border-color] duration-200 ease-out;
+    min-height: 44px;
+    line-height: 1.2;
+    gap: .6rem;
+    white-space: nowrap;
+    font-size: 14px;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+
+    /*
+     * Neon glass default.
+     * border must be transparent to let the border-box gradient show.
+     * backdrop-filter adds frosted-glass depth where the background
+     * behind the button is visible.
+     */
+    border: 1.5px solid transparent;
+    background:
+      linear-gradient(var(--btn-glass-fill), var(--btn-glass-fill)) padding-box,
+      linear-gradient(
+        135deg,
+        var(--btn-neon-from),
+        var(--btn-neon-mid),
+        var(--btn-neon-to)
+      ) border-box;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    color: var(--color-text, #111418);
+    box-shadow: var(--btn-bloom-default);
+  }
+
+  /* Dark theme: text flips to near-white so it reads on the dark fill */
+  [data-theme="dark"] .btn,
+  .dark .btn {
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  /* Hover — brighter border + bloom activates */
+  .btn:hover {
+    border: 1.5px solid transparent;
+    background:
+      linear-gradient(var(--btn-glass-fill-hover), var(--btn-glass-fill-hover)) padding-box,
+      linear-gradient(
+        135deg,
+        var(--btn-neon-from-hover),
+        var(--btn-neon-mid-hover),
+        var(--btn-neon-to-hover)
+      ) border-box;
+    transform: translateY(-2px);
+    box-shadow: var(--btn-bloom-hover);
+    color: var(--btn-primary);
+  }
+
+  [data-theme="dark"] .btn:hover,
+  .dark .btn:hover {
+    color: #fff;
+  }
+
+  /* Press */
+  .btn:active {
+    transform: translateY(1px) scale(.98);
+    border: 1.5px solid transparent;
+    background:
+      linear-gradient(var(--btn-glass-fill-active), var(--btn-glass-fill-active)) padding-box,
+      linear-gradient(
+        135deg,
+        var(--btn-neon-from-active),
+        var(--btn-neon-mid-active),
+        var(--btn-neon-to-active)
+      ) border-box;
+    color: #fff;
+    box-shadow: var(--btn-bloom-active);
+  }
+
+  /* Focus ring — uses primary ring token so it stays on-brand */
+  .btn:focus-visible {
+    outline: none;
+    box-shadow:
+      var(--btn-bloom-default),
+      0 0 0 4px var(--btn-primary-ring),
+      0 0 0 6px color-mix(in srgb, var(--btn-surface) 95%, transparent);
+  }
+
+  /* ─── Sheen (diagonal sweep on hover / focus) ───────────── */
+  .btn::after {
+    content: "";
+    position: absolute;
+    inset: -200% -40%;
+    transform: translateX(-60%) rotate(20deg);
+    background: linear-gradient(
+      90deg,
+      transparent 0 35%,
+      rgba(255, 255, 255, .45) 48%,
+      rgba(255, 255, 255, .18) 52%,
+      transparent 65%
+    );
+    opacity: .85;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .btn:hover::after,
+  .btn:focus-visible::after {
+    animation: shineSweep .85s ease forwards;
+  }
+  @keyframes shineSweep {
+    0%   { transform: translateX(-60%) rotate(20deg); }
+    100% { transform: translateX(25%)  rotate(20deg); }
+  }
+
+
+  /* ─── Primary (solid filled CTA) ───────────────────────────
+   * Overrides the glass fill with a solid primary colour.
+   * The gradient border is replaced by a transparent border
+   * (border slot still present) so the solid bg shows clean.
+   * Bloom uses the primary shadow token.
+   ─────────────────────────────────────────────────────────── */
+  .btn-primary {
+    color: #fff;
+    background: var(--btn-primary);
+    border-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+  .btn-primary:hover {
+    background: var(--btn-primary);
+    border-color: transparent;
+    color: #fff;
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+    box-shadow:
+      0 10px 28px var(--btn-primary-shadow),
+      0 0 0 4px var(--btn-primary-ring);
+  }
+  .btn-primary:active {
+    background: var(--btn-primary);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 12px var(--btn-primary-shadow);
+  }
+  .btn-primary:disabled {
+    opacity: .55;
+    pointer-events: none;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+  }
+
+
+  /* ─── Secondary (outline accent) ───────────────────────────
+   * Retains the glass fill but shifts the border gradient to
+   * use the accent colour family instead of the neon cyan/violet.
+   ─────────────────────────────────────────────────────────── */
+  .btn-secondary {
+    color: var(--btn-accent);
+    background:
+      linear-gradient(var(--btn-glass-fill), var(--btn-glass-fill)) padding-box,
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--btn-accent) 55%, transparent),
+        color-mix(in srgb, var(--btn-accent) 40%, transparent)
+      ) border-box;
+    box-shadow:
+      0 2px 8px color-mix(in srgb, var(--btn-accent) 12%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.60);
+  }
+  .btn-secondary:hover {
+    background:
+      linear-gradient(var(--btn-glass-fill-hover), var(--btn-glass-fill-hover)) padding-box,
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--btn-accent) 85%, transparent),
+        color-mix(in srgb, var(--btn-accent) 70%, transparent)
+      ) border-box;
+    color: var(--btn-accent);
+    box-shadow:
+      0 8px 20px color-mix(in srgb, var(--btn-accent) 35%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.70);
+  }
+  .btn-secondary:active {
+    background:
+      linear-gradient(var(--btn-glass-fill-active), var(--btn-glass-fill-active)) padding-box,
+      linear-gradient(
+        135deg,
+        var(--btn-accent),
+        color-mix(in srgb, var(--btn-accent) 80%, #fff)
+      ) border-box;
+    color: #fff;
+  }
+  .btn-secondary:focus-visible {
+    box-shadow:
+      0 0 0 4px var(--btn-accent-ring),
+      0 0 0 6px color-mix(in srgb, var(--btn-surface) 95%, transparent);
+  }
+  .btn-secondary:disabled {
+    opacity: .55;
+    pointer-events: none;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+  }
+
+
+  /* ─── Tertiary (quiet text link-style) ─────────────────────
+   * Transparent fill, no border gradient — just text.
+   * Inherits base geometry only.
+   ─────────────────────────────────────────────────────────── */
+  .btn-tertiary {
+    background: transparent;
+    border-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    color: var(--btn-muted);
+    box-shadow: none;
+  }
+  .btn-tertiary:hover {
+    background: transparent;
+    border-color: transparent;
+    color: var(--btn-accent);
+    text-decoration: underline;
+    transform: translateY(-1px);
+    box-shadow: none;
+  }
+  .btn-tertiary:active {
+    background: transparent;
+    border-color: transparent;
+    color: var(--btn-accent);
+    box-shadow: none;
+  }
+  .btn-tertiary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--btn-accent-ring);
+  }
+  .btn-tertiary:disabled {
+    opacity: .55;
+    pointer-events: none;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+  }
+
+
+  /* ─── Ghost (subtle outline) ───────────────────────────────
+   * Glass fill with a muted single-colour border (not gradient).
+   * Transitions to primary neon on hover.
+   ─────────────────────────────────────────────────────────── */
+  .btn-ghost {
+    background:
+      linear-gradient(var(--btn-glass-fill), var(--btn-glass-fill)) padding-box,
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, currentColor 28%, transparent),
+        color-mix(in srgb, currentColor 18%, transparent)
+      ) border-box;
+    color: var(--btn-muted);
+    box-shadow: none;
+  }
+  [data-theme="light"] .btn-ghost {
+    color: var(--color-text, #1C1C1C);
+  }
+  .btn-ghost:hover {
+    background:
+      linear-gradient(
+        color-mix(in srgb, var(--btn-primary) 6%, var(--btn-glass-fill)),
+        color-mix(in srgb, var(--btn-primary) 6%, var(--btn-glass-fill))
+      ) padding-box,
+      linear-gradient(
+        135deg,
+        var(--btn-neon-from-hover),
+        var(--btn-neon-mid-hover),
+        var(--btn-neon-to-hover)
+      ) border-box;
+    color: var(--btn-primary);
+    box-shadow: var(--btn-bloom-hover);
+  }
+  .btn-ghost:active {
+    background:
+      linear-gradient(var(--btn-glass-fill-active), var(--btn-glass-fill-active)) padding-box,
+      linear-gradient(135deg, var(--btn-neon-from-active), var(--btn-neon-mid-active), var(--btn-neon-to-active)) border-box;
+    color: #fff;
+    box-shadow: var(--btn-bloom-active);
+  }
+
+
+  /* ─── Outline glow (halo on hover) ─────────────────────────
+   * Single-colour primary border at rest, full neon on hover.
+   ─────────────────────────────────────────────────────────── */
+  .btn-outline-glow {
+    background:
+      linear-gradient(var(--btn-glass-fill), var(--btn-glass-fill)) padding-box,
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--btn-primary) 65%, transparent),
+        color-mix(in srgb, var(--btn-primary) 45%, transparent)
+      ) border-box;
+    color: var(--btn-primary);
+    box-shadow:
+      0 0 6px color-mix(in srgb, var(--btn-primary) 18%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.60);
+  }
+  [data-theme="dark"] .btn-outline-glow {
+    color: #fff;
+  }
+  .btn-outline-glow:hover {
+    background:
+      linear-gradient(var(--btn-glass-fill-hover), var(--btn-glass-fill-hover)) padding-box,
+      linear-gradient(
+        135deg,
+        var(--btn-neon-from-hover),
+        var(--btn-neon-mid-hover),
+        var(--btn-neon-to-hover)
+      ) border-box;
+    box-shadow:
+      0 8px 22px color-mix(in srgb, var(--btn-primary) 40%, transparent),
+      var(--btn-bloom-hover);
+    color: var(--btn-primary);
+  }
+  [data-theme="dark"] .btn-outline-glow:hover {
+    color: #fff;
+  }
+  .btn-outline-glow:active {
+    background:
+      linear-gradient(var(--btn-glass-fill-active), var(--btn-glass-fill-active)) padding-box,
+      linear-gradient(135deg, var(--btn-neon-from-active), var(--btn-neon-mid-active), var(--btn-neon-to-active)) border-box;
+    color: #fff;
+    box-shadow: var(--btn-bloom-active);
+  }
+
+
+  /* ─── Gradient (extra pop, solid fill) ─────────────────────
+   * Solid gradient fill — no glass. Keeps its own identity.
+   ─────────────────────────────────────────────────────────── */
+  .btn-gradient {
+    color: #fff;
+    background: linear-gradient(
+      135deg,
+      var(--btn-primary),
+      color-mix(in srgb, var(--btn-accent) 60%, var(--btn-primary))
+    );
+    border-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--btn-accent) 40%, transparent);
+  }
+  .btn-gradient:hover {
+    background: linear-gradient(
+      135deg,
+      var(--btn-primary),
+      color-mix(in srgb, var(--btn-accent) 60%, var(--btn-primary))
+    );
+    border-color: transparent;
+    color: #fff;
+    filter: saturate(1.1) brightness(1.06);
+    transform: translateY(-1px);
+    box-shadow: 0 16px 48px color-mix(in srgb, var(--btn-accent) 55%, transparent);
+  }
+  .btn-gradient:active {
+    background: linear-gradient(
+      135deg,
+      var(--btn-primary),
+      color-mix(in srgb, var(--btn-accent) 60%, var(--btn-primary))
+    );
+    color: #fff;
+    border-color: transparent;
+  }
+
+
+  /* ─── Neon (pulsing aura, dark fill) ────────────────────────
+   * Dark fill with the full neon gradient border + pulsing bloom.
+   * This variant explicitly opts into the dark fill regardless of
+   * theme — it's intentionally always-dark.
+   ─────────────────────────────────────────────────────────── */
+  .btn-neon {
+    color: #fff;
+    background:
+      linear-gradient(rgba(11, 11, 11, 0.92), rgba(11, 11, 11, 0.92)) padding-box,
+      linear-gradient(
+        135deg,
+        var(--btn-neon-from-active),
+        var(--btn-neon-mid-active),
+        var(--btn-neon-to-active)
+      ) border-box;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: glowPulse 2.2s ease-in-out infinite;
+  }
+  .btn-neon:hover {
+    background:
+      linear-gradient(
+        color-mix(in srgb, var(--btn-accent) 12%, #0b0b0b),
+        color-mix(in srgb, var(--btn-accent) 12%, #0b0b0b)
+      ) padding-box,
+      linear-gradient(
+        135deg,
+        var(--btn-neon-from-active),
+        var(--btn-neon-mid-active),
+        var(--btn-neon-to-active)
+      ) border-box;
+    color: #fff;
+    box-shadow: var(--btn-bloom-active);
+    animation: none;
+  }
+  .btn-neon:active {
+    color: #fff;
+    box-shadow: var(--btn-bloom-active);
+    animation: none;
+  }
+  @keyframes glowPulse {
+    0%, 100% {
+      box-shadow:
+        0 0 0 0 rgba(100, 116, 139, 0.0),
+        0 0 0 0 rgba(19, 91, 236, 0.0);
+    }
+    50% {
+      box-shadow:
+        0 0 18px rgba(0, 210, 255, 0.35),
+        0 0 30px rgba(160, 92, 255, 0.25),
+        0 0 0 4px rgba(19, 91, 236, 0.18);
+    }
+  }
+
+
+  /* ─── Loading helper ────────────────────────────────────────*/
+  .btn-loading {
+    pointer-events: none;
+    opacity: .8;
+  }
+  .btn-loading > .spinner {
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+} /* end @layer components */
+
+
+/* ─── Reduced motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+    animation: none !important;
+  }
+  .btn:hover {
+    transform: none;
+    filter: none;
+  }
+  .btn::after { display: none; }
+  .btn-neon   { animation: none; }
+}

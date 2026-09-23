@@ -1,0 +1,133 @@
+@layer components {
+  .site-footer {
+    @apply border-t pt-12 pb-10 shrink-0;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+  }
+
+  .site-footer h4 {
+    font-family: var(--font-headline);
+    @apply text-sm font-semibold mb-3;
+    color: var(--color-primary-500);
+  }
+
+  /* Base copy */
+  .site-footer p,
+  .site-footer li {
+    @apply text-xs leading-relaxed;
+    color: var(--muted);
+  }
+
+  /* Links (no underline, themed hover/active) */
+  .site-footer a {
+    @apply text-xs leading-relaxed no-underline;
+    color: var(--muted);
+  }
+  .site-footer a:not(.btn-primary):hover,
+  .site-footer a:not(.btn-primary):focus-visible {
+    color: var(--color-accent-500);
+  }
+  .site-footer a[aria-current="page"]:not(.btn-primary),
+  .site-footer .active:not(.btn-primary) {
+    color: var(--color-accent-500);
+  }
+
+  /* Button guard (don’t inherit link hover styles) */
+  .site-footer .btn-primary,
+  .site-footer .btn-primary:hover,
+  .site-footer .btn-primary:focus-visible {
+    @apply no-underline;
+    color: var(--secondary-contrast);
+  }
+
+  .site-footer .brand span {
+    font-family: var(--font-headline);
+  }
+
+  .site-footer .bottom-bar {
+    @apply border-t mt-8 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2 text-[11px];
+    color: var(--muted);
+    border-color: var(--line);
+  }
+
+  .site-footer .footer-socials { 
+    @apply flex flex-row flex-wrap items-center gap-2;
+  }
+
+  /* Footer socials: icon grow on hover (no layout shift) */
+  .site-footer .footer-socials a { 
+    @apply transition-colors; /* keeps your color hover smooth */
+  }
+  .site-footer .footer-socials a svg {
+    @apply transition-transform;
+    transform-origin: center;
+    will-change: transform;
+  }
+  .site-footer .footer-socials a:hover svg,
+  .site-footer .footer-socials a:focus-visible svg {
+    transform: scale(2);
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .site-footer .footer-socials a svg { transition: none; }
+  .site-footer .footer-socials a:hover svg,
+  .site-footer .footer-socials a:focus-visible svg { transform: none; }
+}
+
+/* Enforce (wins regardless of other styles / load order) */
+@layer utilities {
+  .site-footer :is(a, a:visited, a:hover, a:focus, a:focus-visible) {
+    text-decoration: none !important;
+  }
+  .site-footer .btn-primary,
+  .site-footer .btn-primary:hover,
+  .site-footer .btn-primary:focus-visible {
+    text-decoration: none !important;
+  }
+}
+
+@layer components {
+  .site-footer .theme-toggle-btn {
+    @apply inline-flex h-9 w-9 items-center justify-center
+           rounded-full border border-transparent
+           transition;
+    color: var(--muted); /* matches rest of footer */
+  }
+
+  /* Hover effects */
+  .site-footer .theme-toggle-btn:hover,
+  .site-footer .theme-toggle-btn:focus-visible {
+    color: var(--color-accent-500);
+    /* border-color: var(--color-accent-500); */
+  }
+
+  .site-footer .theme-toggle-btn:hover .material-symbols-outlined,
+  .site-footer .theme-toggle-btn:focus-visible .material-symbols-outlined {
+    /* icon follows button color */
+    color: inherit;
+  }
+
+  /* Active theme highlight (light or dark) */
+  [data-theme="light"] .site-footer [data-theme-toggle="light"],
+  [data-theme="dark"]  .site-footer [data-theme-toggle="dark"] {
+    background-color: var(--surface-strong, rgba(255,255,255,0.06)); /* fallback */
+    color: var(--color-accent-400, var(--color-accent-500));
+    /* border-color: var(--color-accent-500); */
+    /* box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent-500) 60%, transparent); */
+  }
+
+  /* Fill active icon */
+  [data-theme="light"] .site-footer [data-theme-toggle="light"] .material-symbols-outlined,
+  [data-theme="dark"]  .site-footer [data-theme-toggle="dark"]  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+  }
+}
+
+/* Ensure icon inherits color from button */
+.material-symbols-outlined {
+  color: inherit;
+}
+

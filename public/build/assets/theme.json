@@ -1,0 +1,242 @@
+{
+  "__processed__": "This file was generated using Vite",
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "layout": {
+      "contentSize": "52rem"
+    },
+    "background": {
+      "backgroundImage": true
+    },
+    "color": {
+      "custom": false,
+      "customDuotone": false,
+      "customGradient": false,
+      "defaultDuotone": false,
+      "defaultGradients": false,
+      "defaultPalette": false,
+      "duotone": [],
+      "palette": [
+        {
+          "slug": "primary",
+          "name": "Electric Blue",
+          "color": "#2979FF"
+        },
+        {
+          "slug": "accent",
+          "name": "Neon Red",
+          "color": "#FF1744"
+        },
+        {
+          "slug": "canvas",
+          "name": "Canvas",
+          "color": "#0A0A0A"
+        },
+        {
+          "slug": "surface",
+          "name": "Surface",
+          "color": "#141414"
+        },
+        {
+          "slug": "text",
+          "name": "Text",
+          "color": "#FFFFFF"
+        },
+        {
+          "slug": "muted",
+          "name": "Muted",
+          "color": "#A0A7B2"
+        },
+        {
+          "slug": "line",
+          "name": "Line",
+          "color": "rgba(255,255,255,.10)"
+        }
+      ],
+      "gradients": [
+        {
+          "slug": "hero-corner-glow",
+          "name": "Hero — Dual Corner Glow (Blue↔Red)",
+          "gradient": "radial-gradient(1200px 600px at -10% -20%, color-mix(in srgb, var(--wp--preset--color--primary) 22%, transparent) 0%, color-mix(in srgb, var(--wp--preset--color--primary) 10%, transparent) 36%, transparent 72%), radial-gradient(900px 520px at 110% 10%, color-mix(in srgb, var(--wp--preset--color--accent) 22%, transparent) 0%, color-mix(in srgb, var(--wp--preset--color--accent) 10%, transparent) 40%, transparent 72%), linear-gradient(135deg,#0A0A0A 0%,#111111 60%,#000000 100%)"
+        },
+        {
+          "slug": "band-bloom-blue-red",
+          "name": "Band — Blue↔Red Bloom",
+          "gradient": "radial-gradient(800px 420px at 10% -10%, color-mix(in srgb, var(--wp--preset--color--primary) 18%, transparent) 0%, transparent 60%), radial-gradient(760px 360px at 90% 110%, color-mix(in srgb, var(--wp--preset--color--accent) 18%, transparent) 0%, transparent 60%)"
+        },
+        {
+          "slug": "surface-bloom",
+          "name": "Surface Bloom",
+          "gradient": "radial-gradient(520px 260px at 10% -10%, color-mix(in srgb, var(--wp--preset--color--primary) 14%, transparent) 0%, transparent 60%), radial-gradient(420px 240px at 90% -20%, color-mix(in srgb, var(--wp--preset--color--accent) 16%, transparent) 0%, transparent 60%)"
+        },
+        {
+          "slug": "hero-diagonal-sheen",
+          "name": "Hero Diagonal Sheen",
+          "gradient": "repeating-linear-gradient(160deg, color-mix(in srgb, var(--wp--preset--color--accent) 22%, var(--wp--preset--color--canvas)) 0 8px, color-mix(in srgb, var(--wp--preset--color--accent) 10%, var(--wp--preset--color--canvas)) 8px 16px), linear-gradient(0deg, var(--wp--preset--color--canvas), var(--wp--preset--color--canvas))"
+        },
+        {
+          "slug": "hero-diagonal-sheen-blue",
+          "name": "Hero Diagonal Sheen — Blue",
+          "gradient": "repeating-linear-gradient(160deg, color-mix(in srgb, var(--wp--preset--color--primary) 22%, var(--wp--preset--color--canvas)) 0 8px, color-mix(in srgb, var(--wp--preset--color--primary) 10%, var(--wp--preset--color--canvas)) 8px 16px), linear-gradient(0deg, var(--wp--preset--color--canvas), var(--wp--preset--color--canvas))"
+        },
+        {
+          "slug": "neon-green-plume",
+          "name": "Plume — Neon Green",
+          "gradient": "radial-gradient(640px 340px at 12% -10%, color-mix(in srgb, #00FF6A 24%, transparent) 0%, transparent 60%), radial-gradient(560px 300px at 88% 110%, color-mix(in srgb, #00FF6A 16%, transparent) 0%, transparent 60%)"
+        },
+        {
+          "slug": "hero-with-diag-multi",
+          "name": "Hero — Corner Glow + Diagonal Sheen",
+          "gradient": "repeating-linear-gradient(45deg, rgba(0,0,0,0.20) 0 8px, transparent 8px 16px), linear-gradient(0deg, var(--wp--preset--color--accent), var(--wp--preset--color--accent))"
+        }
+      ]
+    },
+    "custom": {
+      "spacing": {},
+      "typography": {
+        "font-size": {},
+        "line-height": {}
+      }
+    },
+    "spacing": {
+      "padding": true,
+      "units": [
+        "px",
+        "%",
+        "em",
+        "rem",
+        "vw",
+        "vh"
+      ]
+    },
+    "typography": {
+      "defaultFontSizes": false,
+      "customFontSize": false,
+      "fontFamilies": [
+        {
+          "slug": "body",
+          "name": "Inter",
+          "fontFamily": "'Inter', ui-sans-serif, system-ui"
+        },
+        {
+          "slug": "display",
+          "name": "Oswald",
+          "fontFamily": "'Oswald', ui-sans-serif, system-ui"
+        }
+      ],
+      "fontSizes": [
+        {
+          "name": "body",
+          "slug": "body",
+          "size": "clamp(1rem,.875rem + .5vw,1.125rem)"
+        },
+        {
+          "name": "body-sm",
+          "slug": "body-sm",
+          "size": "clamp(.9rem,.85rem + .3vw,1rem)"
+        },
+        {
+          "name": "body-xs",
+          "slug": "body-xs",
+          "size": "clamp(.8125rem,.78rem + .2vw,.9375rem)"
+        },
+        {
+          "name": "h6",
+          "slug": "h6",
+          "size": "clamp(1.265rem,1.406rem + .3vw,1.617rem)"
+        },
+        {
+          "name": "h5",
+          "slug": "h5",
+          "size": "clamp(1.582rem,1.758rem + .35vw,2.022rem)"
+        },
+        {
+          "name": "h4",
+          "slug": "h4",
+          "size": "clamp(1.977rem,2.197rem + .4vw,2.527rem)"
+        },
+        {
+          "name": "h3",
+          "slug": "h3",
+          "size": "clamp(2.472rem,2.747rem + .45vw,3.159rem)"
+        },
+        {
+          "name": "h2",
+          "slug": "h2",
+          "size": "clamp(3.09rem,3.433rem + .55vw,3.948rem)"
+        },
+        {
+          "name": "h1",
+          "slug": "h1",
+          "size": "clamp(3.863rem,4.292rem + .65vw,4.936rem)"
+        },
+        {
+          "name": "xs",
+          "slug": "xs",
+          "size": ".75rem"
+        },
+        {
+          "name": "sm",
+          "slug": "sm",
+          "size": ".875rem"
+        },
+        {
+          "name": "base",
+          "slug": "base",
+          "size": "1rem"
+        },
+        {
+          "name": "lg",
+          "slug": "lg",
+          "size": "1.125rem"
+        },
+        {
+          "name": "xl",
+          "slug": "xl",
+          "size": "1.25rem"
+        },
+        {
+          "name": "2xl",
+          "slug": "2xl",
+          "size": "1.5rem"
+        },
+        {
+          "name": "3xl",
+          "slug": "3xl",
+          "size": "1.875rem"
+        },
+        {
+          "name": "4xl",
+          "slug": "4xl",
+          "size": "2.25rem"
+        },
+        {
+          "name": "5xl",
+          "slug": "5xl",
+          "size": "3rem"
+        },
+        {
+          "name": "6xl",
+          "slug": "6xl",
+          "size": "3.75rem"
+        },
+        {
+          "name": "7xl",
+          "slug": "7xl",
+          "size": "4.5rem"
+        },
+        {
+          "name": "8xl",
+          "slug": "8xl",
+          "size": "6rem"
+        },
+        {
+          "name": "9xl",
+          "slug": "9xl",
+          "size": "8rem"
+        }
+      ]
+    }
+  }
+}

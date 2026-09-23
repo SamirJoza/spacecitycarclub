@@ -1,0 +1,39 @@
+
+---
+
+## `.cursor/rules/quality-gates-and-testing.mdc`
+
+```md
+---
+description: Quality checks, build checks, and command rules for WordPress Sage 11 theme projects.
+alwaysApply: true
+---
+
+# Quality Gates and Testing Rules
+
+These rules define how to verify WordPress Sage 11 theme changes.
+
+## Command Source of Truth
+
+Before running any terminal command, read:
+
+`.cursor/project-commands.md`
+
+Do not guess commands.
+
+Do not invent npm scripts.
+
+Do not assume Composer is globally installed.
+
+Composer, PHP, and WP-CLI commands should only be treated as available inside Local's Site Shell when the website is running.
+
+## Normal Terminal Commands
+
+The normal Mac terminal should be used for Node, Vite, Tailwind, and frontend asset work.
+
+Common commands may include:
+
+```bash
+npm install
+npm run dev
+npm run build

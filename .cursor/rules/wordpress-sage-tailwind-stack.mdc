@@ -1,0 +1,175 @@
+---
+description: WordPress, Sage 11, Blade, Acorn, and Tailwind CSS project standards.
+alwaysApply: true
+---
+
+# WordPress + Sage 11 + Tailwind CSS Standards
+
+These rules apply to WordPress theme projects built with Sage 11, Blade, Acorn, Vite, and Tailwind CSS.
+
+## Core Stack
+
+Assume this project uses:
+
+- WordPress
+- Sage 11
+- Acorn
+- Blade templates
+- Tailwind CSS
+- Vite
+- PHP 8.2 or newer
+
+Do not introduce unrelated frameworks, libraries, or patterns unless the user explicitly requests them.
+
+Do not add Bootstrap, jQuery, Alpine, React, page builders, or new frontend frameworks unless they already exist in the project or the user asks for them.
+
+## Official Documentation First
+
+Before writing or changing code, verify the correct approach using official documentation for the technology being touched.
+
+Use official documentation first for:
+
+- WordPress core APIs
+- Sage 11 conventions
+- Acorn conventions
+- Blade view usage
+- Tailwind CSS syntax
+- Plugin-specific hooks, filters, and APIs
+
+Avoid guessing APIs, hooks, file paths, class names, configuration syntax, or build behavior.
+
+If something cannot be verified, state the assumption clearly and use the safest minimal solution.
+
+## Project Settings
+
+Before creating or updating theme metadata, read:
+
+`.cursor/project-settings.md`
+
+Use that file as the source of truth for:
+
+- Project Name
+- Project URL
+- Theme Name
+- Theme URI
+- Description
+- Author
+- Author URI
+- Text Domain
+- License
+- License URI
+- Required PHP version
+- Required WordPress version
+
+Do not guess project identity values.
+
+If required values are missing or still placeholders, ask for the smallest missing input.
+
+## Sage Theme Structure
+
+Respect existing project structure.
+
+Common Sage paths include:
+
+- `app/`
+- `app/View/Composers/`
+- `resources/views/`
+- `resources/views/partials/`
+- `resources/views/components/`
+- `resources/views/blocks/`
+- `resources/css/`
+- `resources/js/`
+- `resources/images/`
+- `public/`
+- `style.css`
+
+Do not move files unless the task requires it.
+
+Do not invent a new folder structure when the project already has one.
+
+## Blade Rules
+
+Use Blade templates for markup.
+
+Keep business logic out of Blade when it belongs in PHP classes, composers, support files, or block registration files.
+
+Blade files should:
+
+- Use semantic HTML.
+- Escape output properly.
+- Handle empty optional fields safely.
+- Keep markup readable.
+- Preserve existing classes and structure unless the task requires a change.
+
+## Tailwind CSS Rules
+
+Use Tailwind utilities where appropriate.
+
+Use project design tokens and CSS variables for repeated values such as:
+
+- Colors
+- Fonts
+- Borders
+- Shadows
+- Spacing
+- Radius values
+- Theme-specific surfaces
+- Buttons
+
+Do not repeatedly hard-code colors when a token already exists.
+
+Do not create broad global CSS unless required.
+
+For custom blocks or sections, scope CSS to a clear wrapper class.
+
+## JavaScript Rules
+
+Use project JavaScript conventions.
+
+Do not add JavaScript dependencies unless explicitly requested.
+
+Respect accessibility, reduced motion preferences, and existing event handling patterns.
+
+When adding behavior:
+
+- Keep selectors scoped.
+- Avoid global side effects.
+- Avoid inline JavaScript unless the project already uses that pattern.
+- Use progressive enhancement where possible.
+
+## Accessibility
+
+Use semantic HTML.
+
+Use buttons for actions.
+
+Use links for navigation.
+
+Preserve keyboard access.
+
+Do not remove focus states unless replacing them with an accessible equivalent.
+
+Icon-only buttons need accessible labels.
+
+Interactive components need appropriate ARIA attributes when required.
+
+## WordPress Rules
+
+Use WordPress APIs instead of direct database access unless there is a strong reason.
+
+Escape output using the appropriate WordPress escaping functions.
+
+Sanitize input before saving.
+
+Check capabilities before exposing admin actions or privileged behavior.
+
+Respect nonces for form submissions and admin actions.
+
+## Final Review
+
+Before finishing a response:
+
+- Confirm the solution matches WordPress, Sage 11, Blade, and Tailwind CSS.
+- Confirm existing project conventions were followed.
+- Confirm no unrelated refactors were introduced.
+- Confirm no unsupported dependencies were added.

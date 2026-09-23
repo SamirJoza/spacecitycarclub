@@ -1,0 +1,2631 @@
+/**
+ * resources/css/layouts/mage-event-single.css
+ * File: resources/css/layouts/mage-event-single.css
+ *
+ * What this file does
+ * -----------------------------------------------------------------------------
+ * Styles WPEvently / Mage EventPress “Default Theme” single event template so it
+ * matches the SCCC theme with dark/light support.
+ *
+ * Scope
+ * -----------------------------------------------------------------------------
+ * Hard-scoped to #mage-container.mage .default_theme so we never bleed.
+ */
+
+/* ==========================================================================
+   1) Tokens
+   ========================================================================== */
+
+   #mage-container.mage .default_theme {
+    --mep-container-max: 80rem;
+    --mep-pad-x: clamp(1rem, 3vw, 2rem);
+    --mep-pad-y: clamp(1.25rem, 3vw, 2.25rem);
+    --mep-gap: clamp(1rem, 2.5vw, 1.75rem);
+    --mep-radius: 1.25rem;
+    --mep-blur: 18px;
+  
+    --mep-canvas: var(--color-canvas, #0b1220);
+  
+    --mep-text: rgba(255, 255, 255, 0.92);
+    --mep-muted: rgba(255, 255, 255, 0.78);
+    --mep-heading: rgba(255, 255, 255, 0.97);
+  
+    --mep-glass-bg: rgba(16, 22, 34, 0.55);
+    --mep-glass-bg-2: rgba(16, 22, 34, 0.4);
+    --mep-glass-border: rgba(255, 255, 255, 0.1);
+    --mep-glass-border-strong: rgba(255, 255, 255, 0.16);
+    --mep-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+  
+    --mep-accent: rgba(19, 91, 236, 1);
+    --mep-accent-soft: rgba(19, 91, 236, 0.32);
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme {
+    --mep-canvas: var(--color-canvas, #f5f7fb);
+  
+    --mep-text: rgba(10, 16, 28, 0.92);
+    --mep-muted: rgba(10, 16, 28, 0.7);
+    --mep-heading: rgba(10, 16, 28, 0.96);
+  
+    --mep-glass-bg: rgba(255, 255, 255, 0.74);
+    --mep-glass-bg-2: rgba(255, 255, 255, 0.62);
+    --mep-glass-border: rgba(10, 16, 28, 0.12);
+    --mep-glass-border-strong: rgba(10, 16, 28, 0.16);
+    --mep-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+  
+    --mep-accent-soft: rgba(19, 91, 236, 0.2);
+  }
+  
+  /* ==========================================================================
+     2) Canvas / wrapper cleanup
+     ========================================================================== */
+  
+  #mage-container.mage,
+  #mage-container.mage .mpwem_style.mpwem_wrapper,
+  #mage-container.mage .mpwem_container {
+    background-color: var(--mep-canvas) !important;
+  }
+  
+  #mage-container.mage .default_theme {
+    background: transparent !important;
+    color: var(--mep-text);
+  }
+  
+  /* ==========================================================================
+     3) Base text
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme :where(p, li, span, small, strong, em, a, div) {
+    color: inherit;
+  }
+  
+  #mage-container.mage .default_theme p,
+  #mage-container.mage .default_theme li {
+    color: var(--mep-muted);
+  }
+  
+  #mage-container.mage .default_theme :where(h1, h2, h3, h4, h5, h6) {
+    color: var(--mep-heading);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  
+  #mage-container.mage .default_theme a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  #mage-container.mage .default_theme a:hover {
+    text-decoration: none;
+  }
+  
+  /* ==========================================================================
+     4) Layout
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .content_area {
+    max-width: var(--mep-container-max);
+    margin-inline: auto;
+    padding: var(--mep-pad-y) var(--mep-pad-x);
+    width: 100%;
+  
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: var(--mep-gap);
+    align-items: start;
+  
+    background: transparent !important;
+  }
+  
+  @media (min-width: 960px) {
+    #mage-container.mage .default_theme .content_area {
+      grid-template-columns: minmax(0, 1fr) 22rem !important;
+    }
+  
+    #mage-container.mage .default_theme .mep-default-content {
+      grid-column: 1;
+    }
+  
+    #mage-container.mage .default_theme .mep-default-sidebar {
+      grid-column: 2;
+      align-self: start;
+    }
+  }
+  
+  #mage-container.mage .default_theme .mep-default-content,
+  #mage-container.mage .default_theme .mep-default-sidebar {
+    float: none !important;
+    width: auto !important;
+    min-width: 0;
+  }
+  
+  /* ==========================================================================
+     5) Main glass panels
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mep-default-content,
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part {
+    border-radius: var(--mep-radius);
+    background: var(--mep-glass-bg) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    box-shadow: var(--mep-shadow) !important;
+    backdrop-filter: blur(var(--mep-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--mep-blur)) !important;
+    overflow: hidden;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-content {
+    /*
+     * The plugin outputs the hero image, quick details, description, and FAQ
+     * as direct children of the same content column. Flex + gap keeps those
+     * major pieces from visually melting together without changing markup.
+     */
+    display: flex !important;
+    flex-direction: column;
+    gap: clamp(1.25rem, 2.4vw, 2rem);
+    padding: clamp(1rem, 2.2vw, 1.5rem);
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part {
+    padding: clamp(1rem, 2.2vw, 1.25rem);
+  }
+  
+  @media (min-width: 960px) {
+    #mage-container.mage .default_theme .mep-default-sidebar {
+      position: sticky;
+      top: 6.5rem;
+    }
+  }
+  
+  /* ==========================================================================
+     6) Location / meta chips
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .date_time_location_short .short_item,
+  #mage-container.mage .default_theme .short_item {
+    background: var(--mep-glass-bg-2) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    border-radius: 1rem !important;
+    padding: 0.75rem 0.85rem !important;
+    box-shadow: none !important;
+  }
+  
+  #mage-container.mage .default_theme .short_item :where(h6, p) {
+    color: var(--mep-text) !important;
+  }
+  
+  #mage-container.mage .default_theme .short_item p {
+    color: var(--mep-muted) !important;
+  }
+  
+  /* ==========================================================================
+     7) Timeline
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mpwem_timeline_area,
+  #mage-container.mage .default_theme .timeline_area {
+    background: transparent !important;
+  }
+  
+  #mage-container.mage .default_theme .timeline_area {
+    --mep-tl-col: 3.25rem;
+    --mep-tl-gap: 1rem;
+    --mep-tl-dot: 2.25rem;
+  
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  
+    padding: 0 !important;
+    margin-top: 0.75rem;
+    border: 0 !important;
+  }
+  
+  #mage-container.mage .default_theme .timeline_area::after,
+  #mage-container.mage .default_theme .timeline_item::before,
+  #mage-container.mage .default_theme .timeline_item::after {
+    content: none !important;
+    display: none !important;
+  }
+  
+  #mage-container.mage .default_theme .timeline_area::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--mep-tl-dot) / 2);
+    bottom: calc(var(--mep-tl-dot) / 2);
+    left: calc((var(--mep-tl-col) / 2) - 1px);
+    width: 2px;
+    background: color-mix(in srgb, var(--mep-glass-border-strong) 70%, transparent);
+    z-index: 0;
+  }
+  
+  #mage-container.mage .default_theme .timeline_item {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--mep-tl-col) minmax(0, 1fr);
+    column-gap: var(--mep-tl-gap);
+    align-items: start;
+  
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-left: 0 !important;
+  }
+  
+  #mage-container.mage .default_theme .timeline_item .timeline_counter {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+  
+    grid-column: 1;
+    justify-self: center;
+    align-self: start;
+  
+    width: var(--mep-tl-dot);
+    height: var(--mep-tl-dot);
+    border-radius: 999px;
+  
+    display: grid;
+    place-items: center;
+  
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--mep-heading);
+  
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 55%),
+      color-mix(in srgb, var(--mep-glass-bg) 88%, transparent);
+  
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 55%, var(--mep-glass-border-strong));
+    box-shadow:
+      0 0 0 6px color-mix(in srgb, var(--mep-accent) 16%, transparent),
+      0 12px 30px rgba(0, 0, 0, 0.28);
+  
+    z-index: 3;
+  }
+  
+  #mage-container.mage .default_theme .timeline_item .timeline_counter::after {
+    content: "";
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+  
+    height: 2px;
+    width: calc((var(--mep-tl-col) / 2) + var(--mep-tl-gap) - (var(--mep-tl-dot) / 2));
+    background: color-mix(in srgb, var(--mep-glass-border-strong) 70%, transparent);
+  
+    z-index: 1;
+  }
+  
+  #mage-container.mage .default_theme .timeline_item .timeline_content {
+    grid-column: 2;
+    border: 1px solid var(--mep-glass-border);
+    background: var(--mep-glass-bg-2) !important;
+    border-radius: 1rem;
+    padding: 0.95rem 1.1rem;
+    position: relative;
+    z-index: 2;
+  }
+  
+  #mage-container.mage .default_theme .timeline_item .timeline_content > h6 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  
+    background: transparent !important;
+    color: var(--mep-heading) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  #mage-container.mage .default_theme .timeline_item .timeline_content .mp_wp_editor {
+    background: transparent !important;
+    color: var(--mep-muted) !important;
+    padding-top: 0.8rem;
+  }
+  
+  #mage-container.mage .default_theme .timeline_item .timeline_content ._divider_xs {
+    background: var(--mep-glass-border) !important;
+  }
+  
+  #mage-container.mage .default_theme .timeline_time {
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--mep-glass-border);
+    background: color-mix(in srgb, var(--mep-glass-bg) 75%, transparent);
+    color: var(--mep-heading);
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+  
+  html[data-theme="dark"] #mage-container.mage .default_theme .timeline_time,
+  html.dark #mage-container.mage .default_theme .timeline_time {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mep-accent) 92%, #0b1220),
+      color-mix(in srgb, var(--mep-accent) 55%, #0b1220)
+    ) !important;
+  
+    border-color: color-mix(in srgb, var(--mep-accent) 80%, rgba(255, 255, 255, 0.22)) !important;
+  
+    color: rgba(255, 255, 255, 0.98) !important;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 10px 26px rgba(0, 0, 0, 0.28),
+      0 0 22px rgba(19, 91, 236, 0.5) !important;
+  }
+  
+  #mage-container.mage .default_theme .timeline_item:hover .timeline_counter {
+    box-shadow:
+      0 0 0 6px color-mix(in srgb, var(--mep-accent) 20%, transparent),
+      0 0 26px var(--mep-accent-soft),
+      0 14px 34px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* ==========================================================================
+     8) FAQ
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .faq_area {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-top: 1.25rem;
+  }
+  
+  #mage-container.mage .default_theme .faq_area > h2,
+  #mage-container.mage .default_theme .faq_area > h3 {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 0 0.35rem 0 !important;
+    color: var(--mep-heading) !important;
+  }
+  
+  #mage-container.mage .default_theme .faq_area .description {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    color: var(--mep-muted) !important;
+  }
+  
+  #mage-container.mage .default_theme .faq_items {
+    background: transparent !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin-top: 0.75rem;
+  }
+  
+  #mage-container.mage .default_theme .faq_items .item {
+    background: var(--mep-glass-bg-2) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    border-radius: 0.9rem !important;
+    overflow: hidden;
+  }
+  
+  #mage-container.mage .default_theme .faq_items .item + .item {
+    margin-top: 0.65rem;
+  }
+  
+  #mage-container.mage .default_theme .faq_items .title {
+    background: transparent !important;
+    padding: 0.85rem 0.95rem !important;
+  }
+  
+  #mage-container.mage .default_theme .faq_items .title h3 {
+    margin: 0 !important;
+    font-size: 0.98rem;
+    color: var(--mep-heading) !important;
+  }
+  
+  #mage-container.mage .default_theme .faq_items .content {
+    background: transparent !important;
+    padding: 0 0.95rem 0.95rem !important;
+  }
+  
+  #mage-container.mage .default_theme .faq_items .content p {
+    color: var(--mep-muted) !important;
+  }
+
+  /* ==========================================================================
+     8.1) Main content section segmentation + readable body type
+     ========================================================================== */
+
+  #mage-container.mage .default_theme .mpwem_slider_area {
+    margin: 0 !important;
+  }
+
+  #mage-container.mage .default_theme .mpwem_slider_area .post_thumb {
+    overflow: hidden;
+    border-radius: calc(var(--mep-radius) - 0.3rem);
+    border: 1px solid var(--mep-glass-border) !important;
+    background: var(--mep-glass-bg-2) !important;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+  }
+
+  #mage-container.mage .default_theme .mpwem_details,
+  #mage-container.mage .default_theme .faq_area {
+    position: relative;
+    overflow: hidden;
+
+    margin-top: 0 !important;
+    padding: clamp(1rem, 2vw, 1.45rem) !important;
+
+    border-radius: calc(var(--mep-radius) - 0.2rem) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+
+    background:
+      radial-gradient(120% 140% at 8% 0%, color-mix(in srgb, var(--mep-accent) 10%, transparent), transparent 58%),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-glass-bg) 90%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg-2) 76%, transparent)
+      ) !important;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 16px 38px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details::before,
+  #mage-container.mage .default_theme .faq_area::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    border-radius: inherit;
+
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mep-accent) 70%, rgba(0, 210, 255, 1)),
+      color-mix(in srgb, var(--mep-accent) 45%, rgba(160, 92, 255, 1))
+    );
+
+    box-shadow:
+      0 0 16px color-mix(in srgb, var(--mep-accent) 38%, transparent),
+      0 0 26px rgba(160, 92, 255, 0.18);
+  }
+
+  #mage-container.mage .default_theme .mpwem_details > *,
+  #mage-container.mage .default_theme .faq_area > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details > h2._mb {
+    display: inline-flex;
+    align-items: center;
+
+    margin: 0 0 1rem 0 !important;
+    padding: 0.22rem 0.65rem !important;
+
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 30%, var(--mep-glass-border)) !important;
+
+    background: color-mix(in srgb, var(--mep-accent) 14%, var(--mep-glass-bg-2)) !important;
+    color: var(--mep-heading) !important;
+
+    font-size: 0.78rem !important;
+    font-weight: 850;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details_content {
+    color: var(--mep-muted) !important;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details_content > h2:first-child {
+    margin-top: 0 !important;
+    margin-bottom: clamp(0.7rem, 1.6vw, 1rem) !important;
+    color: var(--mep-heading) !important;
+    font-size: clamp(2rem, 3.8vw, 3.15rem) !important;
+    line-height: 1.05;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details_content p,
+  #mage-container.mage .default_theme .mpwem_details_content li,
+  #mage-container.mage .default_theme .faq_area .description,
+  #mage-container.mage .default_theme .faq_items .content p,
+  #mage-container.mage .default_theme .faq_items .content li {
+    font-size: clamp(1rem, 0.92rem + 0.28vw, 1.125rem) !important;
+    line-height: 1.7 !important;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details_content p,
+  #mage-container.mage .default_theme .mpwem_details_content ul,
+  #mage-container.mage .default_theme .mpwem_details_content ol {
+    margin-bottom: 1rem !important;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details_content ul,
+  #mage-container.mage .default_theme .mpwem_details_content ol {
+    padding-left: 1.25rem !important;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details_content li + li {
+    margin-top: 0.45rem !important;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details_content > :last-child,
+  #mage-container.mage .default_theme .faq_area > :last-child,
+  #mage-container.mage .default_theme .faq_items .content > :last-child {
+    margin-bottom: 0 !important;
+  }
+
+  #mage-container.mage .default_theme .faq_area > h2,
+  #mage-container.mage .default_theme .faq_area > h3 {
+    margin-bottom: 0.65rem !important;
+    font-size: clamp(1.55rem, 2.6vw, 2.2rem) !important;
+  }
+
+  #mage-container.mage .default_theme .faq_area .description {
+    max-width: 68ch;
+  }
+
+  #mage-container.mage .default_theme .faq_items {
+    margin-top: clamp(1rem, 2vw, 1.35rem) !important;
+  }
+
+  #mage-container.mage .default_theme .faq_items .item {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-glass-bg-2) 92%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg) 72%, transparent)
+      ) !important;
+  }
+
+  @media (min-width: 960px) {
+    #mage-container.mage .default_theme .mpwem_details_content p,
+    #mage-container.mage .default_theme .mpwem_details_content li,
+    #mage-container.mage .default_theme .faq_area .description,
+    #mage-container.mage .default_theme .faq_items .content p,
+    #mage-container.mage .default_theme .faq_items .content li {
+      font-size: 1.125rem !important;
+    }
+  }
+
+  html[data-theme="light"] #mage-container.mage .default_theme .mpwem_details,
+  html[data-theme="light"] #mage-container.mage .default_theme .faq_area {
+    background:
+      radial-gradient(120% 140% at 8% 0%, color-mix(in srgb, var(--mep-accent) 7%, transparent), transparent 58%),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.86),
+        rgba(255, 255, 255, 0.68)
+      ) !important;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.78),
+      0 16px 36px rgba(10, 16, 28, 0.09) !important;
+  }
+
+  html[data-theme="light"] #mage-container.mage .default_theme .mpwem_details > h2._mb {
+    background: color-mix(in srgb, var(--mep-accent) 10%, rgba(255, 255, 255, 0.9)) !important;
+    border-color: color-mix(in srgb, var(--mep-accent) 24%, rgba(10, 16, 28, 0.16)) !important;
+    color: rgba(10, 16, 28, 0.92) !important;
+  }
+
+
+  /* ============================================================================
+     8.2) Inline content links
+     ========================================================================== */
+
+  #mage-container.mage .default_theme .mpwem_details_content a,
+  #mage-container.mage .default_theme .faq_items .content a,
+  #mage-container.mage .default_theme .faq_area .description a {
+    color: color-mix(in srgb, var(--mep-accent) 78%, rgba(255, 255, 255, 1)) !important;
+    font-weight: 800;
+    text-decoration-line: underline !important;
+    text-decoration-style: solid;
+    text-decoration-color: color-mix(in srgb, var(--mep-accent) 70%, rgba(0, 210, 255, 1));
+    text-decoration-thickness: 0.11em;
+    text-underline-offset: 0.2em;
+    transition:
+      color 160ms ease,
+      text-decoration-color 160ms ease,
+      text-underline-offset 160ms ease,
+      background-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  #mage-container.mage .default_theme .mpwem_details_content a:hover,
+  #mage-container.mage .default_theme .faq_items .content a:hover,
+  #mage-container.mage .default_theme .faq_area .description a:hover {
+    color: rgba(255, 255, 255, 0.98) !important;
+    text-decoration-color: rgba(0, 210, 255, 0.95);
+    text-underline-offset: 0.28em;
+    background-color: color-mix(in srgb, var(--mep-accent) 14%, transparent);
+    box-shadow: 0 0 0 0.18em color-mix(in srgb, var(--mep-accent) 14%, transparent);
+  }
+
+  #mage-container.mage .default_theme .mpwem_details_content a:focus-visible,
+  #mage-container.mage .default_theme .faq_items .content a:focus-visible,
+  #mage-container.mage .default_theme .faq_area .description a:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--mep-accent) 70%, rgba(0, 210, 255, 1));
+    outline-offset: 0.22em;
+    border-radius: 0.2em;
+  }
+
+  html[data-theme="light"] #mage-container.mage .default_theme .mpwem_details_content a,
+  html[data-theme="light"] #mage-container.mage .default_theme .faq_items .content a,
+  html[data-theme="light"] #mage-container.mage .default_theme .faq_area .description a {
+    color: color-mix(in srgb, var(--mep-accent) 82%, rgba(10, 16, 28, 1)) !important;
+    text-decoration-color: color-mix(in srgb, var(--mep-accent) 72%, rgba(10, 16, 28, 1));
+  }
+
+  html[data-theme="light"] #mage-container.mage .default_theme .mpwem_details_content a:hover,
+  html[data-theme="light"] #mage-container.mage .default_theme .faq_items .content a:hover,
+  html[data-theme="light"] #mage-container.mage .default_theme .faq_area .description a:hover {
+    color: rgba(10, 16, 28, 0.96) !important;
+    background-color: color-mix(in srgb, var(--mep-accent) 10%, transparent);
+    box-shadow: 0 0 0 0.18em color-mix(in srgb, var(--mep-accent) 10%, transparent);
+  }
+  
+  /* ==========================================================================
+     9) Related events
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mpwem_related_area,
+  #mage-container.mage .default_theme .mpwem_related_area .related_title,
+  #mage-container.mage .default_theme .mpwem_related_area .related_item {
+    background: transparent !important;
+  }
+  
+  #mage-container.mage .default_theme .related_navigation button,
+  #mage-container.mage .default_theme .related_navigation ._button_theme_xs,
+  #mage-container.mage .default_theme .related_navigation .slick-arrow {
+    background: var(--mep-glass-bg-2) !important;
+    border: 1px solid var(--mep-glass-border-strong) !important;
+    color: var(--mep-heading) !important;
+    border-radius: 999px !important;
+    box-shadow: none !important;
+  }
+  
+  #mage-container.mage .default_theme .filter_item.mep-event-list-loop {
+    background: var(--mep-glass-bg) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    border-radius: 1rem !important;
+    overflow: hidden;
+  }
+  
+  #mage-container.mage .default_theme .mep_list_event_details {
+    background: transparent !important;
+    padding: 0.85rem 0.85rem 1rem !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_list_title {
+    color: var(--mep-heading) !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_list_event_details .list_price,
+  #mage-container.mage .default_theme .mep_list_event_details .list_content {
+    color: var(--mep-muted) !important;
+  }
+  
+  #mage-container.mage .default_theme .iconIndicator,
+  #mage-container.mage .default_theme .iconIndicator span {
+    background: var(--mep-glass-bg-2) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    color: var(--mep-heading) !important;
+    border-radius: 999px !important;
+  }
+  
+  /* ==========================================================================
+     10) Buttons + base inputs
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme :where(button, .button, a.button, input[type="submit"], input[type="button"]) {
+    appearance: none;
+    border: 1px solid var(--mep-glass-border-strong);
+    border-radius: 999px;
+    padding: 0.65rem 1rem;
+    font-weight: 600;
+    color: var(--mep-heading);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mep-glass-bg) 88%, transparent),
+      color-mix(in srgb, var(--mep-glass-bg) 70%, transparent)
+    );
+    cursor: pointer;
+  }
+  
+  #mage-container.mage .default_theme input[type="text"],
+  #mage-container.mage .default_theme input[type="email"],
+  #mage-container.mage .default_theme input[type="tel"],
+  #mage-container.mage .default_theme input[type="number"],
+  #mage-container.mage .default_theme input[type="date"],
+  #mage-container.mage .default_theme input[type="time"],
+  #mage-container.mage .default_theme textarea,
+  #mage-container.mage .default_theme select {
+    width: 100%;
+    border-radius: 0.9rem;
+    border: 1px solid var(--mep-glass-border);
+    background: color-mix(in srgb, var(--mep-glass-bg) 80%, transparent);
+    color: var(--mep-text);
+    padding: 0.65rem 0.85rem;
+    outline: none;
+  }
+  
+  #mage-container.mage .default_theme input:focus,
+  #mage-container.mage .default_theme textarea:focus,
+  #mage-container.mage .default_theme select:focus {
+    border-color: color-mix(in srgb, var(--mep-accent) 55%, var(--mep-glass-border-strong));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--mep-accent) 22%, transparent);
+  }
+  
+  /* ==========================================================================
+     11) Media
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* ==========================================================================
+     12) Ticket options / booking panel
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mpwem_registration_area,
+  #mage-container.mage .default_theme .mpwem_booking_panel,
+  #mage-container.mage .default_theme .mpwem_ticket_type,
+  #mage-container.mage .default_theme .mpwem_ex_service {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .date-time-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  
+    padding: 0.9rem 1rem !important;
+  
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mep-glass-bg) 92%, transparent),
+      color-mix(in srgb, var(--mep-glass-bg) 70%, transparent)
+    ) !important;
+  
+    border: 1px solid var(--mep-glass-border) !important;
+    border-bottom: 0 !important;
+  
+    border-radius: 1rem 1rem 0 0 !important;
+  
+    backdrop-filter: blur(var(--mep-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--mep-blur)) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .date-time-header .ticket-title {
+    color: var(--mep-heading) !important;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .date-time-area label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  
+    padding: 0.35rem 0.6rem !important;
+    border-radius: 999px !important;
+  
+    background: color-mix(in srgb, var(--mep-glass-bg-2) 82%, transparent) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+  
+    color: var(--mep-heading) !important;
+    margin: 0 !important;
+    white-space: nowrap;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .date-time-area label span,
+  #mage-container.mage .default_theme .mpwem_registration_area .date-time-area label i {
+    color: var(--mep-heading) !important;
+    opacity: 0.9;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area #mpwem_date_time {
+    width: auto !important;
+    min-width: 7.25rem;
+    padding: 0.35rem 0.65rem !important;
+  
+    border-radius: 999px !important;
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 35%, var(--mep-glass-border)) !important;
+  
+    background: color-mix(in srgb, var(--mep-glass-bg) 78%, transparent) !important;
+    color: var(--mep-heading) !important;
+  
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_ticket_type .card-body,
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_ex_service .card-body {
+    background: var(--mep-glass-bg-2) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    border-top: 0 !important;
+  
+    border-radius: 0 0 1rem 1rem !important;
+    overflow: hidden;
+  
+    padding: 0.75rem 0.85rem !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_ex_service .card-header {
+    background: color-mix(in srgb, var(--mep-glass-bg) 86%, transparent) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    border-bottom: 0 !important;
+  
+    border-radius: 1rem 1rem 0 0 !important;
+    color: var(--mep-heading) !important;
+  
+    padding: 0.75rem 0.9rem !important;
+    font-weight: 800;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mep_ticket_item {
+    background: transparent !important;
+    border: 0 !important;
+    padding: 0 !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mep_ticket_item + .mep_ticket_item {
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--mep-glass-border) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .ticket-data {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 0.85rem;
+    align-items: center;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .ticket-name {
+    color: var(--mep-heading) !important;
+    font-weight: 800;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .ticket-description {
+    color: var(--mep-muted) !important;
+    margin-top: 0.25rem;
+    line-height: 1.35;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .ticket-remaining {
+    display: inline-flex;
+    align-items: center;
+  
+    margin-top: 0.45rem;
+    padding: 0.22rem 0.55rem;
+  
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 30%, var(--mep-glass-border)) !important;
+  
+    background: color-mix(in srgb, var(--mep-glass-bg) 78%, transparent) !important;
+    color: var(--mep-heading) !important;
+  
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .qtyIncDec {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  
+    padding: 0.35rem 0.45rem;
+    border-radius: 999px;
+  
+    background: color-mix(in srgb, var(--mep-glass-bg) 80%, transparent) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+  
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .qtyIncDec .decQty,
+  #mage-container.mage .default_theme .mpwem_registration_area .qtyIncDec .incQty {
+    width: 2rem;
+    height: 2rem;
+  
+    display: grid;
+    place-items: center;
+  
+    border-radius: 999px;
+    border: 1px solid var(--mep-glass-border) !important;
+    background: color-mix(in srgb, var(--mep-glass-bg-2) 85%, transparent) !important;
+  
+    color: var(--mep-heading) !important;
+    cursor: pointer;
+  
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .qtyIncDec .decQty:hover,
+  #mage-container.mage .default_theme .mpwem_registration_area .qtyIncDec .incQty:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--mep-accent) 45%, var(--mep-glass-border-strong)) !important;
+    background: color-mix(in srgb, var(--mep-accent) 18%, var(--mep-glass-bg-2)) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .qtyIncDec input.inputIncDec {
+    width: 3.1rem !important;
+    text-align: center;
+  
+    border: 1px solid var(--mep-glass-border) !important;
+    border-radius: 999px !important;
+  
+    background: color-mix(in srgb, var(--mep-glass-bg-2) 88%, transparent) !important;
+    color: var(--mep-heading) !important;
+  
+    padding: 0.35rem 0.4rem !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .ticket-price,
+  #mage-container.mage .default_theme .mpwem_registration_area .ticket-price * {
+    color: var(--mep-heading) !important;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_form_submit_area,
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_summery {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_summery {
+    margin-top: 0.85rem !important;
+  
+    background: color-mix(in srgb, var(--mep-glass-bg) 86%, transparent) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    border-radius: 1rem !important;
+  
+    padding: 0.85rem 0.95rem !important;
+  
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+  
+    backdrop-filter: blur(var(--mep-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--mep-blur)) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_summery .total {
+    color: var(--mep-heading) !important;
+    font-weight: 800;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_summery .mpwem_total {
+    color: var(--mep-heading) !important;
+    font-weight: 900;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_book_now,
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_add_to_cart {
+    border-color: color-mix(in srgb, var(--mep-accent) 55%, var(--mep-glass-border-strong)) !important;
+  
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mep-accent) 55%, #0b1220),
+      color-mix(in srgb, var(--mep-accent) 32%, #0b1220)
+    ) !important;
+  
+    color: rgba(255, 255, 255, 0.98) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 10px 26px rgba(0, 0, 0, 0.28),
+      0 0 22px rgba(19, 91, 236, 0.45) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_book_now[disabled],
+  #mage-container.mage .default_theme .mpwem_registration_area .mpwem_add_to_cart[disabled] {
+    opacity: 0.6;
+    filter: saturate(0.85);
+    cursor: not-allowed;
+  }
+  
+  /* ==========================================================================
+     13) Sidebar seat status + schedule details
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .mpwem_seat_status,
+  #mage-container.mage .default_theme .mep-default-sidebar .mep-default-sidrbar-price-seat,
+  #mage-container.mage .default_theme .mep-default-sidebar .setas-info {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .mep-default-sidrbar-price-seat .setas-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  
+    background: var(--mep-glass-bg-2) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    border-radius: 1rem !important;
+  
+    padding: 0.85rem 0.85rem !important;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .setas-info :where(.total-seats, .available-seats) {
+    background: color-mix(in srgb, var(--mep-glass-bg) 82%, transparent) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    border-radius: 0.9rem !important;
+  
+    padding: 0.7rem 0.75rem !important;
+    text-align: left;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .setas-info :where(.total-seats div, .available-seats div) {
+    color: var(--mep-muted) !important;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .setas-info :where(.total-seats strong, .available-seats strong) {
+    color: var(--mep-heading) !important;
+    font-weight: 900;
+    font-size: 1.1rem;
+  }
+  
+  /* Event schedule date list item — highlighted one-line schedule card */
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area {
+    position: relative;
+    margin-top: 1.05rem !important;
+    padding: 0.95rem 0.95rem !important;
+  
+    border-radius: 1rem !important;
+  
+    background:
+      radial-gradient(100% 140% at 12% 18%, color-mix(in srgb, var(--mep-accent) 18%, transparent), transparent 58%),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--mep-glass-bg) 92%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg-2) 86%, transparent)
+      ) !important;
+  
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 30%, var(--mep-glass-border-strong)) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 14px 34px rgba(0, 0, 0, 0.22),
+      0 0 22px color-mix(in srgb, var(--mep-accent) 14%, transparent) !important;
+  
+    overflow: hidden;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    border-radius: 999px;
+  
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mep-accent) 70%, rgba(0, 210, 255, 1)),
+      color-mix(in srgb, var(--mep-accent) 45%, rgba(160, 92, 255, 1))
+    );
+  
+    box-shadow:
+      0 0 16px color-mix(in srgb, var(--mep-accent) 45%, transparent),
+      0 0 26px rgba(160, 92, 255, 0.22);
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area > h5,
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area ._mb_xs {
+    margin: 0 0 0.55rem 0 !important;
+    color: var(--mep-heading) !important;
+    font-size: 0.86rem !important;
+    font-weight: 850 !important;
+    letter-spacing: 0.01em;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_list_area,
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date-list-item {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_list_area {
+    display: block !important;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date-list-item {
+    display: block !important;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date-list-item::before,
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date-list-item::after,
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item::before,
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item::after {
+    content: none !important;
+    display: none !important;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item {
+    display: block !important;
+    width: 100%;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item a {
+    position: relative;
+  
+    display: flex !important;
+    align-items: center;
+    gap: 0.42rem;
+  
+    width: 100%;
+    max-width: 100%;
+  
+    padding: 0.5rem 0.58rem 0.5rem 0.68rem !important;
+    border-radius: 0.8rem !important;
+  
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-glass-bg-2) 94%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg) 82%, transparent)
+      ) !important;
+  
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 28%, var(--mep-glass-border)) !important;
+  
+    color: var(--mep-heading) !important;
+    font-weight: 780;
+    font-size: clamp(0.69rem, 0.66rem + 0.16vw, 0.78rem);
+    line-height: 1.18;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none !important;
+  
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 8px 20px rgba(0, 0, 0, 0.18);
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item a::before {
+    content: "";
+    flex: 0 0 auto;
+  
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+  
+    background: color-mix(in srgb, var(--mep-accent) 82%, rgba(0, 210, 255, 1));
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--mep-accent) 18%, transparent),
+      0 0 16px color-mix(in srgb, var(--mep-accent) 50%, transparent);
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item a:hover {
+    border-color: color-mix(in srgb, var(--mep-accent) 48%, var(--mep-glass-border-strong)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.11),
+      0 0 0 3px color-mix(in srgb, var(--mep-accent) 18%, transparent),
+      0 12px 26px rgba(0, 0, 0, 0.24);
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area {
+    background:
+      radial-gradient(100% 140% at 12% 18%, color-mix(in srgb, var(--mep-accent) 12%, transparent), transparent 58%),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, rgba(255, 255, 255, 0.96) 90%, var(--mep-accent) 10%),
+        rgba(255, 255, 255, 0.76)
+      ) !important;
+  
+    border-color: color-mix(in srgb, var(--mep-accent) 24%, rgba(10, 16, 28, 0.14)) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.78),
+      0 14px 30px rgba(10, 16, 28, 0.1),
+      0 0 18px color-mix(in srgb, var(--mep-accent) 10%, transparent) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item a {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.94),
+        rgba(255, 255, 255, 0.74)
+      ) !important;
+  
+    border-color: color-mix(in srgb, var(--mep-accent) 26%, rgba(10, 16, 28, 0.16)) !important;
+    color: rgba(10, 16, 28, 0.92) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      0 8px 18px rgba(10, 16, 28, 0.09);
+  }
+  
+  /* ==========================================================================
+     14) Share icons + related cards
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .share_widgets_list a {
+    background: color-mix(in srgb, var(--mep-glass-bg) 82%, transparent) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+    color: var(--mep-heading) !important;
+  
+    width: 2.45rem;
+    height: 2.45rem;
+    border-radius: 999px !important;
+  
+    display: grid !important;
+    place-items: center !important;
+  
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .share_widgets_list a:hover {
+    border-color: color-mix(in srgb, var(--mep-accent) 45%, var(--mep-glass-border-strong)) !important;
+    background: color-mix(in srgb, var(--mep-accent) 16%, var(--mep-glass-bg-2)) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_related_area .mep_list_thumb {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--mep-glass-border) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_related_area .mep_list_thumb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35));
+    pointer-events: none;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_related_area .mep-ev-start-date {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 2;
+  
+    border-radius: 0.95rem;
+    padding: 0.45rem 0.6rem;
+  
+    background: color-mix(in srgb, var(--mep-glass-bg) 82%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 35%, var(--mep-glass-border)) !important;
+  
+    backdrop-filter: blur(var(--mep-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--mep-blur)) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_related_area .mep-ev-start-date .mep-day {
+    color: var(--mep-heading) !important;
+    font-weight: 900;
+    line-height: 1;
+    font-size: 1.05rem;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_related_area .mep-ev-start-date .mep-month {
+    color: var(--mep-muted) !important;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+    margin-top: 0.15rem;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_related_area .mepev-ribbon {
+    border-radius: 999px !important;
+    padding: 0.25rem 0.6rem !important;
+  
+    background: color-mix(in srgb, var(--mep-accent) 22%, var(--mep-glass-bg)) !important;
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 40%, var(--mep-glass-border)) !important;
+  
+    color: rgba(255, 255, 255, 0.96) !important;
+    font-weight: 800;
+    font-size: 0.75rem;
+  }
+  
+  /* ==========================================================================
+     15) Attendee registration form
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mep_attendee_info {
+    --mep-field-bg: color-mix(in srgb, var(--mep-glass-bg) 80%, transparent);
+    --mep-field-bg-hover: color-mix(in srgb, var(--mep-glass-bg) 90%, transparent);
+    --mep-field-border: color-mix(in srgb, var(--mep-glass-border) 86%, transparent);
+    --mep-field-border-focus: color-mix(in srgb, var(--mep-accent) 58%, var(--mep-glass-border-strong));
+    --mep-field-placeholder: color-mix(in srgb, var(--mep-muted) 72%, transparent);
+    --mep-field-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.18);
+  
+    display: block !important;
+    margin-top: 1rem;
+    padding: 0 !important;
+  
+    background: transparent !important;
+    color: var(--mep-text) !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info,
+  #mage-container.mage .default_theme .mep_attendee_info * {
+    box-sizing: border-box;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mep_form_item {
+    position: relative;
+    overflow: hidden;
+  
+    margin: 0 0 1rem 0 !important;
+    padding: clamp(1rem, 2.2vw, 1.25rem) !important;
+  
+    border-radius: 1rem !important;
+    border: 1px solid var(--mep-glass-border) !important;
+  
+    background:
+      radial-gradient(120% 140% at 8% 0%, color-mix(in srgb, var(--mep-accent) 12%, transparent), transparent 58%),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-glass-bg) 92%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg-2) 80%, transparent)
+      ) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 16px 40px rgba(0, 0, 0, 0.24) !important;
+  
+    color: var(--mep-text) !important;
+    backdrop-filter: blur(var(--mep-blur)) saturate(135%) !important;
+    -webkit-backdrop-filter: blur(var(--mep-blur)) saturate(135%) !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mep_form_item::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    border-radius: inherit;
+  
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mep-accent) 70%, rgba(0, 210, 255, 1)),
+      color-mix(in srgb, var(--mep-accent) 45%, rgba(160, 92, 255, 1))
+    );
+  
+    box-shadow:
+      0 0 16px color-mix(in srgb, var(--mep-accent) 42%, transparent),
+      0 0 26px rgba(160, 92, 255, 0.18);
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mep_form_item + .mep_form_item {
+    margin-top: 1rem !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mep_form_item > h6 {
+    position: relative;
+    z-index: 1;
+  
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+  
+    margin: 0 0 1rem 0 !important;
+    padding: 0.75rem 0.85rem !important;
+  
+    border-radius: 0.9rem !important;
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 30%, var(--mep-glass-border)) !important;
+  
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-glass-bg) 94%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg-2) 78%, transparent)
+      ) !important;
+  
+    color: var(--mep-heading) !important;
+    font-size: clamp(0.95rem, 0.9rem + 0.22vw, 1.05rem) !important;
+    font-weight: 850 !important;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mep_form_item > h6 .mpwem_ticket_name,
+  #mage-container.mage .default_theme .mep_attendee_info .mep_form_item > h6 .mpwem_ticket_count {
+    display: inline-flex;
+    align-items: center;
+  
+    padding: 0.18rem 0.5rem;
+    border-radius: 999px;
+  
+    background: color-mix(in srgb, var(--mep-accent) 18%, var(--mep-glass-bg-2)) !important;
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 35%, var(--mep-glass-border)) !important;
+  
+    color: var(--mep-heading) !important;
+    font-size: 0.82em;
+    font-weight: 850;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mp_form_item {
+    position: relative;
+    z-index: 1;
+  
+    margin: 0 0 0.8rem 0 !important;
+    padding: 0 !important;
+  
+    color: var(--mep-text) !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mp_form_item:last-child {
+    margin-bottom: 0 !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mp_form_item label {
+    display: block !important;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: var(--mep-text) !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mp_form_item label > span,
+  #mage-container.mage .default_theme .mep_attendee_info .mp_form_item > ._fs_label {
+    display: block !important;
+  
+    margin: 0 0 0.35rem 0 !important;
+    padding: 0 !important;
+  
+    color: var(--mep-heading) !important;
+    font-size: 0.82rem !important;
+    font-weight: 780 !important;
+    line-height: 1.2;
+    letter-spacing: 0.005em;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .textRequired,
+  #mage-container.mage .default_theme .mep_attendee_info sup.textRequired {
+    color: #fb7185 !important;
+    font-weight: 900 !important;
+    text-shadow: 0 0 12px rgba(251, 113, 133, 0.28);
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .formControl,
+  #mage-container.mage .default_theme .mep_attendee_info input[type="text"].formControl,
+  #mage-container.mage .default_theme .mep_attendee_info input[type="email"].formControl,
+  #mage-container.mage .default_theme .mep_attendee_info input[type="tel"].formControl,
+  #mage-container.mage .default_theme .mep_attendee_info input[type="number"].formControl,
+  #mage-container.mage .default_theme .mep_attendee_info input[type="date"].formControl,
+  #mage-container.mage .default_theme .mep_attendee_info input[type="file"].formControl,
+  #mage-container.mage .default_theme .mep_attendee_info input.date_type.formControl,
+  #mage-container.mage .default_theme .mep_attendee_info select.formControl,
+  #mage-container.mage .default_theme .mep_attendee_info textarea.formControl {
+    width: 100% !important;
+    max-width: 100% !important;
+  
+    min-height: 2.55rem;
+    margin: 0 !important;
+    padding: 0.68rem 0.85rem !important;
+  
+    border-radius: 0.78rem !important;
+    border: 1px solid var(--mep-field-border) !important;
+  
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-field-bg) 94%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg-2) 82%, transparent)
+      ) !important;
+  
+    color: var(--mep-heading) !important;
+    font-size: 0.93rem !important;
+    font-weight: 600;
+    line-height: 1.25;
+  
+    box-shadow: var(--mep-field-shadow) !important;
+    outline: none !important;
+  
+    transition:
+      border-color 160ms ease,
+      background 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info textarea.formControl {
+    min-height: 6.5rem;
+    resize: vertical;
+    line-height: 1.45;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .formControl::placeholder {
+    color: var(--mep-field-placeholder) !important;
+    opacity: 1;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .formControl:hover {
+    border-color: color-mix(in srgb, var(--mep-accent) 28%, var(--mep-glass-border-strong)) !important;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-field-bg-hover) 96%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg-2) 86%, transparent)
+      ) !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .formControl:focus,
+  #mage-container.mage .default_theme .mep_attendee_info .formControl:focus-visible,
+  #mage-container.mage .default_theme .mep_attendee_info input.date_type.formControl:focus {
+    border-color: var(--mep-field-border-focus) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 0 3px color-mix(in srgb, var(--mep-accent) 20%, transparent),
+      0 0 24px color-mix(in srgb, var(--mep-accent) 20%, transparent),
+      0 14px 28px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  /* Attendee select dropdown — custom arrow with safe spacing */
+  #mage-container.mage .default_theme .mep_attendee_info select.formControl {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+  
+    padding-right: 3rem !important;
+  
+    background-image:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-field-bg) 94%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg-2) 82%, transparent)
+      ),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23f8fafc' stroke-width='2.35' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  
+    background-repeat: no-repeat !important;
+    background-position: 0 0, right 1rem center !important;
+    background-size: 100% 100%, 0.85rem 0.85rem !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info select.formControl option {
+    background: #111827;
+    color: rgba(255, 255, 255, 0.94);
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info input[type="file"].formControl {
+    cursor: pointer;
+    padding: 0.55rem 0.65rem !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info input[type="file"].formControl::file-selector-button {
+    margin-right: 0.85rem;
+    padding: 0.45rem 0.75rem;
+  
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 38%, var(--mep-glass-border-strong));
+    border-radius: 999px;
+  
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-accent) 30%, var(--mep-glass-bg)),
+        color-mix(in srgb, var(--mep-accent) 18%, var(--mep-glass-bg-2))
+      );
+  
+    color: var(--mep-heading);
+    font-weight: 800;
+    cursor: pointer;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 8px 18px rgba(0, 0, 0, 0.18);
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mep_file_item {
+    display: block !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .attach_file_view {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .attach_file_view img[src=""],
+  #mage-container.mage .default_theme .mep_attendee_info .attach_file_view iframe[src=""] {
+    display: none !important;
+  }
+  
+  /* Checkbox/radio field container */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item,
+  #mage-container.mage .default_theme .mep_attendee_info .mep_radio_item {
+    margin-top: 0.95rem !important;
+    padding: 0.85rem !important;
+  
+    border-radius: 0.9rem !important;
+    border: 1px solid color-mix(in srgb, var(--mep-glass-border) 86%, transparent) !important;
+  
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-glass-bg-2) 78%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg) 68%, transparent)
+      ) !important;
+  
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  
+  /* Checkbox field label */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item > ._fs_label {
+    display: block !important;
+    margin: 0 0 0.7rem 0 !important;
+    padding: 0 !important;
+  
+    color: var(--mep-heading) !important;
+    -webkit-text-fill-color: var(--mep-heading) !important;
+  
+    font-size: 0.86rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    opacity: 1 !important;
+  }
+  
+  /* Checkbox group */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item .groupCheckBox,
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item .groupCheckBox.flexWrap {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 0.55rem !important;
+  
+    width: auto !important;
+    max-width: 100% !important;
+  
+    margin: 0 !important;
+    padding: 0 !important;
+  
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  /* Hidden storage input should not affect layout */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item .groupCheckBox > input[type="hidden"] {
+    display: none !important;
+  }
+  
+  /*
+   * FINAL CHECKBOX FIX
+   * Markup:
+   * label.customCheckboxLabel > input[type="checkbox"] + span.customCheckbox
+   *
+   * The real input is hidden.
+   * The label gets the fake square via label::before.
+   * The span is ONLY readable label text.
+   */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel,
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel._mr {
+    position: relative !important;
+  
+    display: inline-flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.52rem !important;
+  
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  
+    height: auto !important;
+    min-height: 0 !important;
+  
+    margin: 0 !important;
+    padding: 0 !important;
+  
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+  
+    color: var(--mep-heading) !important;
+    -webkit-text-fill-color: var(--mep-heading) !important;
+  
+    font-size: 0.92rem !important;
+    font-weight: 650 !important;
+    line-height: 1.25 !important;
+    text-align: left !important;
+  
+    opacity: 1 !important;
+    transform: none !important;
+    cursor: pointer !important;
+  }
+  
+  /* Real input hidden — prevents duplicate checkboxes */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel > input[type="checkbox"] {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+  
+    display: block !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  
+    width: 1px !important;
+    height: 1px !important;
+    min-width: 1px !important;
+    min-height: 1px !important;
+  
+    margin: 0 !important;
+    padding: 0 !important;
+  
+    pointer-events: none !important;
+    transform: none !important;
+  }
+  
+  /* Visual checkbox square belongs to the label, NOT the span */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel::before {
+    content: "" !important;
+  
+    display: inline-block !important;
+    flex: 0 0 1rem !important;
+  
+    width: 1rem !important;
+    height: 1rem !important;
+    min-width: 1rem !important;
+    min-height: 1rem !important;
+  
+    margin: 0 !important;
+    padding: 0 !important;
+  
+    border-radius: 0.22rem !important;
+    border: 2px solid color-mix(in srgb, var(--mep-accent) 72%, rgba(255, 255, 255, 0.35)) !important;
+  
+    background: color-mix(in srgb, var(--mep-glass-bg) 72%, transparent) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 0 2px color-mix(in srgb, var(--mep-accent) 10%, transparent) !important;
+  
+    transform: none !important;
+  }
+  
+  /* Remove any plugin decoration on the label */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel::after {
+    content: none !important;
+    display: none !important;
+  }
+  
+  /* The span is plain text only */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel > span.customCheckbox {
+    position: static !important;
+  
+    display: inline !important;
+    flex: 0 1 auto !important;
+  
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  
+    margin: 0 !important;
+    padding: 0 !important;
+  
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+  
+    color: var(--mep-heading) !important;
+    -webkit-text-fill-color: var(--mep-heading) !important;
+  
+    font-size: 0.92rem !important;
+    font-weight: 650 !important;
+    line-height: 1.25 !important;
+    text-align: left !important;
+    text-indent: 0 !important;
+    letter-spacing: normal !important;
+  
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+  
+  /* Kill plugin pseudo-elements on span.customCheckbox */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel > span.customCheckbox::before,
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel > span.customCheckbox::after {
+    content: none !important;
+    display: none !important;
+  }
+  
+  /* Checked state */
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel:has(> input[type="checkbox"]:checked)::before {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-accent) 88%, #0b1220),
+        color-mix(in srgb, var(--mep-accent) 62%, #0b1220)
+      ) !important;
+  
+    border-color: color-mix(in srgb, var(--mep-accent) 88%, rgba(255, 255, 255, 0.45)) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 0 0 3px color-mix(in srgb, var(--mep-accent) 18%, transparent),
+      0 0 18px color-mix(in srgb, var(--mep-accent) 35%, transparent) !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel:has(> input[type="checkbox"]:checked) > span.customCheckbox {
+    font-weight: 850 !important;
+  }
+  
+  /* Radio group */
+  #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck,
+  #mage-container.mage .default_theme .mep_attendee_info .flexWrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center;
+    gap: 0.55rem !important;
+  
+    margin: 0 !important;
+    padding: 0 !important;
+  
+    background: transparent !important;
+    border: 0 !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck ._button_general_mr {
+    min-width: 2.65rem;
+    min-height: 2.2rem;
+  
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+  
+    margin: 0 !important;
+    padding: 0.42rem 0.8rem !important;
+  
+    border-radius: 999px !important;
+    border: 1px solid color-mix(in srgb, var(--mep-glass-border-strong) 86%, transparent) !important;
+  
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-glass-bg) 82%, transparent),
+        color-mix(in srgb, var(--mep-glass-bg-2) 72%, transparent)
+      ) !important;
+  
+    color: var(--mep-heading) !important;
+    font-size: 0.88rem;
+    font-weight: 850;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 8px 18px rgba(0, 0, 0, 0.16);
+  
+    transition:
+      transform 140ms ease,
+      border-color 140ms ease,
+      background 140ms ease,
+      box-shadow 140ms ease;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck ._button_general_mr:hover,
+  #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck ._button_general_mr:focus-visible {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--mep-accent) 42%, var(--mep-glass-border-strong)) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 0 0 3px color-mix(in srgb, var(--mep-accent) 12%, transparent),
+      0 10px 22px rgba(0, 0, 0, 0.2);
+  
+    outline: none !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck ._button_general_mr.active,
+  #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck ._button_general_mr.mep_active,
+  #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck ._button_general_mr._active,
+  #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck ._button_general_mr[aria-pressed="true"],
+  #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck ._button_general_mr.selected {
+    border-color: color-mix(in srgb, var(--mep-accent) 65%, rgba(255, 255, 255, 0.18)) !important;
+  
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-accent) 56%, #0b1220),
+        color-mix(in srgb, var(--mep-accent) 34%, #0b1220)
+      ) !important;
+  
+    color: rgba(255, 255, 255, 0.98) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 0 0 3px color-mix(in srgb, var(--mep-accent) 18%, transparent),
+      0 0 22px color-mix(in srgb, var(--mep-accent) 32%, transparent),
+      0 12px 24px rgba(0, 0, 0, 0.24) !important;
+  }
+  
+  #mage-container.mage .default_theme .mep_attendee_info .mep_form_item > br,
+  #mage-container.mage .default_theme .mep_attendee_info .mp_form_item > br {
+    display: none !important;
+  }
+  
+  /* Light theme attendee form */
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info {
+    --mep-field-bg: rgba(255, 255, 255, 0.86);
+    --mep-field-bg-hover: rgba(255, 255, 255, 0.96);
+    --mep-field-border: rgba(10, 16, 28, 0.14);
+    --mep-field-border-focus: color-mix(in srgb, var(--mep-accent) 55%, rgba(10, 16, 28, 0.18));
+    --mep-field-placeholder: rgba(10, 16, 28, 0.44);
+    --mep-field-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 10px 24px rgba(10, 16, 28, 0.08);
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mep_form_item {
+    background:
+      radial-gradient(120% 140% at 8% 0%, color-mix(in srgb, var(--mep-accent) 8%, transparent), transparent 58%),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.86),
+        rgba(255, 255, 255, 0.7)
+      ) !important;
+  
+    border-color: rgba(10, 16, 28, 0.12) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.82),
+      0 16px 36px rgba(10, 16, 28, 0.1) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mep_form_item > h6 {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.92),
+        rgba(255, 255, 255, 0.72)
+      ) !important;
+  
+    border-color: color-mix(in srgb, var(--mep-accent) 22%, rgba(10, 16, 28, 0.14)) !important;
+    color: rgba(10, 16, 28, 0.96) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mp_form_item label > span,
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mp_form_item > ._fs_label {
+    color: rgba(10, 16, 28, 0.88) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .formControl,
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info input.formControl,
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info select.formControl,
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info textarea.formControl {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.95),
+        rgba(255, 255, 255, 0.78)
+      ) !important;
+  
+    color: rgba(10, 16, 28, 0.94) !important;
+    border-color: rgba(10, 16, 28, 0.14) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.82),
+      0 10px 22px rgba(10, 16, 28, 0.08) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .formControl::placeholder {
+    color: rgba(10, 16, 28, 0.46) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .formControl:focus,
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .formControl:focus-visible {
+    border-color: color-mix(in srgb, var(--mep-accent) 48%, rgba(10, 16, 28, 0.16)) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 0 0 3px color-mix(in srgb, var(--mep-accent) 16%, transparent),
+      0 12px 26px rgba(10, 16, 28, 0.1) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info select.formControl {
+    background-image:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.95),
+        rgba(255, 255, 255, 0.78)
+      ),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%230a101c' stroke-width='2.35' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  
+    background-repeat: no-repeat !important;
+    background-position: 0 0, right 1rem center !important;
+    background-size: 100% 100%, 0.85rem 0.85rem !important;
+    color: rgba(10, 16, 28, 0.94) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info select.formControl option {
+    background: #ffffff;
+    color: rgba(10, 16, 28, 0.94);
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item,
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mep_radio_item {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.74),
+        rgba(255, 255, 255, 0.58)
+      ) !important;
+  
+    border-color: rgba(10, 16, 28, 0.12) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item > ._fs_label,
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel,
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel > span.customCheckbox {
+    color: rgba(10, 16, 28, 0.94) !important;
+    -webkit-text-fill-color: rgba(10, 16, 28, 0.94) !important;
+    opacity: 1 !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item label.customCheckboxLabel::before {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: color-mix(in srgb, var(--mep-accent) 58%, rgba(10, 16, 28, 0.25)) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 0 0 2px color-mix(in srgb, var(--mep-accent) 9%, transparent) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mep_attendee_info input[type="file"].formControl::file-selector-button {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--mep-accent) 18%, #ffffff),
+        color-mix(in srgb, var(--mep-accent) 10%, #ffffff)
+      );
+  
+    border-color: color-mix(in srgb, var(--mep-accent) 30%, rgba(10, 16, 28, 0.18));
+    color: rgba(10, 16, 28, 0.92);
+  }
+  
+  @media (min-width: 760px) {
+    #mage-container.mage .default_theme .mep_attendee_info .mep_form_item {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem 0.95rem;
+    }
+  
+    #mage-container.mage .default_theme .mep_attendee_info .mep_form_item > h6,
+    #mage-container.mage .default_theme .mep_attendee_info .mep_checkbox_item,
+    #mage-container.mage .default_theme .mep_attendee_info .mep_radio_item,
+    #mage-container.mage .default_theme .mep_attendee_info .mep_file_item,
+    #mage-container.mage .default_theme .mep_attendee_info .mp_form_item:has(textarea) {
+      grid-column: 1 / -1;
+    }
+  
+    #mage-container.mage .default_theme .mep_attendee_info .mp_form_item {
+      margin-bottom: 0 !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    #mage-container.mage .default_theme .mep_attendee_info .mep_form_item {
+      padding: 0.9rem !important;
+    }
+  
+    #mage-container.mage .default_theme .mep_attendee_info .mep_form_item > h6 {
+      padding: 0.7rem 0.75rem !important;
+    }
+  
+    #mage-container.mage .default_theme .mep_attendee_info .groupCheckBox,
+    #mage-container.mage .default_theme .mep_attendee_info .groupRadioCheck {
+      gap: 0.45rem !important;
+    }
+  }
+  
+  /* ==========================================================================
+     16) Event expired callout
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mpwem-expired-card {
+    --mep-expired-cyan: rgba(0, 210, 255, 0.78);
+    --mep-expired-violet: rgba(160, 92, 255, 0.74);
+    --mep-expired-glass: rgba(16, 22, 34, 0.58);
+  
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  
+    border-radius: 1.25rem;
+    padding: 1.6rem 1.25rem;
+  
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.04)),
+      radial-gradient(120% 140% at 18% 22%, color-mix(in srgb, var(--mep-expired-cyan) 55%, transparent), transparent 62%),
+      radial-gradient(140% 160% at 82% 78%, color-mix(in srgb, var(--mep-expired-violet) 45%, transparent), transparent 64%),
+      var(--mep-expired-glass) !important;
+  
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  
+    box-shadow:
+      0 22px 70px rgba(0, 0, 0, 0.44),
+      0 0 28px color-mix(in srgb, var(--mep-expired-cyan) 28%, transparent),
+      0 0 46px color-mix(in srgb, var(--mep-expired-violet) 22%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -18px 28px rgba(0, 0, 0, 0.18) !important;
+  
+    backdrop-filter: blur(18px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem-expired-card::before {
+    content: "";
+    position: absolute;
+    inset: -40% -35%;
+    background:
+      radial-gradient(60% 55% at 22% 18%, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0) 62%),
+      linear-gradient(115deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.1) 22%, rgba(255, 255, 255, 0) 48%);
+    transform: rotate(10deg);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  #mage-container.mage .default_theme .mpwem-expired-card::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+  
+    background: linear-gradient(135deg, rgba(0, 210, 255, 0.78), rgba(160, 92, 255, 0.74));
+  
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  
+    opacity: 0.75;
+    filter: blur(0.15px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  #mage-container.mage .default_theme .mpwem-expired-card > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  #mage-container.mage .default_theme .mpwem-expired-card .mpwem-total-sold-badge {
+    color: rgba(11, 18, 32, 0.96) !important;
+  
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.86)) !important;
+  
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      0 12px 28px rgba(0, 0, 0, 0.28),
+      0 0 0 1px rgba(255, 255, 255, 0.18),
+      0 0 18px rgba(0, 210, 255, 0.22),
+      0 0 22px rgba(160, 92, 255, 0.18) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem-expired-card .mpwem-total-sold-badge,
+  #mage-container.mage .default_theme .mpwem-expired-card .mpwem-total-sold-badge * {
+    color: rgba(11, 18, 32, 0.96) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem-expired-card .mpwem-total-sold-badge:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 16px 34px rgba(0, 0, 0, 0.34),
+      0 0 0 1px rgba(255, 255, 255, 0.22),
+      0 0 26px rgba(0, 210, 255, 0.28),
+      0 0 30px rgba(160, 92, 255, 0.22) !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem-expired-card .mpwem-total-sold-badge:focus,
+  #mage-container.mage .default_theme .mpwem-expired-card .mpwem-total-sold-badge:focus-visible {
+    outline: none !important;
+    box-shadow:
+      0 0 0 3px rgba(0, 210, 255, 0.22),
+      0 0 0 6px rgba(160, 92, 255, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      0 16px 34px rgba(0, 0, 0, 0.34) !important;
+  }
+  
+  /* ==========================================================================
+     17) Organizer block
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer {
+    position: relative;
+    overflow: hidden;
+  
+    border-radius: 1rem;
+    padding: 1rem 1rem;
+    margin: 0 0 1rem 0;
+  
+    background:
+      radial-gradient(120% 140% at 18% 18%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 55%),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--mep-accent) 20%, var(--mep-glass-bg) 80%),
+        color-mix(in srgb, rgba(160, 92, 255, 1) 16%, var(--mep-glass-bg) 84%)
+      ) !important;
+  
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 28%, var(--mep-glass-border-strong)) !important;
+  
+    box-shadow:
+      0 16px 44px rgba(0, 0, 0, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -18px 28px rgba(0, 0, 0, 0.1) !important;
+  
+    backdrop-filter: blur(var(--mep-blur)) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(var(--mep-blur)) saturate(140%) !important;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer::before {
+    content: "";
+    position: absolute;
+    inset: -40% -35%;
+    background: linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.1) 18%,
+      rgba(255, 255, 255, 0) 45%
+    );
+    transform: rotate(10deg);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer::after {
+    content: "";
+    position: absolute;
+    inset: -22px;
+    background:
+      radial-gradient(circle at 18% 30%, rgba(0, 210, 255, 0.22), rgba(0, 210, 255, 0) 55%),
+      radial-gradient(circle at 82% 70%, rgba(160, 92, 255, 0.2), rgba(160, 92, 255, 0) 58%);
+    filter: blur(18px);
+    opacity: 0.85;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer h5 {
+    margin: 0 0 0.5rem 0 !important;
+    color: rgba(255, 255, 255, 0.96) !important;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer_item {
+    color: rgba(255, 255, 255, 0.78) !important;
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer_item a {
+    display: inline-flex;
+    align-items: center;
+  
+    padding: 0.05rem 0.6rem;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  
+    color: rgba(255, 255, 255, 0.96) !important;
+    font-weight: 700;
+    text-decoration: none !important;
+  
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 10px 24px rgba(0, 0, 0, 0.22);
+  }
+  
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer_item a:hover {
+    background: rgba(255, 255, 255, 0.14) !important;
+    border-color: rgba(255, 255, 255, 0.26) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 14px 30px rgba(0, 0, 0, 0.28),
+      0 0 16px rgba(0, 210, 255, 0.22),
+      0 0 18px rgba(160, 92, 255, 0.18) !important;
+  }
+  
+  .mep-default-sidrbar-price-seat {
+    padding: 0;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme
+  .mep-default-sidebar .df-sidebar-part .mpwem_organizer {
+    background:
+      radial-gradient(120% 140% at 18% 18%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 55%),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--mep-accent) 16%, rgba(11, 18, 32, 0.92)),
+        color-mix(in srgb, rgba(160, 92, 255, 1) 12%, rgba(11, 18, 32, 0.92))
+      ) !important;
+  
+    border: 1px solid color-mix(in srgb, var(--mep-accent) 22%, rgba(255, 255, 255, 0.18)) !important;
+  
+    box-shadow:
+      0 18px 46px rgba(0, 0, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 0 -18px 28px rgba(0, 0, 0, 0.12) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme
+  .mep-default-sidebar .df-sidebar-part .mpwem_organizer h5 {
+    color: rgba(255, 255, 255, 0.96) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme
+  .mep-default-sidebar .df-sidebar-part .mpwem_organizer_item {
+    color: rgba(255, 255, 255, 0.78) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme
+  .mep-default-sidebar .df-sidebar-part .mpwem_organizer_item a {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: rgba(255, 255, 255, 0.96) !important;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme
+  .mep-default-sidebar .df-sidebar-part
+  .mpwem_organizer.mpwem_organizer > h5 {
+    color: rgba(255, 255, 255, 0.96) !important;
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.96) !important;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  }
+  
+  /* ==========================================================================
+     18) Add Calendar dropdown
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mpwem_calender_area [data-collapse="#mpwem_calender_area"] {
+    margin-top: 0.65rem;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_calender_area [data-collapse="#mpwem_calender_area"] ._mt_xs_fdColumn {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.55rem;
+  
+    padding: 0.85rem;
+    border-radius: 1rem;
+  
+    background: var(--mep-glass-bg-2) !important;
+    border: 1px solid var(--mep-glass-border) !important;
+  
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(var(--mep-blur)) saturate(135%);
+    -webkit-backdrop-filter: blur(var(--mep-blur)) saturate(135%);
+  }
+  
+  #mage-container.mage .default_theme .mpwem_calender_area [data-collapse="#mpwem_calender_area"] a._button_general_mt_xs {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  
+    padding: 0.55rem 0.85rem !important;
+    border-radius: 999px !important;
+  
+    text-decoration: none !important;
+    font-weight: 800;
+    font-size: 0.92rem;
+    line-height: 1.1;
+  
+    color: var(--mep-heading) !important;
+  
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mep-glass-bg) 86%, transparent),
+      color-mix(in srgb, var(--mep-glass-bg) 70%, transparent)
+    ) !important;
+  
+    border: 1px solid var(--mep-glass-border-strong) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      0 10px 22px rgba(0, 0, 0, 0.2);
+  
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_calender_area [data-collapse="#mpwem_calender_area"] a._button_general_mt_xs:hover,
+  #mage-container.mage .default_theme .mpwem_calender_area [data-collapse="#mpwem_calender_area"] a._button_general_mt_xs:focus-visible {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--mep-accent) 55%, var(--mep-glass-border-strong)) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 0 0 4px color-mix(in srgb, var(--mep-accent) 18%, transparent),
+      0 14px 28px rgba(0, 0, 0, 0.26);
+  
+    outline: none !important;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_calender_area [data-collapse="#mpwem_calender_area"] a._button_general_mt_xs:active {
+    transform: translateY(0);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 8px 18px rgba(0, 0, 0, 0.22);
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme
+  .mpwem_calender_area [data-collapse="#mpwem_calender_area"] ._mt_xs_fdColumn {
+    background: color-mix(in srgb, var(--mep-glass-bg) 92%, rgba(10, 16, 28, 0.06)) !important;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme
+  .mpwem_calender_area [data-collapse="#mpwem_calender_area"] a._button_general_mt_xs {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.92),
+      rgba(255, 255, 255, 0.78)
+    ) !important;
+  
+    border-color: rgba(10, 16, 28, 0.18) !important;
+    color: rgba(10, 16, 28, 0.92) !important;
+  
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 10px 22px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* ==========================================================================
+     19) H1 divider
+     ========================================================================== */
+  
+  #mage-container.mage .default_theme .mpwem_tile {
+    position: relative;
+    padding-bottom: 0.95rem;
+    margin-bottom: 1.15rem;
+  
+    --h1-underline-w: min(560px, 100%);
+    --h1-glow-h: 8px;
+    --h1-glow-blur: 7px;
+    --h1-glow-op: 0.55;
+    --h1-line-glow: 10px;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_tile::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0.24rem;
+    width: var(--h1-underline-w);
+    height: var(--h1-glow-h);
+    border-radius: 999px;
+  
+    background:
+      radial-gradient(circle at 14% 50%, rgba(0, 210, 255, 0.38), rgba(0, 210, 255, 0) 60%),
+      radial-gradient(circle at 58% 50%, rgba(160, 92, 255, 0.32), rgba(160, 92, 255, 0) 62%),
+      linear-gradient(90deg, rgba(0, 210, 255, 0.14), rgba(160, 92, 255, 0.12));
+  
+    filter: blur(var(--h1-glow-blur));
+    opacity: var(--h1-glow-op);
+    pointer-events: none;
+  }
+  
+  #mage-container.mage .default_theme .mpwem_tile::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: var(--h1-underline-w);
+    height: 1px;
+    border-radius: 999px;
+  
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      color-mix(in srgb, var(--mep-accent) 55%, rgba(0, 210, 255, 1)) 18%,
+      color-mix(in srgb, var(--mep-accent) 45%, rgba(160, 92, 255, 1)) 58%,
+      rgba(255, 255, 255, 0.14) 100%
+    );
+  
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 0 var(--h1-line-glow) rgba(0, 210, 255, 0.12),
+      0 0 calc(var(--h1-line-glow) + 2px) rgba(160, 92, 255, 0.1);
+  
+    pointer-events: none;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mpwem_tile {
+    --h1-glow-h: 6px;
+    --h1-glow-blur: 4px;
+    --h1-glow-op: 0.3;
+    --h1-line-glow: 6px;
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mpwem_tile::before {
+    background:
+      radial-gradient(circle at 14% 50%, rgba(0, 160, 255, 0.34), rgba(0, 160, 255, 0) 62%),
+      radial-gradient(circle at 58% 50%, rgba(140, 70, 255, 0.3), rgba(140, 70, 255, 0) 64%),
+      linear-gradient(90deg, rgba(0, 160, 255, 0.1), rgba(140, 70, 255, 0.08));
+  }
+  
+  html[data-theme="light"] #mage-container.mage .default_theme .mpwem_tile::after {
+    background: linear-gradient(
+      90deg,
+      rgba(11, 18, 32, 0.22) 0%,
+      color-mix(in srgb, var(--mep-accent) 70%, rgba(11, 18, 32, 1)) 18%,
+      color-mix(in srgb, rgba(140, 70, 255, 1) 70%, rgba(11, 18, 32, 1)) 58%,
+      rgba(11, 18, 32, 0.2) 100%
+    );
+  
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.08),
+      0 0 6px rgba(0, 160, 255, 0.1),
+      0 0 7px rgba(140, 70, 255, 0.08);
+  }

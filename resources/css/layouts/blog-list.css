@@ -1,0 +1,942 @@
+/* --------------------------------------------------------------------------
+| File path + filename: resources/styles/components/blog-list.css
+|--------------------------------------------------------------------------
+| Purpose:
+| - Scoped styling for the blog overview: hero, feed shell, post cards, and
+|   the two-column content/sidebar page structure.
+|
+| Why this file exists:
+| - Blog styling lives in a separate CSS file per project convention.
+| - Explicit BEM classes replace raw utility composition for the structural
+|   relationships that utility classes cannot express cleanly (sticky sidebar,
+|   hero overlay, two-column layout with independent inner padding).
+|
+| Integration:
+| - Import from your Vite CSS entry point:
+|   @import "./components/blog-list.css";
+|
+| Layout overview:
+|   <sccc-blog-above-fold>   ← full-width hero wrapper (max-width 1280 px)
+|     <sccc-blog-hero>       ← hero card (image + overlay + content)
+|   <sccc-blog-layout>       ← two-column grid (max-width 1280 px)
+|     <sccc-blog-layout__content>
+|       [container]          ← inner padding shell (from blog.blade.php)
+|         <sccc-blog-list>   ← toolbar + grid + pagination
+|     <sccc-blog-layout__sidebar>
+|       <sccc-blog-layout__sidebar-inner>  ← sticky at ≥ 1024 px
+|
+| Design tokens used:
+|   --color-surface, --color-text, --color-muted, --color-line,
+|   --color-primary-500, --secondary, --font-display
+|   (fall back to hardcoded values when tokens are absent)
+|
+| Dark mode:
+|   Driven by [data-theme="dark"] on <html> (set by the No-FOUC script in
+|   blog.blade.php) and the `.dark` class (set by Tailwind dark mode config).
+|   Both selectors are handled.
+|
+| Layer strategy:
+|   - All structural/visual styles live inside @layer components.
+|   - Text-decoration resets live OUTSIDE any layer (see section 0 below).
+|     Why: unlayered styles always win over layered styles in the CSS cascade,
+|     regardless of selector specificity. The global theme stylesheet likely
+|     sets `a { text-decoration: underline }` outside a layer, which would
+|     beat any rule inside @layer components. Moving the reset outside the
+|     layer removes the need for !important entirely.
+--------------------------------------------------------------------------*/
+
+
+/* ==========================================================================
+   0. TEXT-DECORATION RESET — outside @layer
+   Placed here so these rules are unlayered and beat the global theme link
+   styles without needing !important.
+   Scope is tight (BEM class + element) to avoid affecting anything outside
+   this component system.
+========================================================================== */
+
+.sccc-blog-list a,
+.sccc-blog-hero a,
+.sccc-post-card a,
+.sccc-entry-meta a {
+  text-decoration: none;
+}
+
+
+@layer components {
+
+  /* ==========================================================================
+     1. ABOVE-FOLD WRAPPER
+     Full-width container for the hero section. Lives ABOVE the content/sidebar
+     grid. Max-width and horizontal padding match the blog layout below so the
+     hero aligns with the grid columns.
+  ========================================================================== */
+
+  .sccc-blog-above-fold {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding: 1.5rem 1rem 0;
+  }
+
+  @media (min-width: 640px) {
+    .sccc-blog-above-fold {
+      padding-block-start: 2.5rem;
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .sccc-blog-above-fold {
+      padding-inline: 2rem;
+    }
+  }
+
+
+  /* ==========================================================================
+     2. HERO SECTION
+     Full-width featured post card with image background, gradient overlay,
+     and anchored text content.
+  ========================================================================== */
+
+  .sccc-blog-hero {
+    position: relative;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgb(0 0 0 / 0.28);
+    margin-bottom: 3rem;
+    cursor: pointer;
+  }
+
+  .sccc-blog-hero__media {
+    height: 400px;
+    width: 100%;
+    background-color: #0f1820;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.7s ease;
+    background-image:
+      radial-gradient(
+        circle at top left,
+        color-mix(in srgb, var(--color-primary-500, #13a4ec) 28%, transparent),
+        transparent 36%
+      ),
+      linear-gradient(
+        135deg,
+        #0b1117,
+        color-mix(in srgb, var(--color-primary-500, #13a4ec) 20%, #0b1117)
+      );
+  }
+
+  .sccc-blog-hero:hover .sccc-blog-hero__media {
+    transform: scale(1.05);
+  }
+
+  @media (min-width: 640px) {
+    .sccc-blog-hero__media {
+      height: 500px;
+    }
+  }
+
+  .sccc-blog-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgb(0 0 0 / 0.9),
+      rgb(0 0 0 / 0.4) 50%,
+      transparent
+    );
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .sccc-blog-hero__content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .sccc-blog-hero__content {
+      padding: 2.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .sccc-blog-hero__content {
+      padding: 4rem;
+    }
+  }
+
+  .sccc-blog-hero__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background: var(--color-primary-500, #13a4ec);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .sccc-blog-hero__title {
+    margin: 0;
+    max-width: 48rem;
+    color: #fff;
+    font-family: var(--font-display, inherit);
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-shadow: 0 2px 8px rgb(0 0 0 / 0.4);
+  }
+
+  .sccc-blog-hero__title a {
+    color: inherit;
+    transition: color 0.2s ease;
+  }
+
+  .sccc-blog-hero__title a:hover,
+  .sccc-blog-hero__title a:focus-visible {
+    color: color-mix(in srgb, #fff 80%, var(--color-primary-500, #13a4ec) 20%);
+    outline: none;
+  }
+
+  .sccc-blog-hero__excerpt {
+    display: none;
+    max-width: 40rem;
+    margin: 0;
+    color: rgb(255 255 255 / 0.82);
+    font-size: 0.95rem;
+    line-height: 1.75;
+    text-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+  }
+
+  @media (min-width: 640px) {
+    .sccc-blog-hero__excerpt {
+      display: block;
+    }
+  }
+
+  .sccc-blog-hero__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 800;
+    transition: color 0.2s ease, gap 0.2s ease;
+  }
+
+  .sccc-blog-hero__cta:hover,
+  .sccc-blog-hero__cta:focus-visible {
+    color: var(--color-primary-500, #13a4ec);
+    gap: 0.65rem;
+    outline: none;
+  }
+
+  .sccc-blog-hero__cta svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+
+  /* ==========================================================================
+     3. BLOG PAGE LAYOUT (two-column grid)
+  ========================================================================== */
+
+  .sccc-blog-layout {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+  }
+
+  .sccc-blog-layout__content,
+  .sccc-blog-layout__sidebar {
+    min-width: 0;
+  }
+
+  .sccc-blog-layout__sidebar {
+    padding: 0 1rem 2rem;
+  }
+
+  .sccc-blog-layout__sidebar-inner {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .sccc-blog-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .sccc-blog-layout__sidebar {
+      padding: 2.5rem 1.5rem 2rem 0;
+    }
+
+    .sccc-blog-layout__sidebar-inner {
+      position: sticky;
+      top: 1.5rem;
+    }
+  }
+
+  .sccc-blog-layout__content .container {
+    max-width: none;
+  }
+
+
+  /* ==========================================================================
+     4. BLOG LIST SHELL & DESIGN TOKENS
+     --sccc-blog-primary is also defined on .sccc-post-card (section 9) so
+     that post cards used outside .sccc-blog-list (e.g. category archives,
+     search results) resolve the same colour value consistently.
+  ========================================================================== */
+
+  .sccc-blog-list {
+    --sccc-blog-surface:      var(--color-surface,     var(--surface,   #ffffff));
+    --sccc-blog-surface-2:    color-mix(in srgb, var(--color-surface, var(--surface, #ffffff)) 94%, white 6%);
+    --sccc-blog-text:         var(--color-text,        var(--text,      #111418));
+    --sccc-blog-muted:        var(--color-muted,       var(--muted,     #5f6670));
+    --sccc-blog-line:         var(--color-line,        var(--line,      rgba(17, 20, 24, 0.12)));
+    --sccc-blog-primary:      var(--color-primary-500, var(--primary,   #13a4ec));
+    --sccc-blog-secondary:    var(--secondary,                          #f05a28);
+    --sccc-blog-shadow:       0 18px 48px rgb(0 0 0 / 0.12);
+    --sccc-blog-shadow-hover: 0 24px 58px rgb(0 0 0 / 0.18);
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+
+  /* ==========================================================================
+     5. TOOLBAR
+  ========================================================================== */
+
+  .sccc-blog-list__toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 1px solid var(--sccc-blog-line);
+    border-radius: 1.25rem;
+    background:
+      radial-gradient(
+        circle at top right,
+        color-mix(in srgb, var(--sccc-blog-primary) 10%, transparent),
+        transparent 32%
+      ),
+      linear-gradient(180deg, var(--sccc-blog-surface-2), var(--sccc-blog-surface));
+    box-shadow: 0 12px 38px rgb(0 0 0 / 0.08);
+  }
+
+  @media (min-width: 768px) {
+    .sccc-blog-list__toolbar {
+      padding: 1.75rem;
+    }
+  }
+
+  .sccc-blog-list__toolbar-top {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .sccc-blog-list__toolbar-top {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+  }
+
+  .sccc-blog-list__title {
+    margin: 0;
+    flex-shrink: 0;
+    color: var(--sccc-blog-text);
+    font-family: var(--font-display, inherit);
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+
+  /* ==========================================================================
+     6. SEARCH FORM
+  ========================================================================== */
+
+  .sccc-blog-list__search {
+    position: relative;
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .sccc-blog-list__search {
+      width: auto;
+      min-width: 280px;
+    }
+  }
+
+  .sccc-blog-list__search input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.85rem 1rem 0.85rem 2.85rem;
+    border: 1px solid var(--sccc-blog-line);
+    border-radius: 9999px;
+    background: var(--sccc-blog-surface);
+    color: var(--sccc-blog-text);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+    font-size: 0.9rem;
+  }
+
+  .sccc-blog-list__search input::placeholder {
+    color: var(--sccc-blog-muted);
+  }
+
+  .sccc-blog-list__search input:focus {
+    border-color: color-mix(in srgb, var(--sccc-blog-primary) 45%, transparent);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--sccc-blog-primary) 14%, transparent),
+      0 10px 24px rgb(0 0 0 / 0.08);
+  }
+
+  .sccc-blog-list__search-icon {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    color: var(--sccc-blog-muted);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .sccc-blog-list__search-icon svg {
+    width: 1rem;
+    height: 1rem;
+    stroke: currentColor;
+    stroke-width: 1.8;
+  }
+
+
+  /* ==========================================================================
+     7. CATEGORY CHIPS
+  ========================================================================== */
+
+  .sccc-blog-list__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .sccc-blog-list__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.5rem;
+    padding-inline: 1rem;
+    border: 1px solid var(--sccc-blog-line);
+    border-radius: 9999px;
+    background: var(--sccc-blog-surface);
+    color: var(--sccc-blog-text);
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition:
+      transform .2s ease,
+      border-color .2s ease,
+      color .2s ease,
+      background-color .2s ease;
+  }
+
+  .sccc-blog-list__chip:hover,
+  .sccc-blog-list__chip:focus-visible {
+    color: var(--sccc-blog-primary);
+    border-color: color-mix(in srgb, var(--sccc-blog-primary) 30%, transparent);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .sccc-blog-list__chip.is-active {
+    border-color: transparent;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sccc-blog-primary) 94%, white 6%),
+      var(--sccc-blog-primary)
+    );
+    color: #fff;
+    box-shadow: 0 14px 36px color-mix(in srgb, var(--sccc-blog-primary) 24%, transparent);
+  }
+
+
+  /* ==========================================================================
+     8. POST GRID
+  ========================================================================== */
+
+  .sccc-blog-list__grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .sccc-blog-list__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+
+  /* ==========================================================================
+     9. POST CARD
+     --sccc-blog-primary is re-declared here so the card is self-contained.
+     When a card renders inside .sccc-blog-list it inherits the parent token
+     (same value). When it renders outside (archive, search) it uses its own
+     declaration and the colour is identical — no mismatch possible.
+  ========================================================================== */
+
+  .sccc-post-card {
+    /*
+     * Token redeclaration — intentional.
+     * Ensures --sccc-blog-primary resolves to the correct value on post cards
+     * used outside .sccc-blog-list (category archives, search results, etc.)
+     * without duplicating the entire token set. Only primary is needed here
+     * because it is the only token used by .sccc-entry-meta and the card links.
+     */
+    --sccc-blog-primary: var(--color-primary-500, var(--primary, #13a4ec));
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--sccc-blog-line);
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, var(--sccc-blog-surface-2), var(--sccc-blog-surface));
+    box-shadow: var(--sccc-blog-shadow);
+    transition:
+      transform .28s ease,
+      border-color .28s ease,
+      box-shadow .28s ease;
+  }
+
+  .sccc-post-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--sccc-blog-primary) 26%, transparent);
+    box-shadow: var(--sccc-blog-shadow-hover);
+  }
+
+  .sccc-post-card__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #0f1820;
+  }
+
+  .sccc-post-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .6s ease;
+  }
+
+  .sccc-post-card:hover .sccc-post-card__image {
+    transform: scale(1.05);
+  }
+
+  .sccc-post-card__image--fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(
+        circle at top left,
+        color-mix(in srgb, var(--sccc-blog-primary) 28%, transparent),
+        transparent 36%
+      ),
+      linear-gradient(
+        135deg,
+        #0b1117,
+        color-mix(in srgb, var(--sccc-blog-primary) 20%, #0b1117)
+      );
+  }
+
+  .sccc-post-card__image--fallback span {
+    color: rgb(255 255 255 / 0.5);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  .sccc-post-card__badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    padding-inline: 0.6rem;
+    border-radius: 0.375rem;
+    background: rgb(5 10 14 / 0.62);
+    color: #fff;
+    backdrop-filter: blur(10px);
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .sccc-post-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    flex: 1;
+  }
+
+  @media (min-width: 768px) {
+    .sccc-post-card__body {
+      padding: 1.25rem;
+    }
+  }
+
+  .sccc-post-card__header {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .sccc-post-card__title {
+    margin: 0;
+    font-family: var(--font-display, inherit);
+    font-size: clamp(1.1rem, 2vw, 1.3rem);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .sccc-post-card__title a {
+    color: var(--sccc-blog-text);
+    transition: color .2s ease;
+  }
+
+  .sccc-post-card:hover .sccc-post-card__title a,
+  .sccc-post-card__title a:hover,
+  .sccc-post-card__title a:focus-visible {
+    /*
+     * Matches .sccc-entry-meta__item--taxonomy:hover exactly.
+     * Both use the same color-mix ratio so hover states are visually
+     * consistent across the card.
+     */
+    color: rgb(19, 164, 236);
+    outline: none;
+  }
+
+  .sccc-post-card__summary {
+    color: var(--sccc-blog-muted);
+    font-size: 0.88rem;
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sccc-post-card__footer {
+    padding-top: 0.25rem;
+    margin-top: auto;
+  }
+
+  .sccc-post-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: rgb(19, 164, 236);
+    font-size: 0.88rem;
+    font-weight: 800;
+    transition: gap .2s ease, color .2s ease;
+  }
+
+  .sccc-post-card__link:hover,
+  .sccc-post-card__link:focus-visible {
+    /*
+     * Previously this used color-mix to lighten primary on hover, which
+     * created a visible mismatch against entry-meta (which stays at full
+     * primary on hover). Unified to full primary so all interactive
+     * elements on the card behave consistently.
+     */
+    color: var(--sccc-blog-primary);
+    gap: 0.6rem;
+    outline: none;
+  }
+
+
+  /* ==========================================================================
+     10. ENTRY META (date, category)
+     Color is --sccc-blog-primary, inheriting from .sccc-post-card above.
+     Hover is also full primary so it matches .sccc-post-card__link:hover
+     and .sccc-post-card__title a:hover exactly.
+  ========================================================================== */
+
+  .sccc-entry-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgb(19, 164, 236);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .sccc-entry-meta__item {
+    color: inherit;
+  }
+
+  .sccc-entry-meta__item--taxonomy {
+    transition: color .2s ease;
+  }
+
+  .sccc-entry-meta__item--taxonomy:hover,
+  .sccc-entry-meta__item--taxonomy:focus-visible {
+    color: var(--sccc-blog-primary);
+    outline: none;
+  }
+
+  .sccc-entry-meta__dot {
+    width: 0.22rem;
+    height: 0.22rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--sccc-blog-primary) 55%, transparent);
+    flex: 0 0 auto;
+  }
+
+
+  /* ==========================================================================
+     11. EMPTY STATE
+  ========================================================================== */
+
+  .sccc-blog-list__empty {
+    padding: 2rem;
+    border: 1px solid var(--sccc-blog-line);
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, var(--sccc-blog-surface-2), var(--sccc-blog-surface));
+    text-align: center;
+    box-shadow: var(--sccc-blog-shadow);
+  }
+
+  .sccc-blog-list__empty h2 {
+    margin: 0;
+    color: var(--sccc-blog-text);
+    font-family: var(--font-display, inherit);
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .sccc-blog-list__empty p {
+    max-width: 40rem;
+    margin: 0.85rem auto 0;
+    color: var(--sccc-blog-muted);
+    line-height: 1.8;
+  }
+
+
+  /* ==========================================================================
+     12. PAGINATION
+  ========================================================================== */
+
+  .sccc-blog-list__pagination {
+    display: flex;
+    justify-content: center;
+  }
+
+  .sccc-blog-list__pagination .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .sccc-blog-list__pagination a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding-inline: 1.35rem;
+    border: 1px solid var(--sccc-blog-line);
+    border-radius: 9999px;
+    background: var(--sccc-blog-surface);
+    color: var(--sccc-blog-text);
+    font-size: 0.92rem;
+    font-weight: 800;
+    transition: transform .2s ease, border-color .2s ease, color .2s ease;
+  }
+
+  .sccc-blog-list__pagination a:hover,
+  .sccc-blog-list__pagination a:focus-visible {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--sccc-blog-primary) 30%, transparent);
+    color: var(--sccc-blog-primary);
+    outline: none;
+  }
+
+
+  /* ==========================================================================
+     13. NEWSLETTER SECTION
+     Full-width dark banner between </main> and the footer.
+  ========================================================================== */
+
+  .sccc-newsletter {
+    width: 100%;
+    background-color: #0d1418;
+    border-top: 1px solid rgba(35, 60, 72, 0.9);
+    margin-top: 3rem;
+    padding: 4rem 1rem;
+  }
+
+  .sccc-newsletter__inner {
+    max-width: 48rem;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .sccc-newsletter__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary-500, #13a4ec);
+  }
+
+  .sccc-newsletter__icon svg {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .sccc-newsletter__heading {
+    margin: 0;
+    color: #fff;
+    font-family: var(--font-display, inherit);
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .sccc-newsletter__body {
+    max-width: 36rem;
+    margin: 0;
+    color: #8ea3ad;
+    font-size: 0.95rem;
+    line-height: 1.8;
+  }
+
+  .sccc-newsletter__form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 28rem;
+    margin-top: 0.75rem;
+  }
+
+  @media (min-width: 480px) {
+    .sccc-newsletter__form {
+      flex-direction: row;
+    }
+  }
+
+  .sccc-newsletter__input {
+    flex: 1;
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(35, 60, 72, 0.9);
+    border-radius: 0.5rem;
+    background: #1a2830;
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .sccc-newsletter__input::placeholder {
+    color: #5f7a87;
+  }
+
+  .sccc-newsletter__input:focus {
+    border-color: color-mix(in srgb, var(--color-primary-500, #13a4ec) 50%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500, #13a4ec) 14%, transparent);
+  }
+
+  .sccc-newsletter__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding-inline: 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: var(--color-primary-500, #13a4ec);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color .2s ease, transform .2s ease;
+  }
+
+  .sccc-newsletter__btn:hover,
+  .sccc-newsletter__btn:focus-visible {
+    background: color-mix(in srgb, var(--color-primary-500, #13a4ec) 84%, white 16%);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .sccc-newsletter__disclaimer {
+    margin: 0;
+    color: #4a6370;
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+
+  /* ==========================================================================
+     14. DARK MODE OVERRIDES
+  ========================================================================== */
+
+  [data-theme="dark"] .sccc-blog-list,
+  .dark .sccc-blog-list {
+    --sccc-blog-surface:      var(--color-surface, var(--surface,  #16262e));
+    --sccc-blog-surface-2:    color-mix(in srgb, var(--color-surface, var(--surface, #16262e)) 92%, #1f3440 8%);
+    --sccc-blog-text:         var(--color-text,   var(--text,      #ffffff));
+    --sccc-blog-muted:        var(--color-muted,  var(--muted,     #a6b5be));
+    --sccc-blog-line:         var(--color-line,   var(--line,      rgba(255, 255, 255, 0.12)));
+    --sccc-blog-shadow:       0 20px 56px rgb(0 0 0 / 0.32);
+    --sccc-blog-shadow-hover: 0 28px 72px rgb(0 0 0 / 0.42);
+  }
+
+} /* end @layer components */

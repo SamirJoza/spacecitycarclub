@@ -1,0 +1,1499 @@
+/**
+ * resources/styles/woo-checkout.css
+ * File: resources/styles/woo-checkout.css
+ *
+ * What this stylesheet does
+ * -----------------------------------------------------------------------------
+ * This is the single canonical SCCC WooCommerce Blocks stylesheet for:
+ * - WooCommerce Checkout Block
+ * - WooCommerce Cart Block
+ *
+ * Why this file exists
+ * -----------------------------------------------------------------------------
+ * Two very similar files existed:
+ * - resources/styles/woo-checkout.css
+ * - resources/styles/woocommerce-checkout.css
+ *
+ * This file combines them into one safer stylesheet so checkout/cart styling does
+ * not compete with itself or depend on load order between two overlapping files.
+ *
+ * Important import note
+ * -----------------------------------------------------------------------------
+ * Keep this file:
+ *   resources/styles/woo-checkout.css
+ *
+ * Remove/stop importing this older duplicate:
+ *   resources/styles/woocommerce-checkout.css
+ *
+ * Theme switching rules
+ * -----------------------------------------------------------------------------
+ * Your preferred project signals:
+ * - Light: <html data-theme="light">
+ * - Dark:  <html data-theme="dark" class="dark">
+ *
+ * This file also supports either dark signal on its own:
+ * - <html data-theme="dark">
+ * - <html class="dark">
+ *
+ * Why:
+ * If the .dark class or data-theme attribute is temporarily missing, checkout
+ * fields still get usable default dark styling instead of falling back to
+ * browser-default white controls.
+ *
+ * Scope / safety
+ * -----------------------------------------------------------------------------
+ * - Scoped to body.woocommerce-checkout and body.woocommerce-cart.
+ * - Targets WooCommerce Blocks wrappers:
+ *     Checkout: .wp-block-woocommerce-checkout / .wc-block-checkout
+ *     Cart:     .wp-block-woocommerce-cart / .wc-block-cart
+ * - Avoids collateral styling across normal site content.
+ *
+ * Specific fix added here
+ * -----------------------------------------------------------------------------
+ * The rendered HTML uses WooCommerce Checkout Block select classes:
+ * - .wc-blocks-components-select__container
+ * - .wc-blocks-components-select__select
+ * - .wc-blocks-components-select__label
+ * - .wc-blocks-components-select__expand
+ *
+ * The country/state dropdowns were white-on-white in dark mode because the
+ * select controls were falling back to browser/Woo default colors. This file now
+ * forces the closed select, option list, floating label, and SVG arrow to use
+ * the SCCC field colors.
+ *
+ * Additional cart removal control note
+ * -----------------------------------------------------------------------------
+ * The cart remove control is styled as a text action rather than a bordered pill.
+ * The visible label is now:
+ *   "remove from cart"
+ *
+ * Why:
+ * - You asked to remove the outer border treatment.
+ * - You wanted visible text next to the remove icon.
+ *
+ * Implementation approach:
+ * - Remove the previous bordered “pill” treatment.
+ * - Keep a small inline “×” icon.
+ * - Inject the visible label with ::after so we do not need to edit Woo block
+ *   markup for this presentation-only change.
+ */
+
+/* ==========================================================================
+   SCCC Woo Checkout + Cart — shared variables
+   ========================================================================== */
+
+/**
+ * Default values
+ * -----------------------------------------------------------------------------
+ * These are intentionally dark-mode leaning because the screenshot issue was
+ * white browser controls inside a dark checkout page.
+ *
+ * Why:
+ * The old file only set several variables when the exact selector
+ * html[data-theme="dark"].dark matched. If one of those signals was absent,
+ * key CSS variables could be undefined and Woo/browser defaults could win.
+ */
+ body.woocommerce-checkout .wp-block-woocommerce-checkout,
+ body.woocommerce-checkout .wc-block-checkout,
+ body.woocommerce-cart .wp-block-woocommerce-cart,
+ body.woocommerce-cart .wc-block-cart {
+   /* Brand / primary */
+   --sccc-wc-primary: var(--color-primary, #135bec);
+   --sccc-wc-danger: #ef4444;
+ 
+   /* Layout */
+   --sccc-wc-max-width: 1200px;
+   --sccc-wc-radius: 16px;
+   --sccc-wc-sidebar-w: 400px;
+   --sccc-wc-sidebar-min: 360px;
+ 
+   /* Typography */
+   --sccc-wc-font: var(
+     --font-sans,
+     ui-sans-serif,
+     system-ui,
+     -apple-system,
+     Segoe UI,
+     Roboto,
+     Helvetica,
+     Arial,
+     "Apple Color Emoji",
+     "Segoe UI Emoji"
+   );
+ 
+   /* Motion */
+   --sccc-wc-ease: 180ms ease;
+ 
+   /* Dark-safe defaults */
+   --sccc-wc-color-scheme: dark;
+   --sccc-wc-page-bg: var(--background-dark, #101622);
+ 
+   /* Text */
+   --sccc-wc-text: rgba(255, 255, 255, 0.92);
+   --sccc-wc-muted: rgba(255, 255, 255, 0.70);
+   --sccc-wc-muted-2: rgba(255, 255, 255, 0.55);
+ 
+   /* Lines */
+   --sccc-wc-line: rgba(255, 255, 255, 0.12);
+   --sccc-wc-input-line: rgba(255, 255, 255, 0.18);
+ 
+   /* Inputs and selects */
+   --sccc-wc-input-bg: rgba(255, 255, 255, 0.055);
+   --sccc-wc-field-bg: linear-gradient(180deg, rgba(21, 29, 50, 0.96) 0%, rgba(15, 23, 42, 0.98) 100%);
+   --sccc-wc-field-solid-bg: #111827;
+   --sccc-wc-field-text: #eef3ff;
+   --sccc-wc-field-placeholder: rgba(221, 229, 243, 0.46);
+   --sccc-wc-field-label: rgba(221, 229, 243, 0.62);
+   --sccc-wc-field-border: rgba(255, 255, 255, 0.18);
+   --sccc-wc-field-hover-border: rgba(101, 210, 255, 0.28);
+   --sccc-wc-field-focus-border: rgba(101, 210, 255, 0.58);
+   --sccc-wc-field-focus-ring: rgba(101, 210, 255, 0.14);
+   --sccc-wc-field-icon: rgba(221, 229, 243, 0.78);
+   --sccc-wc-field-shine: rgba(255, 255, 255, 0.035);
+   --sccc-wc-field-outline: rgba(255, 255, 255, 0.025);
+ 
+   /* Native select option list */
+   --sccc-wc-option-bg: #111827;
+   --sccc-wc-option-text: #eef3ff;
+   --sccc-wc-option-muted: rgba(221, 229, 243, 0.58);
+   --sccc-wc-option-checked-bg: #1d4ed8;
+ 
+   /* Glass surfaces */
+   --sccc-wc-glass-top: rgba(14, 20, 32, 0.82);
+   --sccc-wc-glass-bot: rgba(12, 18, 30, 0.58);
+   --sccc-wc-glass-2-top: rgba(18, 26, 40, 0.70);
+   --sccc-wc-glass-2-bot: rgba(14, 22, 36, 0.52);
+   --sccc-wc-glass-border: rgba(255, 255, 255, 0.12);
+   --sccc-wc-glass-highlight: rgba(255, 255, 255, 0.08);
+ 
+   /* Focus / glow */
+   --sccc-wc-focus: color-mix(in srgb, var(--sccc-wc-primary) 60%, white);
+   --sccc-wc-focus-soft: color-mix(in srgb, var(--sccc-wc-primary) 25%, transparent);
+   --sccc-wc-shadow: 0 18px 52px rgba(0, 0, 0, 0.40);
+   --sccc-wc-glow:
+     0 0 0 1px color-mix(in srgb, var(--sccc-wc-primary) 22%, transparent),
+     0 10px 28px color-mix(in srgb, var(--sccc-wc-primary) 14%, transparent);
+ 
+   /* Cart CTA neon glass border */
+   --sccc-wc-cta-a: #8b5cf6;
+   --sccc-wc-cta-b: #3b82f6;
+   --sccc-wc-cta-c: #38bdf8;
+   --sccc-wc-cta-text: rgba(255, 255, 255, 0.96);
+   --sccc-wc-cta-fill-top: rgba(14, 20, 32, 0.72);
+   --sccc-wc-cta-fill-bot: rgba(12, 18, 30, 0.52);
+   --sccc-wc-cta-glow: color-mix(in srgb, var(--sccc-wc-cta-b) 28%, transparent);
+ 
+   /* Checkout place-order button */
+   --sccc-wc-btn-border: rgba(101, 210, 255, 0.26);
+   --sccc-wc-btn-bg: linear-gradient(180deg, rgba(16, 31, 66, 0.98) 0%, rgba(9, 18, 42, 0.98) 100%);
+   --sccc-wc-btn-text: #eef3ff;
+   --sccc-wc-btn-shadow:
+     0 14px 34px rgba(0, 0, 0, 0.28),
+     inset 0 1px 0 rgba(255, 255, 255, 0.06),
+     0 0 0 1px rgba(101, 210, 255, 0.06);
+   --sccc-wc-btn-hover-border: rgba(101, 210, 255, 0.4);
+   --sccc-wc-btn-hover-shadow:
+     0 18px 38px rgba(0, 0, 0, 0.34),
+     inset 0 1px 0 rgba(255, 255, 255, 0.08),
+     0 0 0 4px rgba(101, 210, 255, 0.12);
+ 
+   /* Danger surfaces */
+   --sccc-wc-danger-bg: color-mix(in srgb, var(--sccc-wc-danger) 16%, rgba(0, 0, 0, 0.35));
+   --sccc-wc-danger-border: color-mix(in srgb, var(--sccc-wc-danger) 34%, rgba(255, 255, 255, 0.12));
+ 
+   color-scheme: var(--sccc-wc-color-scheme);
+ }
+ 
+ /**
+  * Light theme values
+  * -----------------------------------------------------------------------------
+  * Keeps checkout/cart crisp and readable in light mode.
+  */
+ html[data-theme="light"] body.woocommerce-checkout .wp-block-woocommerce-checkout,
+ html[data-theme="light"] body.woocommerce-checkout .wc-block-checkout,
+ html[data-theme="light"] body.woocommerce-cart .wp-block-woocommerce-cart,
+ html[data-theme="light"] body.woocommerce-cart .wc-block-cart {
+   --sccc-wc-color-scheme: light;
+   --sccc-wc-page-bg: var(--color-bg, #f6f8fc);
+ 
+   /* Text */
+   --sccc-wc-text: #0f172a;
+   --sccc-wc-muted: rgba(15, 23, 42, 0.70);
+   --sccc-wc-muted-2: rgba(15, 23, 42, 0.55);
+ 
+   /* Lines */
+   --sccc-wc-line: rgba(15, 23, 42, 0.10);
+   --sccc-wc-input-line: rgba(15, 23, 42, 0.18);
+ 
+   /* Inputs and selects */
+   --sccc-wc-input-bg: rgba(255, 255, 255, 0.92);
+   --sccc-wc-field-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 248, 252, 0.98) 100%);
+   --sccc-wc-field-solid-bg: #ffffff;
+   --sccc-wc-field-text: #132033;
+   --sccc-wc-field-placeholder: rgba(19, 32, 51, 0.42);
+   --sccc-wc-field-label: rgba(19, 32, 51, 0.58);
+   --sccc-wc-field-border: rgba(19, 32, 51, 0.18);
+   --sccc-wc-field-hover-border: rgba(41, 121, 255, 0.32);
+   --sccc-wc-field-focus-border: rgba(41, 121, 255, 0.56);
+   --sccc-wc-field-focus-ring: rgba(41, 121, 255, 0.14);
+   --sccc-wc-field-icon: rgba(19, 32, 51, 0.68);
+   --sccc-wc-field-shine: rgba(255, 255, 255, 0.72);
+   --sccc-wc-field-outline: rgba(19, 32, 51, 0.04);
+ 
+   /* Native select option list */
+   --sccc-wc-option-bg: #ffffff;
+   --sccc-wc-option-text: #132033;
+   --sccc-wc-option-muted: rgba(19, 32, 51, 0.46);
+   --sccc-wc-option-checked-bg: #dbeafe;
+ 
+   /* Glass surfaces */
+   --sccc-wc-glass-top: rgba(255, 255, 255, 0.82);
+   --sccc-wc-glass-bot: rgba(255, 255, 255, 0.68);
+   --sccc-wc-glass-2-top: rgba(255, 255, 255, 0.76);
+   --sccc-wc-glass-2-bot: rgba(255, 255, 255, 0.62);
+   --sccc-wc-glass-border: rgba(15, 23, 42, 0.12);
+   --sccc-wc-glass-highlight: rgba(255, 255, 255, 0.65);
+ 
+   /* Focus / glow */
+   --sccc-wc-shadow: 0 14px 38px rgba(15, 23, 42, 0.10);
+ 
+   /* Cart CTA neon glass border */
+   --sccc-wc-cta-a: #7c3aed;
+   --sccc-wc-cta-b: #2563eb;
+   --sccc-wc-cta-c: #38bdf8;
+   --sccc-wc-cta-text: #0f172a;
+   --sccc-wc-cta-fill-top: rgba(255, 255, 255, 0.82);
+   --sccc-wc-cta-fill-bot: rgba(255, 255, 255, 0.60);
+   --sccc-wc-cta-glow: color-mix(in srgb, var(--sccc-wc-cta-b) 18%, transparent);
+ 
+   /* Checkout place-order button */
+   --sccc-wc-btn-border: rgba(15, 131, 182, 0.22);
+   --sccc-wc-btn-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 247, 253, 0.98) 100%);
+   --sccc-wc-btn-text: #10233f;
+   --sccc-wc-btn-shadow:
+     0 12px 28px rgba(15, 23, 42, 0.1),
+     inset 0 1px 0 rgba(255, 255, 255, 0.9),
+     0 0 0 1px rgba(15, 131, 182, 0.04);
+   --sccc-wc-btn-hover-border: rgba(15, 131, 182, 0.36);
+   --sccc-wc-btn-hover-shadow:
+     0 16px 34px rgba(15, 23, 42, 0.14),
+     inset 0 1px 0 rgba(255, 255, 255, 1),
+     0 0 0 4px rgba(15, 131, 182, 0.1);
+ 
+   /* Danger surfaces */
+   --sccc-wc-danger-bg: color-mix(in srgb, var(--sccc-wc-danger) 10%, white);
+   --sccc-wc-danger-border: color-mix(in srgb, var(--sccc-wc-danger) 30%, rgba(15, 23, 42, 0.12));
+ }
+ 
+ /**
+  * Dark theme values
+  * -----------------------------------------------------------------------------
+  * Duplicates the default dark values under both supported signals so the theme
+  * remains stable whether the site sends data-theme, class="dark", or both.
+  */
+ html[data-theme="dark"] body.woocommerce-checkout .wp-block-woocommerce-checkout,
+ html[data-theme="dark"] body.woocommerce-checkout .wc-block-checkout,
+ html[data-theme="dark"] body.woocommerce-cart .wp-block-woocommerce-cart,
+ html[data-theme="dark"] body.woocommerce-cart .wc-block-cart,
+ html.dark body.woocommerce-checkout .wp-block-woocommerce-checkout,
+ html.dark body.woocommerce-checkout .wc-block-checkout,
+ html.dark body.woocommerce-cart .wp-block-woocommerce-cart,
+ html.dark body.woocommerce-cart .wc-block-cart {
+   --sccc-wc-color-scheme: dark;
+   --sccc-wc-page-bg: var(--background-dark, #101622);
+ 
+   --sccc-wc-text: rgba(255, 255, 255, 0.92);
+   --sccc-wc-muted: rgba(255, 255, 255, 0.70);
+   --sccc-wc-muted-2: rgba(255, 255, 255, 0.55);
+ 
+   --sccc-wc-line: rgba(255, 255, 255, 0.12);
+   --sccc-wc-input-line: rgba(255, 255, 255, 0.18);
+ 
+   --sccc-wc-input-bg: rgba(255, 255, 255, 0.055);
+   --sccc-wc-field-bg: linear-gradient(180deg, rgba(21, 29, 50, 0.96) 0%, rgba(15, 23, 42, 0.98) 100%);
+   --sccc-wc-field-solid-bg: #111827;
+   --sccc-wc-field-text: #eef3ff;
+   --sccc-wc-field-placeholder: rgba(221, 229, 243, 0.46);
+   --sccc-wc-field-label: rgba(221, 229, 243, 0.62);
+   --sccc-wc-field-border: rgba(255, 255, 255, 0.18);
+   --sccc-wc-field-hover-border: rgba(101, 210, 255, 0.28);
+   --sccc-wc-field-focus-border: rgba(101, 210, 255, 0.58);
+   --sccc-wc-field-focus-ring: rgba(101, 210, 255, 0.14);
+   --sccc-wc-field-icon: rgba(221, 229, 243, 0.78);
+   --sccc-wc-field-shine: rgba(255, 255, 255, 0.035);
+   --sccc-wc-field-outline: rgba(255, 255, 255, 0.025);
+ 
+   --sccc-wc-option-bg: #111827;
+   --sccc-wc-option-text: #eef3ff;
+   --sccc-wc-option-muted: rgba(221, 229, 243, 0.58);
+   --sccc-wc-option-checked-bg: #1d4ed8;
+ 
+   --sccc-wc-glass-top: rgba(14, 20, 32, 0.82);
+   --sccc-wc-glass-bot: rgba(12, 18, 30, 0.58);
+   --sccc-wc-glass-2-top: rgba(18, 26, 40, 0.70);
+   --sccc-wc-glass-2-bot: rgba(14, 22, 36, 0.52);
+   --sccc-wc-glass-border: rgba(255, 255, 255, 0.12);
+   --sccc-wc-glass-highlight: rgba(255, 255, 255, 0.08);
+ 
+   --sccc-wc-shadow: 0 18px 52px rgba(0, 0, 0, 0.40);
+ 
+   --sccc-wc-cta-a: #8b5cf6;
+   --sccc-wc-cta-b: #3b82f6;
+   --sccc-wc-cta-c: #38bdf8;
+   --sccc-wc-cta-text: rgba(255, 255, 255, 0.96);
+   --sccc-wc-cta-fill-top: rgba(14, 20, 32, 0.72);
+   --sccc-wc-cta-fill-bot: rgba(12, 18, 30, 0.52);
+   --sccc-wc-cta-glow: color-mix(in srgb, var(--sccc-wc-cta-b) 28%, transparent);
+ 
+   --sccc-wc-btn-border: rgba(101, 210, 255, 0.26);
+   --sccc-wc-btn-bg: linear-gradient(180deg, rgba(16, 31, 66, 0.98) 0%, rgba(9, 18, 42, 0.98) 100%);
+   --sccc-wc-btn-text: #eef3ff;
+   --sccc-wc-btn-shadow:
+     0 14px 34px rgba(0, 0, 0, 0.28),
+     inset 0 1px 0 rgba(255, 255, 255, 0.06),
+     0 0 0 1px rgba(101, 210, 255, 0.06);
+   --sccc-wc-btn-hover-border: rgba(101, 210, 255, 0.4);
+   --sccc-wc-btn-hover-shadow:
+     0 18px 38px rgba(0, 0, 0, 0.34),
+     inset 0 1px 0 rgba(255, 255, 255, 0.08),
+     0 0 0 4px rgba(101, 210, 255, 0.12);
+ 
+   --sccc-wc-danger-bg: color-mix(in srgb, var(--sccc-wc-danger) 16%, rgba(0, 0, 0, 0.35));
+   --sccc-wc-danger-border: color-mix(in srgb, var(--sccc-wc-danger) 34%, rgba(255, 255, 255, 0.12));
+ }
+ 
+ /* ==========================================================================
+    Page-level baseline
+    ========================================================================== */
+ 
+ html[data-theme="light"] body.woocommerce-checkout,
+ html[data-theme="dark"] body.woocommerce-checkout,
+ html.dark body.woocommerce-checkout,
+ html[data-theme="light"] body.woocommerce-cart,
+ html[data-theme="dark"] body.woocommerce-cart,
+ html.dark body.woocommerce-cart {
+   background: var(--sccc-wc-page-bg, transparent);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout,
+ body.woocommerce-checkout .wc-block-checkout,
+ body.woocommerce-cart .wp-block-woocommerce-cart,
+ body.woocommerce-cart .wc-block-cart {
+   font-family: var(--sccc-wc-font);
+   color: var(--sccc-wc-text);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout.alignwide,
+ body.woocommerce-cart .wp-block-woocommerce-cart.alignwide {
+   max-width: var(--sccc-wc-max-width);
+   margin-left: auto;
+   margin-right: auto;
+   padding: clamp(18px, 3vw, 32px) clamp(12px, 2vw, 24px);
+ }
+ 
+ /* Links */
+ body.woocommerce-checkout .wp-block-woocommerce-checkout a,
+ body.woocommerce-checkout .wc-block-checkout a,
+ body.woocommerce-cart .wp-block-woocommerce-cart a,
+ body.woocommerce-cart .wc-block-cart a {
+   color: color-mix(in srgb, var(--sccc-wc-primary) 85%, var(--sccc-wc-text));
+   text-decoration: none;
+   transition:
+     opacity var(--sccc-wc-ease),
+     transform var(--sccc-wc-ease);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout a:hover,
+ body.woocommerce-checkout .wc-block-checkout a:hover,
+ body.woocommerce-cart .wp-block-woocommerce-cart a:hover,
+ body.woocommerce-cart .wc-block-cart a:hover {
+   opacity: 0.92;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout a:focus-visible,
+ body.woocommerce-checkout .wc-block-checkout a:focus-visible,
+ body.woocommerce-cart .wp-block-woocommerce-cart a:focus-visible,
+ body.woocommerce-cart .wc-block-cart a:focus-visible {
+   outline: 2px solid var(--sccc-wc-focus);
+   outline-offset: 3px;
+   border-radius: 10px;
+ }
+ 
+ /* ==========================================================================
+    Layout: stacked by default, 2-column on desktop
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-sidebar-layout,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-sidebar-layout,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-sidebar-layout,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-sidebar-layout {
+   display: flex !important;
+   flex-direction: column !important;
+   flex-wrap: nowrap !important;
+   align-items: stretch !important;
+   gap: clamp(14px, 2vw, 22px);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-main,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-sidebar,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-main,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-sidebar,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-main,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-sidebar,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-main,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-sidebar,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__main,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__sidebar,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__main,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__sidebar {
+   min-width: 0;
+ }
+ 
+ @media (min-width: 1100px) {
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-sidebar-layout,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-components-sidebar-layout,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-sidebar-layout,
+   body.woocommerce-cart .wc-block-cart .wc-block-components-sidebar-layout {
+     flex-direction: row !important;
+     align-items: flex-start !important;
+     flex-wrap: nowrap !important;
+   }
+ 
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-main,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-components-main,
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__main,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-main,
+   body.woocommerce-cart .wc-block-cart .wc-block-components-main,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__main {
+     flex: 1 1 auto !important;
+     min-width: 0 !important;
+   }
+ 
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-sidebar,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-components-sidebar,
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__sidebar,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-sidebar,
+   body.woocommerce-cart .wc-block-cart .wc-block-components-sidebar,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__sidebar {
+     flex: 0 0 var(--sccc-wc-sidebar-w) !important;
+     width: var(--sccc-wc-sidebar-w) !important;
+     min-width: var(--sccc-wc-sidebar-min) !important;
+   }
+ }
+ 
+ /* ==========================================================================
+    Glass cards: checkout main/sidebar + cart main/sidebar
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__main,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__sidebar,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__main,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__sidebar,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__main,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__sidebar,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__main,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__sidebar {
+   position: relative;
+   background: linear-gradient(135deg, var(--sccc-wc-glass-top), var(--sccc-wc-glass-bot));
+   border: 1px solid var(--sccc-wc-glass-border);
+   border-radius: var(--sccc-wc-radius);
+   overflow: hidden;
+   box-shadow:
+     var(--sccc-wc-shadow),
+     inset 0 1px 0 var(--sccc-wc-glass-highlight);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__main::before,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__sidebar::before,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__main::before,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__sidebar::before,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__main::before,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__sidebar::before,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__main::before,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__sidebar::before {
+   content: "";
+   position: absolute;
+   inset: 0;
+   pointer-events: none;
+   opacity: 0.14;
+   background:
+     radial-gradient(900px 460px at 16% 10%, rgba(19, 91, 236, 0.20) 0%, transparent 60%),
+     radial-gradient(700px 420px at 94% 18%, rgba(255, 255, 255, 0.08) 0%, transparent 62%);
+ }
+ 
+ @supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__main,
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__sidebar,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__main,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__sidebar,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__main,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__sidebar,
+   body.woocommerce-cart .wc-block-cart .wc-block-cart__main,
+   body.woocommerce-cart .wc-block-cart .wc-block-cart__sidebar {
+     -webkit-backdrop-filter: blur(14px) saturate(115%);
+     backdrop-filter: blur(14px) saturate(115%);
+   }
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__main,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__main,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__main,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__main {
+   padding: clamp(16px, 2.4vw, 28px);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__sidebar,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__sidebar,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__sidebar,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__sidebar {
+   padding: clamp(14px, 2vw, 24px);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__sidebar.is-sticky,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__sidebar.is-sticky {
+   top: 24px;
+ }
+ 
+ /* ==========================================================================
+    Section headings / step titles
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-step__heading-container,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-step__heading-container {
+   padding-bottom: 12px;
+   margin-bottom: 14px;
+   border-bottom: 1px solid var(--sccc-wc-line);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-step__title,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-step__title,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-title,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-title,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-title,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-title {
+   color: var(--sccc-wc-text);
+   font-weight: 750;
+   letter-spacing: -0.01em;
+   line-height: 1.2;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout fieldset.wc-block-components-checkout-step,
+ body.woocommerce-checkout .wc-block-checkout fieldset.wc-block-components-checkout-step {
+   margin: 0 0 18px;
+   padding: 0;
+   border: 0;
+ }
+ 
+ /* ==========================================================================
+    Text inputs and textareas
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input {
+   margin-bottom: 14px;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input input,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input textarea,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input input,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input textarea,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input input,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input textarea,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input input,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input textarea {
+   width: 100%;
+   background: var(--sccc-wc-field-bg) !important;
+   background-color: var(--sccc-wc-field-solid-bg) !important;
+   color: var(--sccc-wc-field-text) !important;
+   -webkit-text-fill-color: var(--sccc-wc-field-text) !important;
+   border: 1px solid var(--sccc-wc-field-border) !important;
+   border-radius: 12px;
+   padding: 14px;
+   box-shadow:
+     inset 0 1px 0 var(--sccc-wc-field-shine),
+     0 0 0 1px var(--sccc-wc-field-outline);
+   transition:
+     border-color var(--sccc-wc-ease),
+     box-shadow var(--sccc-wc-ease),
+     background var(--sccc-wc-ease);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input input:hover,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input textarea:hover,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input input:hover,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input textarea:hover,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input input:hover,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input textarea:hover,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input input:hover,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input textarea:hover {
+   border-color: var(--sccc-wc-field-hover-border) !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input input:focus,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input textarea:focus,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input input:focus,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input textarea:focus,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input input:focus,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input textarea:focus,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input input:focus,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input textarea:focus {
+   outline: none !important;
+   border-color: var(--sccc-wc-field-focus-border) !important;
+   box-shadow:
+     0 0 0 4px var(--sccc-wc-field-focus-ring),
+     inset 0 1px 0 var(--sccc-wc-field-shine),
+     0 0 0 1px var(--sccc-wc-field-outline);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input input::placeholder,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input textarea::placeholder,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input input::placeholder,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input textarea::placeholder,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input input::placeholder,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input textarea::placeholder,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input input::placeholder,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input textarea::placeholder {
+   color: var(--sccc-wc-field-placeholder);
+   opacity: 1;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input label,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input label,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input label,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input label {
+   color: var(--sccc-wc-field-label) !important;
+   -webkit-text-fill-color: var(--sccc-wc-field-label) !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input.is-active label,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-text-input:focus-within label,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input.is-active label,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-text-input:focus-within label,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input.is-active label,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-text-input:focus-within label,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input.is-active label,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-text-input:focus-within label {
+   color: var(--sccc-wc-muted-2) !important;
+   -webkit-text-fill-color: var(--sccc-wc-muted-2) !important;
+ }
+ 
+ /* ==========================================================================
+    WooCommerce Block selects / dropdowns
+    ========================================================================== */
+ 
+ /**
+  * Select container
+  * -----------------------------------------------------------------------------
+  * Gives the country/state controls the same rounded glass surface as the text
+  * fields and helps prevent Woo/browser background bleed-through.
+  */
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__container,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__container,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__container,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__container {
+   position: relative;
+   border-radius: 12px;
+   background: var(--sccc-wc-field-bg) !important;
+   background-color: var(--sccc-wc-field-solid-bg) !important;
+   color-scheme: var(--sccc-wc-color-scheme);
+ }
+ 
+ /**
+  * Closed select field
+  * -----------------------------------------------------------------------------
+  * This is the main white-on-white fix.
+  */
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__select,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__select,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__select,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__select,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout select.wc-blocks-components-select__select,
+ body.woocommerce-checkout .wc-block-checkout select.wc-blocks-components-select__select {
+   display: block;
+   width: 100%;
+   min-height: 3.15rem;
+   padding: 1.18rem 2.75rem 0.42rem 0.75rem !important;
+   border: 1px solid var(--sccc-wc-field-border) !important;
+   border-radius: 12px !important;
+   background: var(--sccc-wc-field-bg) !important;
+   background-color: var(--sccc-wc-field-solid-bg) !important;
+   color: var(--sccc-wc-field-text) !important;
+   -webkit-text-fill-color: var(--sccc-wc-field-text) !important;
+   box-shadow:
+     inset 0 1px 0 var(--sccc-wc-field-shine),
+     0 0 0 1px var(--sccc-wc-field-outline);
+   font-size: 0.96rem;
+   line-height: 1.25;
+   appearance: none;
+   -webkit-appearance: none;
+   color-scheme: var(--sccc-wc-color-scheme);
+   transition:
+     border-color var(--sccc-wc-ease),
+     box-shadow var(--sccc-wc-ease),
+     background var(--sccc-wc-ease);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__select:hover,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__select:hover,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__select:hover,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__select:hover {
+   border-color: var(--sccc-wc-field-hover-border) !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__select:focus,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__select:focus-visible,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__select:focus,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__select:focus-visible,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__select:focus,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__select:focus-visible,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__select:focus,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__select:focus-visible {
+   outline: none !important;
+   border-color: var(--sccc-wc-field-focus-border) !important;
+   box-shadow:
+     0 0 0 4px var(--sccc-wc-field-focus-ring),
+     inset 0 1px 0 var(--sccc-wc-field-shine),
+     0 0 0 1px var(--sccc-wc-field-outline);
+ }
+ 
+ /**
+  * Floating select label
+  * -----------------------------------------------------------------------------
+  * Woo positions this label above the selected value. Force it away from white.
+  */
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__label,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__label,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__label,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__label {
+   color: var(--sccc-wc-field-label) !important;
+   -webkit-text-fill-color: var(--sccc-wc-field-label) !important;
+   background: transparent !important;
+   z-index: 2;
+ }
+ 
+ /**
+  * Select arrow icon
+  * -----------------------------------------------------------------------------
+  * Woo uses an inline SVG. This keeps the chevron visible in both themes.
+  */
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__expand,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__expand,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__expand,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__expand {
+   color: var(--sccc-wc-field-icon) !important;
+   fill: var(--sccc-wc-field-icon) !important;
+   pointer-events: none;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__expand path,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__expand path,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__expand path,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__expand path {
+   fill: currentColor !important;
+ }
+ 
+ /**
+  * Native browser dropdown list
+  * -----------------------------------------------------------------------------
+  * Browsers/operating systems vary in how much they allow option styling, but
+  * these rules fix the common Chrome/Safari/Firefox cases and keep the selected
+  * value readable.
+  */
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__select option,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__select optgroup,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__select option,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__select optgroup,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__select option,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__select optgroup,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__select option,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__select optgroup {
+   background-color: var(--sccc-wc-option-bg) !important;
+   color: var(--sccc-wc-option-text) !important;
+   -webkit-text-fill-color: var(--sccc-wc-option-text) !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__select option:disabled,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__select option:disabled,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__select option:disabled,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__select option:disabled {
+   color: var(--sccc-wc-option-muted) !important;
+   -webkit-text-fill-color: var(--sccc-wc-option-muted) !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-blocks-components-select__select option:checked,
+ body.woocommerce-checkout .wc-block-checkout .wc-blocks-components-select__select option:checked,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-blocks-components-select__select option:checked,
+ body.woocommerce-cart .wc-block-cart .wc-blocks-components-select__select option:checked {
+   background-color: var(--sccc-wc-option-checked-bg) !important;
+   color: var(--sccc-wc-option-text) !important;
+   -webkit-text-fill-color: var(--sccc-wc-option-text) !important;
+ }
+ 
+ /* ==========================================================================
+    Checkbox / radio polish
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkbox label,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkbox label,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-checkbox label,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-checkbox label {
+   display: inline-flex;
+   align-items: flex-start;
+   gap: 0.75rem;
+   margin: 0;
+   color: var(--sccc-wc-muted);
+   font-size: 0.96rem;
+   line-height: 1.45;
+   cursor: pointer;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkbox__input,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkbox__input,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-checkbox__input,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-checkbox__input {
+   flex: 0 0 auto;
+   width: 1.05rem;
+   height: 1.05rem;
+   margin: 0.14rem 0 0 !important;
+   accent-color: var(--sccc-eyebrow, #65d2ff);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkbox__label,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control__label,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkbox__label,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control__label,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-checkbox__label,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-radio-control__label,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-checkbox__label,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-radio-control__label {
+   color: var(--sccc-wc-muted) !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkbox__input:focus-visible,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control__input:focus-visible,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkbox__input:focus-visible,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control__input:focus-visible,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-checkbox__input:focus-visible,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-radio-control__input:focus-visible,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-checkbox__input:focus-visible,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-radio-control__input:focus-visible {
+   outline: 2px solid var(--sccc-wc-focus);
+   outline-offset: 3px;
+   border-radius: 6px;
+ }
+ 
+ /* ==========================================================================
+    Checkout: order note checkbox + textarea
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__add-note,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__add-note {
+   display: flex;
+   flex-direction: column;
+   gap: 0.95rem;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__add-note .wc-block-components-textarea,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__add-note .wc-block-components-textarea {
+   display: block;
+   width: 100%;
+   min-height: 7rem;
+   padding: 0.95rem 1rem;
+   border: 1px solid var(--sccc-wc-field-border) !important;
+   border-radius: 1rem;
+   background: var(--sccc-wc-field-bg) !important;
+   background-color: var(--sccc-wc-field-solid-bg) !important;
+   color: var(--sccc-wc-field-text) !important;
+   -webkit-text-fill-color: var(--sccc-wc-field-text) !important;
+   box-shadow:
+     inset 0 1px 0 var(--sccc-wc-field-shine),
+     0 0 0 1px var(--sccc-wc-field-outline);
+   font-size: 0.98rem;
+   line-height: 1.5;
+   resize: vertical;
+   transition:
+     border-color var(--sccc-wc-ease),
+     box-shadow var(--sccc-wc-ease),
+     background-color var(--sccc-wc-ease);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__add-note .wc-block-components-textarea::placeholder,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__add-note .wc-block-components-textarea::placeholder {
+   color: var(--sccc-wc-field-placeholder);
+   opacity: 1;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__add-note .wc-block-components-textarea:hover,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__add-note .wc-block-components-textarea:hover {
+   border-color: var(--sccc-wc-field-hover-border) !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__add-note .wc-block-components-textarea:focus,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__add-note .wc-block-components-textarea:focus {
+   outline: none !important;
+   border-color: var(--sccc-wc-field-focus-border) !important;
+   box-shadow:
+     0 0 0 4px var(--sccc-wc-field-focus-ring),
+     inset 0 1px 0 var(--sccc-wc-field-shine),
+     0 0 0 1px var(--sccc-wc-field-outline);
+ }
+ 
+ /* ==========================================================================
+    Buttons: shared base
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-button,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wp-element-button,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-button,
+ body.woocommerce-checkout .wc-block-checkout .wp-element-button,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-button,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wp-element-button,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-button,
+ body.woocommerce-cart .wc-block-cart .wp-element-button {
+   border-radius: 12px;
+   transition:
+     transform var(--sccc-wc-ease),
+     opacity var(--sccc-wc-ease),
+     box-shadow var(--sccc-wc-ease),
+     background var(--sccc-wc-ease),
+     border-color var(--sccc-wc-ease);
+ }
+ 
+ /* ==========================================================================
+    Checkout: Return to cart button
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-return-to-cart-button,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-return-to-cart-button {
+   display: inline-flex !important;
+   align-items: center !important;
+   justify-content: center !important;
+   gap: 0.55rem !important;
+   min-height: 2.75rem;
+   padding: 0.78rem 1rem !important;
+   border-radius: 12px;
+   background: linear-gradient(135deg, var(--sccc-wc-glass-2-top), var(--sccc-wc-glass-2-bot));
+   border: 1px solid var(--sccc-wc-glass-border);
+   color: var(--sccc-wc-text) !important;
+   box-shadow: inset 0 1px 0 var(--sccc-wc-glass-highlight);
+   line-height: 1 !important;
+   white-space: nowrap !important;
+   text-decoration: none !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-return-to-cart-button svg,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-return-to-cart-button svg {
+   display: none !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-return-to-cart-button::before,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-return-to-cart-button::before {
+   content: "←";
+   display: inline-block;
+   flex: 0 0 auto;
+   line-height: 1;
+   font-size: 1rem;
+   transform: translateY(-0.02em);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-return-to-cart-button:hover,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-return-to-cart-button:hover {
+   transform: translateY(-1px);
+   opacity: 0.96;
+ }
+ 
+ /* ==========================================================================
+    Checkout + Cart: Coupon panel and Apply button
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-panel__button,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-panel__button,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-panel__button,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-panel__button {
+   background: linear-gradient(135deg, var(--sccc-wc-glass-2-top), var(--sccc-wc-glass-2-bot));
+   border: 1px solid var(--sccc-wc-glass-border);
+   border-radius: 12px;
+   padding: 12px 14px;
+   color: var(--sccc-wc-text);
+   box-shadow: inset 0 1px 0 var(--sccc-wc-glass-highlight);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-panel__button:hover,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-panel__button:hover,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-panel__button:hover,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-panel__button:hover {
+   transform: translateY(-1px);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-totals-coupon__form,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-totals-coupon__form,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-totals-coupon__form,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-totals-coupon__form {
+   display: grid;
+   grid-template-columns: minmax(0, 1fr) auto;
+   gap: 0.75rem;
+   align-items: center !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-totals-coupon__input,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-totals-coupon__input,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-totals-coupon__input,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-totals-coupon__input {
+   min-width: 0;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-totals-coupon__button,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-totals-coupon__button,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-totals-coupon__button,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-totals-coupon__button {
+   align-self: center !important;
+   display: inline-flex !important;
+   align-items: center !important;
+   justify-content: center !important;
+   width: auto !important;
+   min-width: 5.4rem !important;
+   min-height: 2.55rem !important;
+   padding: 0.7rem 0.95rem !important;
+   border-radius: 0.9rem !important;
+   font-size: 0.88rem !important;
+   line-height: 1 !important;
+   white-space: nowrap;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-totals-coupon__button .wc-block-components-button__text,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-totals-coupon__button .wc-block-components-button__text,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-totals-coupon__button .wc-block-components-button__text,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-totals-coupon__button .wc-block-components-button__text {
+   display: inline-flex !important;
+   align-items: center !important;
+   justify-content: center !important;
+   line-height: 1 !important;
+ }
+ 
+ /* ==========================================================================
+    Checkout: Place Order button
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button {
+   position: relative;
+   display: inline-flex !important;
+   align-items: center !important;
+   justify-content: center !important;
+   gap: 0.65rem;
+   min-height: 3.15rem !important;
+   padding: 0.95rem 1.55rem !important;
+   border: 1px solid var(--sccc-wc-btn-border) !important;
+   border-radius: 9999px !important;
+   background: var(--sccc-wc-btn-bg) !important;
+   color: var(--sccc-wc-btn-text) !important;
+   -webkit-text-fill-color: var(--sccc-wc-btn-text) !important;
+   box-shadow:
+     var(--sccc-wc-btn-shadow),
+     0 0 24px rgba(83, 197, 245, 0.12) !important;
+   text-decoration: none !important;
+   cursor: pointer !important;
+   font-size: 0.92rem !important;
+   font-weight: 700 !important;
+   line-height: 1 !important;
+   letter-spacing: 0.012em !important;
+   overflow: hidden !important;
+   transition:
+     transform var(--sccc-wc-ease),
+     box-shadow var(--sccc-wc-ease),
+     border-color var(--sccc-wc-ease),
+     filter var(--sccc-wc-ease) !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button::before,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button::before {
+   content: "";
+   width: 0.56rem;
+   height: 0.56rem;
+   border-radius: 9999px;
+   flex: 0 0 auto;
+   background: linear-gradient(180deg, #8de6ff 0%, #53c5f5 100%);
+   box-shadow:
+     0 0 0 3px rgba(83, 197, 245, 0.12),
+     0 0 18px rgba(83, 197, 245, 0.28);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button::after,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button::after {
+   content: "";
+   position: absolute;
+   inset: 1px;
+   border-radius: 9999px;
+   background: linear-gradient(
+     180deg,
+     rgba(255, 255, 255, 0.14) 0%,
+     rgba(255, 255, 255, 0.04) 24%,
+     rgba(255, 255, 255, 0) 60%
+   );
+   pointer-events: none;
+ }
+ 
+ html[data-theme="light"] body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button::before,
+ html[data-theme="light"] body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button::before {
+   background: linear-gradient(180deg, #2bb3e8 0%, #0f83b6 100%);
+   box-shadow:
+     0 0 0 3px rgba(15, 131, 182, 0.1),
+     0 0 12px rgba(15, 131, 182, 0.12);
+ }
+ 
+ html[data-theme="light"] body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button::after,
+ html[data-theme="light"] body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button::after {
+   background: linear-gradient(
+     180deg,
+     rgba(255, 255, 255, 0.7) 0%,
+     rgba(255, 255, 255, 0.28) 24%,
+     rgba(255, 255, 255, 0) 60%
+   );
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button:hover,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button:focus-visible,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button:hover,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button:focus-visible {
+   transform: translateY(-1px) !important;
+   border-color: var(--sccc-wc-btn-hover-border) !important;
+   box-shadow: var(--sccc-wc-btn-hover-shadow) !important;
+   outline: none !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button:active,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button:active {
+   transform: translateY(0) !important;
+   filter: brightness(0.99) !important;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button .wc-block-components-button__text,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button .wc-block-components-button__text,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button .wc-block-components-checkout-place-order-button__text,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button .wc-block-components-checkout-place-order-button__text {
+   position: relative;
+   z-index: 1;
+   color: inherit !important;
+   -webkit-text-fill-color: inherit !important;
+ }
+ 
+ /* ==========================================================================
+    Cart: Proceed to Checkout button
+    ========================================================================== */
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained {
+   position: relative;
+   overflow: hidden;
+   display: inline-flex !important;
+   align-items: center;
+   justify-content: center;
+   width: 100%;
+   min-height: 52px;
+   padding: 14px 18px;
+   border-radius: 16px;
+   text-decoration: none;
+   border: 1px solid transparent;
+   background:
+     linear-gradient(135deg, var(--sccc-wc-cta-fill-top) 0%, var(--sccc-wc-cta-fill-bot) 100%) padding-box,
+     linear-gradient(135deg, var(--sccc-wc-cta-a) 0%, var(--sccc-wc-cta-b) 55%, var(--sccc-wc-cta-c) 100%) border-box;
+   color: var(--sccc-wc-cta-text);
+   font-weight: 900;
+   letter-spacing: 0.01em;
+   box-shadow:
+     0 0 0 1px color-mix(in srgb, var(--sccc-wc-cta-b) 24%, transparent),
+     0 16px 44px var(--sccc-wc-cta-glow),
+     inset 0 1px 0 rgba(255, 255, 255, 0.22);
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained::before,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained::before {
+   content: "";
+   position: absolute;
+   inset: -2px;
+   border-radius: inherit;
+   pointer-events: none;
+   opacity: 0.42;
+   background: linear-gradient(135deg, var(--sccc-wc-cta-a) 0%, var(--sccc-wc-cta-b) 55%, var(--sccc-wc-cta-c) 100%);
+   filter: blur(14px);
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained::after,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained::after {
+   content: "";
+   position: absolute;
+   top: -20%;
+   left: -140%;
+   width: 120%;
+   height: 160%;
+   pointer-events: none;
+   opacity: 0.42;
+   background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.34) 45%, transparent 70%);
+   transform: skewX(-12deg);
+   transition: left 700ms ease;
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained:hover,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained:hover {
+   opacity: 0.99;
+   transform: translateY(-1px);
+   box-shadow:
+     0 0 0 1px color-mix(in srgb, var(--sccc-wc-cta-b) 30%, transparent),
+     0 20px 56px color-mix(in srgb, var(--sccc-wc-cta-b) 26%, transparent),
+     inset 0 1px 0 rgba(255, 255, 255, 0.26);
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained:hover::before,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained:hover::before {
+   opacity: 0.58;
+   filter: blur(16px);
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained:hover::after,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained:hover::after {
+   left: 120%;
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained:active,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained:active {
+   transform: translateY(0);
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained:focus-visible,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained:focus-visible {
+   outline: none;
+   box-shadow:
+     0 0 0 4px color-mix(in srgb, var(--sccc-wc-cta-b) 18%, transparent),
+     0 20px 56px var(--sccc-wc-cta-glow),
+     inset 0 1px 0 rgba(255, 255, 255, 0.26);
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained .wc-block-components-button__text,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained .wc-block-components-button__text {
+   color: inherit;
+ }
+ 
+ /* ==========================================================================
+    Cart: Remove item action
+    --------------------------------------------------------------------------
+    Why this section changed
+    - Removes the bordered / pill styling from the old remove action.
+    - Presents the control as a clean inline action.
+    - Shows a visible label: "remove from cart".
+    ========================================================================== */
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart-item__remove-link,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart-item__remove-link {
+   appearance: none;
+   -webkit-appearance: none;
+   display: inline-flex !important;
+   align-items: center !important;
+   justify-content: flex-start !important;
+   gap: 0.45rem !important;
+   padding: 0 !important;
+   min-height: auto !important;
+   margin: 0 !important;
+ 
+   /* Important: remove the old “pill” look */
+   border: 0 !important;
+   border-radius: 0 !important;
+   background: transparent !important;
+   box-shadow: none !important;
+ 
+   /* Hide any inline text so we can present a consistent visible label */
+   font-size: 0 !important;
+   line-height: 1 !important;
+ 
+   color: color-mix(in srgb, var(--sccc-wc-danger) 78%, var(--sccc-wc-text)) !important;
+   text-decoration: none !important;
+   cursor: pointer;
+   user-select: none;
+ }
+ 
+ /* Simple inline icon with no outer border */
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart-item__remove-link::before,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart-item__remove-link::before {
+   content: "×";
+   display: inline-block;
+   flex: 0 0 auto;
+ 
+   width: auto;
+   height: auto;
+   margin: 0;
+ 
+   border: 0 !important;
+   border-radius: 0 !important;
+   background: transparent !important;
+   box-shadow: none !important;
+ 
+   color: currentColor;
+   font-size: 1rem;
+   font-weight: 700;
+   line-height: 1;
+ }
+ 
+ /* Visible action label requested by you */
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart-item__remove-link::after,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart-item__remove-link::after {
+   content: "remove from cart";
+   display: inline-block;
+   flex: 0 0 auto;
+ 
+   color: currentColor;
+   font-size: 0.875rem;
+   font-weight: 600;
+   line-height: 1.2;
+   letter-spacing: 0.01em;
+ }
+ 
+ /* Hover / focus states stay subtle and text-link-like */
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart-item__remove-link:hover,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart-item__remove-link:hover {
+   color: color-mix(in srgb, var(--sccc-wc-danger) 92%, white 8%) !important;
+   opacity: 1;
+   transform: none !important;
+   text-decoration: underline !important;
+   text-decoration-thickness: 1px;
+   text-underline-offset: 0.14em;
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart-item__remove-link:active,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart-item__remove-link:active {
+   opacity: 0.92;
+   transform: none !important;
+   box-shadow: none !important;
+ }
+ 
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart-item__remove-link:focus-visible,
+ body.woocommerce-cart .wc-block-cart .wc-block-cart-item__remove-link:focus-visible {
+   outline: 2px solid color-mix(in srgb, var(--sccc-wc-danger) 45%, white 10%) !important;
+   outline-offset: 4px;
+   border-radius: 6px !important;
+   box-shadow: none !important;
+ }
+ 
+ /* ==========================================================================
+    Checkout: Terms + helper text
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-checkout__terms,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-checkout__terms {
+   color: var(--sccc-wc-muted);
+   padding-top: 14px;
+   margin-top: 16px;
+   border-top: 1px solid var(--sccc-wc-line);
+ }
+ 
+ /* ==========================================================================
+    Notices
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-notices,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-notices,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-notices,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-notices {
+   margin-bottom: 14px;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-notice-snackbar-list,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-notice-snackbar-list,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-notice-snackbar-list,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-notice-snackbar-list {
+   border-radius: 12px;
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-notice-banner,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-notice-banner,
+ body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-notice-banner,
+ body.woocommerce-cart .wc-block-cart .wc-block-components-notice-banner {
+   background: linear-gradient(135deg, var(--sccc-wc-glass-2-top), var(--sccc-wc-glass-2-bot));
+   border: 1px solid var(--sccc-wc-glass-border);
+   border-radius: 12px;
+   color: var(--sccc-wc-text);
+   box-shadow:
+     var(--sccc-wc-shadow),
+     inset 0 1px 0 var(--sccc-wc-glass-highlight);
+ }
+ 
+ /* ==========================================================================
+    Checkout sidebar: order summary
+    ========================================================================== */
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-order-summary__title,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-order-summary__title {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: 12px;
+   padding: 12px 12px 14px;
+   margin: -6px -6px 14px;
+   border-radius: 14px;
+   background: linear-gradient(135deg, var(--sccc-wc-glass-2-top), var(--sccc-wc-glass-2-bot));
+   border: 1px solid var(--sccc-wc-glass-border);
+   box-shadow: inset 0 1px 0 var(--sccc-wc-glass-highlight);
+ }
+ 
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-order-summary__title-text,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-order-summary__title-text,
+ body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-order-summary__title-price,
+ body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-order-summary__title-price {
+   color: var(--sccc-wc-text);
+   font-weight: 850;
+   letter-spacing: -0.01em;
+ }
+ 
+ /* ==========================================================================
+    Mobile
+    ========================================================================== */
+ 
+ @media (max-width: 767px) {
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-totals-coupon__form,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-components-totals-coupon__form,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-totals-coupon__form,
+   body.woocommerce-cart .wc-block-cart .wc-block-components-totals-coupon__form {
+     grid-template-columns: 1fr;
+   }
+ 
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-totals-coupon__button,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-components-totals-coupon__button,
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-checkout-place-order-button,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-components-checkout-place-order-button,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-totals-coupon__button,
+   body.woocommerce-cart .wc-block-cart .wc-block-components-totals-coupon__button {
+     width: 100% !important;
+   }
+ 
+   /* Keep the remove action readable on smaller screens */
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart-item__remove-link::after,
+   body.woocommerce-cart .wc-block-cart .wc-block-cart-item__remove-link::after {
+     font-size: 0.8125rem;
+   }
+ }
+ 
+ /* ==========================================================================
+    Reduced motion
+    ========================================================================== */
+ 
+ @media (prefers-reduced-motion: reduce) {
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-button,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-components-button,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-button,
+   body.woocommerce-cart .wc-block-cart .wc-block-components-button,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart__submit-button.contained::after,
+   body.woocommerce-cart .wc-block-cart .wc-block-cart__submit-button.contained::after,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart-item__remove-link,
+   body.woocommerce-cart .wc-block-cart .wc-block-cart-item__remove-link {
+     transition: none !important;
+   }
+ 
+   body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-button:hover,
+   body.woocommerce-checkout .wc-block-checkout .wc-block-components-button:hover,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-components-button:hover,
+   body.woocommerce-cart .wc-block-cart .wc-block-components-button:hover,
+   body.woocommerce-cart .wp-block-woocommerce-cart .wc-block-cart-item__remove-link:hover,
+   body.woocommerce-cart .wc-block-cart .wc-block-cart-item__remove-link:hover {
+     transform: none !important;
+   }
+ }

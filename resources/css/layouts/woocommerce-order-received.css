@@ -1,0 +1,527 @@
+/**
+ * resources/styles/woocommerce-order-received.css
+ * File: resources/styles/woocommerce-order-received.css
+ *
+ * What this stylesheet does
+ * -----------------------------------------------------------------------------
+ * Styles ONLY the WooCommerce "Order received / Thank you" page.
+ *
+ * Important rules
+ * -----------------------------------------------------------------------------
+ * - Scoped to: body.woocommerce-order-received (no collateral impact).
+ * - Does NOT rely on Tailwind `dark:` variants.
+ * - Uses your theme toggles:
+ *     Light: html[data-theme="light"]
+ *     Dark:  html[data-theme="dark"].dark (and also .dark as a safety net)
+ *
+ * Design intent (this iteration)
+ * -----------------------------------------------------------------------------
+ * - Keep cards mostly DARK (no washed-out glass fill).
+ * - Glass effect is LIMITED to borders (subtle border sheen).
+ * - Lifted appearance via premium shadow + slight inner highlight.
+ */
+
+/* ==========================================================================
+   1) PAGE-LOCAL "TUNING KNOBS" (easy tweaks)
+   ========================================================================== */
+
+   .woocommerce-order-received {
+    /* Layout */
+    --sccc-or-maxw: 72rem;
+    --sccc-or-pad: clamp(1rem, 3vw, 2rem);
+    --sccc-or-radius: 1.25rem;
+  
+    /* Theme tokens (fallbacks) */
+    --sccc-or-bg: var(--color-bg, #0b1220);
+  
+    /* IMPORTANT: keep surfaces dark/true (no milky overlays) */
+    --sccc-or-surface: var(--color-surface, rgba(255, 255, 255, 0.06));
+  
+    --sccc-or-text: var(--color-text, #eaf0ff);
+    --sccc-or-muted: var(--color-muted, rgba(234, 240, 255, 0.72));
+    --sccc-or-line: var(--color-line, rgba(255, 255, 255, 0.12));
+  
+    /* Label color (higher contrast than muted, used for card labels) */
+    --sccc-or-label: rgba(234, 240, 255, 0.82);
+  
+    /* Brand / accents */
+    --sccc-or-primary: var(--color-primary-500, #135bec);
+    --sccc-or-accent: var(--color-accent-500, var(--sccc-or-primary));
+    --sccc-or-link: var(--sccc-or-accent);
+  
+    /* Success */
+    --sccc-or-success: var(--color-success-500, #22c55e);
+  
+    /* Focus ring */
+    --sccc-or-focus: color-mix(in srgb, var(--sccc-or-accent) 55%, transparent);
+  
+    /* ------------------------------------------------------------------------
+       Border-glass system (LIMITED to borders)
+       ------------------------------------------------------------------------
+       Technique:
+       - border: 1px solid transparent
+       - background:
+           1) fill layer (padding-box)  -> stays dark/true
+           2) border sheen (border-box) -> glassy edge
+    ------------------------------------------------------------------------ */
+  
+    /* Card fill (does NOT change background tone) */
+    --sccc-or-card-fill: var(--sccc-or-surface);
+  
+    /* Border sheen stops (dark theme defaults) */
+    --sccc-or-border-a: rgba(255, 255, 255, 0.20); /* top highlight */
+    --sccc-or-border-b: rgba(255, 255, 255, 0.10); /* mid */
+    --sccc-or-border-c: rgba(255, 255, 255, 0.06); /* lowlight */
+    --sccc-or-border-accent: rgba(19, 91, 236, 0.16); /* tiny tint (border only) */
+  
+    /* Lift (outer) + inner top highlight */
+    --sccc-or-card-shadow:
+      0 16px 40px rgba(0, 0, 0, 0.28),
+      0 6px 18px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  
+    /* Softer lift for large wrapper */
+    --sccc-or-wrapper-shadow:
+      0 20px 55px rgba(0, 0, 0, 0.32),
+      0 8px 24px rgba(0, 0, 0, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  
+  /* Light theme overrides (keep classy, not washed) */
+  html[data-theme="light"] .woocommerce-order-received {
+    --sccc-or-bg: var(--color-bg, #f6f8fb);
+  
+    /* More opaque surfaces on light so text stays crisp */
+    --sccc-or-surface: var(--color-surface, rgba(255, 255, 255, 0.92));
+    --sccc-or-text: var(--color-text, #0f172a);
+    --sccc-or-muted: var(--color-muted, rgba(15, 23, 42, 0.72));
+    --sccc-or-line: var(--color-line, rgba(15, 23, 42, 0.14));
+    --sccc-or-label: rgba(15, 23, 42, 0.78);
+    --sccc-or-link: var(--sccc-or-accent);
+  
+    --sccc-or-card-fill: var(--sccc-or-surface);
+  
+    /* Border sheen becomes a subtle dark edge + tiny blue tint */
+    --sccc-or-border-a: rgba(15, 23, 42, 0.22);
+    --sccc-or-border-b: rgba(15, 23, 42, 0.14);
+    --sccc-or-border-c: rgba(15, 23, 42, 0.10);
+    --sccc-or-border-accent: rgba(19, 91, 236, 0.14);
+  
+    --sccc-or-card-shadow:
+      0 14px 34px rgba(2, 6, 23, 0.10),
+      0 6px 16px rgba(2, 6, 23, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  
+    --sccc-or-wrapper-shadow:
+      0 18px 45px rgba(2, 6, 23, 0.12),
+      0 8px 20px rgba(2, 6, 23, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+  
+  /* Dark theme overrides */
+  html[data-theme="dark"] .woocommerce-order-received,
+  .dark .woocommerce-order-received {
+    --sccc-or-bg: var(--color-bg, #0b1220);
+    --sccc-or-surface: var(--color-surface, rgba(255, 255, 255, 0.06));
+    --sccc-or-text: var(--color-text, #eaf0ff);
+    --sccc-or-muted: var(--color-muted, rgba(234, 240, 255, 0.72));
+    --sccc-or-line: var(--color-line, rgba(255, 255, 255, 0.12));
+    --sccc-or-label: rgba(234, 240, 255, 0.82);
+    --sccc-or-link: var(--sccc-or-accent);
+  }
+  
+  /* Better mixes when supported */
+  @supports (background: color-mix(in oklab, white, black)) {
+    html[data-theme="dark"] .woocommerce-order-received,
+    .dark .woocommerce-order-received {
+      /* Keep things DARK, but clean up border sheen */
+      --sccc-or-border-a: color-mix(in oklab, white 22%, transparent);
+      --sccc-or-border-b: color-mix(in oklab, white 12%, transparent);
+      --sccc-or-border-c: color-mix(in oklab, white 8%, transparent);
+      --sccc-or-border-accent: color-mix(in oklab, var(--sccc-or-accent) 22%, transparent);
+  
+      /* Links: slightly brighter on dark */
+      --sccc-or-link: color-mix(in oklab, var(--sccc-or-accent) 78%, white);
+    }
+  
+    html[data-theme="light"] .woocommerce-order-received {
+      --sccc-or-border-a: color-mix(in oklab, black 22%, transparent);
+      --sccc-or-border-b: color-mix(in oklab, black 14%, transparent);
+      --sccc-or-border-c: color-mix(in oklab, black 10%, transparent);
+      --sccc-or-border-accent: color-mix(in oklab, var(--sccc-or-accent) 16%, transparent);
+    }
+  }
+  
+  /* ==========================================================================
+     2) BASE PAGE STRUCTURE
+     ========================================================================== */
+  
+  .woocommerce-order-received main#main {
+    padding-block: clamp(1.25rem, 3vw, 2.5rem);
+  }
+  
+  .woocommerce-order-received .woocommerce {
+    max-width: var(--sccc-or-maxw);
+    margin-inline: auto;
+    padding-inline: var(--sccc-or-pad);
+  }
+  
+  .woocommerce-order-received .woocommerce :where(h1, h2, h3, p, li, th, td, address) {
+    color: var(--sccc-or-text);
+  }
+  
+  .woocommerce-order-received .woocommerce :where(p) {
+    line-height: 1.55;
+  }
+  
+  /* Links: explicitly style visited state so the browser doesn’t turn them purple */
+  .woocommerce-order-received .woocommerce :where(a),
+  .woocommerce-order-received .woocommerce :where(a:visited) {
+    color: var(--sccc-or-link);
+    text-decoration: none;
+  }
+  .woocommerce-order-received .woocommerce :where(a:hover) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  
+  .woocommerce-order-received .woocommerce :where(a:focus-visible, button:focus-visible, [tabindex]:focus-visible) {
+    outline: 2px solid var(--sccc-or-focus);
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+  }
+  
+  /* ==========================================================================
+     3) BORDER-GLASS “LIFTED CARD” APPEARANCE (shared)
+     ========================================================================== */
+  
+  .woocommerce-order-received .woocommerce-order,
+  .woocommerce-order-received .woocommerce ul.woocommerce-order-overview.order_details > li,
+  .woocommerce-order-received table.woocommerce-table--order-details,
+  .woocommerce-order-received .product-name .wc-item-meta li,
+  .woocommerce-order-received .woocommerce-customer-details address {
+    border: 1px solid transparent;
+    background:
+      /* Fill: stays true (no washing) */
+      linear-gradient(var(--sccc-or-card-fill), var(--sccc-or-card-fill)) padding-box,
+      /* Border sheen: glass edge only */
+      linear-gradient(
+        135deg,
+        var(--sccc-or-border-a) 0%,
+        var(--sccc-or-border-b) 35%,
+        var(--sccc-or-border-c) 70%,
+        var(--sccc-or-border-accent) 100%
+      ) border-box;
+  }
+  
+  /* Individual lift tuning */
+  .woocommerce-order-received .woocommerce-order {
+    border-radius: var(--sccc-or-radius);
+    padding: var(--sccc-or-pad);
+    box-shadow: var(--sccc-or-wrapper-shadow);
+  }
+  
+  .woocommerce-order-received .woocommerce ul.woocommerce-order-overview.order_details > li,
+  .woocommerce-order-received .product-name .wc-item-meta li,
+  .woocommerce-order-received .woocommerce-customer-details address,
+  .woocommerce-order-received table.woocommerce-table--order-details {
+    box-shadow: var(--sccc-or-card-shadow);
+  }
+  
+  /* ==========================================================================
+     4) SUCCESS NOTICE
+     ========================================================================== */
+  
+  .woocommerce-order-received .woocommerce-notice.woocommerce-notice--success {
+    position: relative;
+    margin: 0 0 1.25rem;
+    padding: 1rem 1rem 1rem 3rem;
+    border-radius: 1rem;
+  
+    /* Keep fill dark/true; “success” is mainly border + icon */
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--sccc-or-card-fill), var(--sccc-or-card-fill)) padding-box,
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--sccc-or-success) 45%, var(--sccc-or-border-a)) 0%,
+        color-mix(in srgb, var(--sccc-or-success) 18%, var(--sccc-or-border-b)) 45%,
+        var(--sccc-or-border-c) 80%,
+        var(--sccc-or-border-accent) 100%
+      ) border-box;
+  
+    box-shadow: var(--sccc-or-card-shadow);
+    font-weight: 650;
+  }
+  
+  .woocommerce-order-received .woocommerce-notice.woocommerce-notice--success::before {
+    content: "✓";
+    position: absolute;
+    left: 1rem;
+    top: 0.95rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: #ffffff;
+    background: var(--sccc-or-success);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--sccc-or-success) 30%, transparent);
+  }
+  
+  /* ==========================================================================
+     5) ORDER OVERVIEW (ONE ROW on non-mobile; stack on mobile)
+     ========================================================================== */
+  
+  .woocommerce-order-received .woocommerce ul.woocommerce-order-overview.order_details {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+  
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr; /* mobile */
+  }
+  
+  @media (min-width: 640px) {
+    .woocommerce-order-received .woocommerce ul.woocommerce-order-overview.order_details {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0.75rem;
+    }
+  }
+  
+  .woocommerce-order-received .woocommerce ul.woocommerce-order-overview.order_details > li {
+    float: none;
+    border-right: none !important;
+    margin: 0;
+  
+    min-width: 0;
+    border-radius: 1rem;
+    padding: 0.85rem 0.95rem;
+  
+    /* Label (ORDER NUMBER:, DATE:, etc.) */
+    color: var(--sccc-or-label);
+    font-size: 0.82rem;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+  }
+  
+  @media (min-width: 640px) {
+    .woocommerce-order-received .woocommerce ul.woocommerce-order-overview.order_details > li {
+      flex: 1 1 0;
+    }
+  }
+  
+  .woocommerce-order-received .woocommerce ul.woocommerce-order-overview.order_details > li > strong {
+    display: block;
+    margin-top: 0.45rem;
+  
+    color: var(--sccc-or-text);
+    font-size: 1.05rem;
+    font-weight: 800;
+  
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+  
+    text-transform: none;
+  }
+  
+  .woocommerce-order-received .woocommerce ul.woocommerce-order-overview.order_details
+    > li.woocommerce-order-overview__email > strong {
+    font-size: 1rem;
+  }
+  
+  /* ==========================================================================
+     6) ORDER DETAILS (table)
+     ========================================================================== */
+  
+  .woocommerce-order-received .woocommerce-order-details {
+    margin-top: 1.25rem;
+  }
+  
+  .woocommerce-order-received .woocommerce-order-details__title {
+    margin: 0 0 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+  }
+  
+  .woocommerce-order-received table.woocommerce-table--order-details {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 1.1rem;
+  }
+  
+  /* Header gets a subtle accent wash (not the whole table) */
+  .woocommerce-order-received table.woocommerce-table--order-details thead th {
+    text-align: left;
+    padding: 0.9rem 1rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sccc-or-muted);
+    border-bottom: 1px solid var(--sccc-or-line);
+  
+    background:
+      radial-gradient(
+        520px 160px at 10% 0%,
+        color-mix(in srgb, var(--sccc-or-accent) 14%, transparent) 0%,
+        transparent 60%
+      );
+  }
+  
+  .woocommerce-order-received table.woocommerce-table--order-details td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--sccc-or-line);
+    vertical-align: top;
+  }
+  
+  .woocommerce-order-received table.woocommerce-table--order-details tbody tr:last-child td {
+    border-bottom: none;
+  }
+  
+  /* Product title/link: readable, never purple visited */
+  .woocommerce-order-received table.woocommerce-table--order-details td.product-name,
+  .woocommerce-order-received table.woocommerce-table--order-details td.product-name :where(a, a:visited) {
+    color: var(--sccc-or-link);
+  }
+  .woocommerce-order-received table.woocommerce-table--order-details td.product-name :where(a, a:visited) {
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .woocommerce-order-received table.woocommerce-table--order-details td.product-name :where(a:hover) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  
+  .woocommerce-order-received .product-name .product-quantity {
+    font-weight: 800;
+    color: var(--sccc-or-muted);
+  }
+  
+  /* Meta chips: readable text (Woo sometimes injects dark table defaults) */
+  .woocommerce-order-received .product-name .wc-item-meta {
+    list-style: none;
+    padding: 0;
+    margin: 0.65rem 0 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  
+  .woocommerce-order-received .product-name .wc-item-meta li {
+    border-radius: 0.9rem;
+    padding: 0.65rem 0.75rem;
+  }
+  
+  .woocommerce-order-received .product-name .wc-item-meta li > .wc-item-meta-label {
+    display: block;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    color: var(--sccc-or-label);
+    font-weight: 800;
+    margin-bottom: 0.15rem;
+  }
+  
+  .woocommerce-order-received .product-name .wc-item-meta li :where(p, span, bdi, strong) {
+    margin: 0;
+    color: var(--sccc-or-text) !important;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  
+  .woocommerce-order-received .product-total {
+    text-align: right;
+    white-space: nowrap;
+    font-weight: 850;
+  }
+  
+  /* Footer totals area */
+  .woocommerce-order-received table.woocommerce-table--order-details tfoot th,
+  .woocommerce-order-received table.woocommerce-table--order-details tfoot td {
+    padding: 0.9rem 1rem;
+    border-top: 1px solid var(--sccc-or-line);
+    border-bottom: none;
+  }
+  
+  .woocommerce-order-received table.woocommerce-table--order-details tfoot th {
+    text-align: left;
+    color: var(--sccc-or-muted);
+    font-weight: 750;
+  }
+  
+  .woocommerce-order-received table.woocommerce-table--order-details tfoot td {
+    text-align: right;
+    font-weight: 850;
+  }
+  
+  .woocommerce-order-received table.woocommerce-table--order-details tfoot tr:last-child th,
+  .woocommerce-order-received table.woocommerce-table--order-details tfoot tr:last-child td {
+    background:
+      radial-gradient(
+        560px 180px at 80% 40%,
+        color-mix(in srgb, var(--sccc-or-accent) 10%, transparent) 0%,
+        transparent 62%
+      );
+  }
+  
+  /* ==========================================================================
+     7) BILLING ADDRESS
+     ========================================================================== */
+  
+  .woocommerce-order-received .woocommerce-customer-details {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--sccc-or-line);
+    padding-top: 1.25rem;
+  }
+  
+  .woocommerce-order-received .woocommerce-column__title {
+    margin: 0 0 0.75rem;
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+  
+  .woocommerce-order-received .woocommerce-customer-details address {
+    font-style: normal;
+    margin: 0;
+    padding: 1rem;
+    border-radius: 1rem;
+    line-height: 1.6;
+  }
+  
+  .woocommerce-order-received .woocommerce-customer-details :where(.woocommerce-customer-details--phone, .woocommerce-customer-details--email) {
+    margin: 0.5rem 0 0;
+    color: var(--sccc-or-muted);
+    font-weight: 650;
+  }
+  
+  /* ==========================================================================
+     8) SMALL QUALITY-OF-LIFE TWEAKS
+     ========================================================================== */
+  
+  .woocommerce-order-received .woocommerce-order > :first-child { margin-top: 0; }
+  .woocommerce-order-received .woocommerce-order > :last-child { margin-bottom: 0; }
+  
+  .woocommerce-order-received .woocommerce-Price-amount {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.2px;
+  }
+  
+  .woocommerce-order-received .woocommerce-order > p {
+    margin: 0.75rem 0 0;
+    color: var(--sccc-or-muted);
+    font-weight: 600;
+  }
+  
+  @media (max-width: 480px) {
+    .woocommerce-order-received table.woocommerce-table--order-details :where(th, td) {
+      padding: 0.8rem 0.75rem;
+    }
+  }
+  

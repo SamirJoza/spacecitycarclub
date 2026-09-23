@@ -1,0 +1,450 @@
+/* =====================================================================
+   SPACE CITY CAR CLUB - UNIFIED GRADIENT SYSTEM
+   =====================================================================
+   Single source of truth for all gradients
+   - High-impact, automotive/space-themed gradients
+   - Uses Space City Blue (#135bec) as primary
+   - All gradients support light & dark modes
+   - Backward compatible with existing references
+   ===================================================================== */
+
+/* === Token aliases === */
+:root, :host, html {
+  --bg: var(--color-canvas);
+  --surface: var(--color-surface);
+  --primary: var(--color-primary-500);
+  --primary-light: var(--color-primary-300);
+  --primary-dark: var(--color-primary-600);
+  --text: var(--color-text);
+  --muted: var(--color-muted);
+  --line: var(--color-line);
+}
+
+/* =====================================================================
+   GRADIENT DEFINITIONS (CSS Variables - Single Source of Truth)
+   ===================================================================== */
+@layer base {
+  /* --------------------------------------------------------------------
+     HERO GRADIENTS - High impact for hero sections
+     -------------------------------------------------------------------- */
+  
+  /* Hero: Dual Corner Glow (Space City Blue) */
+  html.dark {
+    --gradient-hero-corner-glow:
+      radial-gradient(1200px 600px at -10% -20%,
+        rgba(19, 91, 236, 0.28) 0%,
+        rgba(19, 91, 236, 0.12) 36%,
+        transparent 72%
+      ),
+      radial-gradient(900px 520px at 110% 10%,
+        rgba(19, 91, 236, 0.20) 0%,
+        rgba(19, 91, 236, 0.10) 40%,
+        transparent 72%
+      ),
+      linear-gradient(135deg, #101622 0%, #0f172a 60%, #0a0e1a 100%);
+  }
+
+  html:not(.dark) {
+    --gradient-hero-corner-glow:
+      radial-gradient(1200px 600px at -10% -20%,
+        rgba(19, 91, 236, 0.18) 0%,
+        rgba(19, 91, 236, 0.08) 32%,
+        transparent 62%
+      ),
+      radial-gradient(900px 520px at 110% 10%,
+        rgba(19, 91, 236, 0.12) 0%,
+        rgba(19, 91, 236, 0.06) 34%,
+        transparent 62%
+      ),
+      linear-gradient(135deg, #f6f6f8 0%, #f6f6f8 60%, #f6f6f8 100%);
+  }
+
+  /* Hero: Speed Streak (diagonal motion effect) */
+  html.dark {
+    --gradient-hero-speed-streak:
+      linear-gradient(160deg,
+        transparent 0%,
+        transparent 50%,
+        rgba(19, 91, 236, 0.15) 52%,
+        rgba(19, 91, 236, 0.25) 55%,
+        rgba(19, 91, 236, 0.15) 58%,
+        transparent 65%
+      ),
+      linear-gradient(135deg, #101622 0%, #0f172a 60%, #0a0e1a 100%);
+  }
+
+  html:not(.dark) {
+    --gradient-hero-speed-streak:
+      linear-gradient(160deg,
+        transparent 0%,
+        transparent 50%,
+        rgba(19, 91, 236, 0.10) 52%,
+        rgba(19, 91, 236, 0.18) 55%,
+        rgba(19, 91, 236, 0.10) 58%,
+        transparent 65%
+      ),
+      linear-gradient(135deg, #f6f6f8 0%, #f6f6f8 60%, #f6f6f8 100%);
+  }
+
+  /* --------------------------------------------------------------------
+     SECTION GRADIENTS - Subtle blooms for content sections
+     -------------------------------------------------------------------- */
+  
+  /* Section: Dual Bloom (corner glows) */
+  html.dark {
+    --gradient-section-bloom:
+      radial-gradient(800px 420px at 10% -10%,
+        rgba(19, 91, 236, 0.20) 0%,
+        transparent 60%
+      ),
+      radial-gradient(760px 360px at 90% 110%,
+        rgba(19, 91, 236, 0.15) 0%,
+        transparent 60%
+      );
+  }
+
+  html:not(.dark) {
+    --gradient-section-bloom:
+      radial-gradient(800px 420px at 10% -10%,
+        rgba(19, 91, 236, 0.12) 0%,
+        transparent 60%
+      ),
+      radial-gradient(760px 360px at 90% 110%,
+        rgba(19, 91, 236, 0.10) 0%,
+        transparent 60%
+      );
+  }
+
+  /* Section: Vertical Glow (top to bottom fade) */
+  html.dark {
+    --gradient-section-vertical:
+      linear-gradient(180deg,
+        rgba(16, 22, 34, 1) 0%,
+        rgba(19, 91, 236, 0.15) 50%,
+        rgba(16, 22, 34, 1) 100%
+      );
+  }
+
+  html:not(.dark) {
+    --gradient-section-vertical:
+      linear-gradient(180deg,
+        #f6f6f8 0%,
+        rgba(19, 91, 236, 0.10) 50%,
+        #f6f6f8 100%
+      );
+  }
+
+  /* --------------------------------------------------------------------
+     SURFACE GRADIENTS - For cards and containers
+     -------------------------------------------------------------------- */
+  
+  /* Surface: Subtle Bloom */
+  html.dark {
+    --gradient-surface-bloom:
+      radial-gradient(520px 260px at 10% -10%,
+        rgba(19, 91, 236, 0.16) 0%,
+        transparent 60%
+      ),
+      radial-gradient(420px 240px at 90% -20%,
+        rgba(19, 91, 236, 0.12) 0%,
+        transparent 60%
+      );
+  }
+
+  html:not(.dark) {
+    --gradient-surface-bloom:
+      radial-gradient(520px 260px at 10% -10%,
+        rgba(19, 91, 236, 0.10) 0%,
+        transparent 60%
+      ),
+      radial-gradient(420px 240px at 90% -20%,
+        rgba(19, 91, 236, 0.08) 0%,
+        transparent 60%
+      );
+  }
+
+  /* Surface: Edge Glow (subtle border glow) */
+  html.dark {
+    --gradient-surface-edge:
+      linear-gradient(90deg,
+        rgba(19, 91, 236, 0.20) 0%,
+        transparent 10%,
+        transparent 90%,
+        rgba(19, 91, 236, 0.20) 100%
+      );
+  }
+
+  html:not(.dark) {
+    --gradient-surface-edge:
+      linear-gradient(90deg,
+        rgba(19, 91, 236, 0.12) 0%,
+        transparent 10%,
+        transparent 90%,
+        rgba(19, 91, 236, 0.12) 100%
+      );
+  }
+
+  /* --------------------------------------------------------------------
+     TEXT GRADIENTS - For headings and highlights
+     -------------------------------------------------------------------- */
+  
+  /* Text: Primary Blue Gradient */
+  --gradient-text-primary:
+    linear-gradient(90deg,
+      #135bec 0%,
+      #60a5fa 50%,
+      #135bec 100%
+    );
+
+  /* Text: Speed Line (motion effect) */
+  --gradient-text-speed:
+    linear-gradient(90deg,
+      #135bec 0%,
+      #60a5fa 30%,
+      #135bec 60%,
+      #60a5fa 100%
+    );
+
+  /* Text: Glow (bright center) */
+  --gradient-text-glow:
+    linear-gradient(90deg,
+      #0d4bc4 0%,
+      #135bec 25%,
+      #60a5fa 50%,
+      #135bec 75%,
+      #0d4bc4 100%
+    );
+
+  /* --------------------------------------------------------------------
+     RESPONSIVE ADJUSTMENTS
+     -------------------------------------------------------------------- */
+  
+  @media (max-width: 1024px) {
+    html.dark {
+      --gradient-hero-corner-glow:
+        radial-gradient(900px 480px at -6% -12%,
+          rgba(19, 91, 236, 0.28) 0%,
+          rgba(19, 91, 236, 0.12) 34%,
+          transparent 70%
+        ),
+        radial-gradient(760px 420px at 105% 8%,
+          rgba(19, 91, 236, 0.20) 0%,
+          rgba(19, 91, 236, 0.10) 38%,
+          transparent 70%
+        ),
+        linear-gradient(135deg, #101622 0%, #0f172a 60%, #0a0e1a 100%);
+    }
+    html:not(.dark) {
+      --gradient-hero-corner-glow:
+        radial-gradient(900px 480px at -6% -12%,
+          rgba(19, 91, 236, 0.18) 0%,
+          rgba(19, 91, 236, 0.08) 30%,
+          transparent 58%
+        ),
+        radial-gradient(760px 420px at 105% 8%,
+          rgba(19, 91, 236, 0.12) 0%,
+          rgba(19, 91, 236, 0.06) 30%,
+          transparent 58%
+        ),
+        linear-gradient(135deg, #f6f6f8 0%, #f6f6f8 60%, #f6f6f8 100%);
+    }
+  }
+
+  @media (max-width: 640px) {
+    html.dark {
+      --gradient-hero-corner-glow:
+        radial-gradient(0 0 at -200% -200%, transparent, transparent),
+        radial-gradient(900px 520px at 50% -8%,
+          rgba(19, 91, 236, 0.20) 0%,
+          rgba(19, 91, 236, 0.10) 40%,
+          transparent 72%
+        ),
+        linear-gradient(180deg, #101622 0%, #0f172a 60%, #0a0e1a 100%);
+    }
+    html:not(.dark) {
+      --gradient-hero-corner-glow:
+        radial-gradient(0 0 at -200% -200%, transparent, transparent),
+        radial-gradient(900px 520px at 50% -8%,
+          rgba(19, 91, 236, 0.12) 0%,
+          rgba(19, 91, 236, 0.06) 34%,
+          transparent 62%
+        ),
+        linear-gradient(180deg, #f6f6f8 0%, #f6f6f8 60%, #f6f6f8 100%);
+    }
+  }
+}
+
+/* =====================================================================
+   UTILITY CLASSES
+   ===================================================================== */
+@layer utilities {
+  /* Hero utilities */
+  .bg-hero {
+    background: var(--gradient-hero-corner-glow);
+  }
+
+  .bg-hero-speed-streak {
+    background: var(--gradient-hero-speed-streak);
+  }
+
+  /* Section utilities */
+  .bg-section-bloom {
+    background: var(--gradient-section-bloom), var(--bg);
+  }
+
+  .bg-section-vertical {
+    background: var(--gradient-section-vertical);
+  }
+
+  /* Surface utilities */
+  .bg-surface-bloom {
+    background: var(--gradient-surface-bloom), var(--surface);
+  }
+
+  .bg-surface-edge {
+    background: var(--gradient-surface-edge), var(--surface);
+  }
+
+  /* Convenience aliases */
+  .bg-canvas { background: var(--bg); }
+  .bg-surface { background: var(--surface); }
+}
+
+/* =====================================================================
+   GUTENBERG PRESET OVERRIDES
+   =====================================================================
+   Maps CSS variables to WordPress gradient presets
+   Maintains backward compatibility with existing gradient names
+   ===================================================================== */
+@layer base {
+  /* Hero: Corner Glow (renamed from hero-corner-glow) */
+  .has-hero-corner-glow-gradient-background,
+  .has-space-city-hero-gradient-background {
+    --wp--preset--gradient--hero-corner-glow: var(--gradient-hero-corner-glow) !important;
+    --wp--preset--gradient--space-city-hero: var(--gradient-hero-corner-glow) !important;
+    background-color: transparent !important;
+    background-repeat: no-repeat;
+  }
+
+  /* Hero: Speed Streak (new) */
+  .has-hero-speed-streak-gradient-background {
+    --wp--preset--gradient--hero-speed-streak: var(--gradient-hero-speed-streak) !important;
+    background-color: transparent !important;
+    background-repeat: no-repeat;
+  }
+
+  /* Section: Bloom (renamed from band-bloom-blue-red) */
+  .has-band-bloom-blue-red-gradient-background,
+  .has-bloom-blue-red-gradient-background,
+  .has-section-bloom-gradient-background {
+    --wp--preset--gradient--band-bloom-blue-red: var(--gradient-section-bloom) !important;
+    --wp--preset--gradient--bloom-blue-red: var(--gradient-section-bloom) !important;
+    --wp--preset--gradient--section-bloom: var(--gradient-section-bloom) !important;
+    background-color: transparent !important;
+    background-repeat: no-repeat;
+  }
+
+  /* Section: Vertical Glow (new) */
+  .has-section-vertical-gradient-background {
+    --wp--preset--gradient--section-vertical: var(--gradient-section-vertical) !important;
+    background-color: transparent !important;
+    background-repeat: no-repeat;
+  }
+
+  /* Surface: Bloom (existing) */
+  .has-surface-bloom-gradient-background {
+    --wp--preset--gradient--surface-bloom: var(--gradient-surface-bloom) !important;
+    background-color: transparent !important;
+    background-repeat: no-repeat;
+  }
+
+  /* Surface: Edge Glow (new) */
+  .has-surface-edge-gradient-background {
+    --wp--preset--gradient--surface-edge: var(--gradient-surface-edge) !important;
+    background-color: transparent !important;
+    background-repeat: no-repeat;
+  }
+
+  /* Hero: Diagonal Sheen (legacy - now uses blue) */
+  .has-hero-diagonal-sheen-gradient-background {
+    --wp--preset--gradient--hero-diagonal-sheen:
+      repeating-linear-gradient(
+        160deg,
+        color-mix(in srgb, var(--primary) 22%, var(--bg)) 0 8px,
+        color-mix(in srgb, var(--primary) 10%, var(--bg)) 8px 16px
+      ) !important;
+    background-color: transparent !important;
+    background-repeat: repeat;
+  }
+
+  /* Hero: Diagonal Sheen Blue (existing) */
+  .has-hero-diagonal-sheen-blue-gradient-background {
+    --wp--preset--gradient--hero-diagonal-sheen-blue:
+      repeating-linear-gradient(
+        160deg,
+        color-mix(in srgb, var(--primary) 22%, var(--bg)) 0 8px,
+        color-mix(in srgb, var(--primary) 10%, var(--bg)) 8px 16px
+      ) !important;
+    background-color: transparent !important;
+    background-repeat: repeat;
+  }
+
+  /* Legacy: Neon Green Plume (kept for backward compatibility) */
+  .has-neon-green-plume-gradient-background {
+    --wp--preset--gradient--neon-green-plume:
+      radial-gradient(640px 340px at 12% -10%,
+        color-mix(in srgb, #00FF6A 24%, transparent) 0%, transparent 60%
+      ),
+      radial-gradient(560px 300px at 88% 110%,
+        color-mix(in srgb, #00FF6A 16%, transparent) 0%, transparent 60%
+      ) !important;
+    background-color: transparent !important;
+    background-repeat: no-repeat;
+  }
+
+  @media (max-width: 640px) {
+    .has-neon-green-plume-gradient-background {
+      --wp--preset--gradient--neon-green-plume:
+        radial-gradient(520px 280px at 50% -12%,
+          color-mix(in srgb, #00FF6A 24%, transparent) 0%, transparent 60%
+        ),
+        radial-gradient(480px 260px at 50% 112%,
+          color-mix(in srgb, #00FF6A 16%, transparent) 0%, transparent 60%
+        ) !important;
+    }
+  }
+
+  /* Legacy: Hero with Diagonal Multi (kept for backward compatibility) */
+  .has-hero-with-diag-multi-gradient-background {
+    position: relative;
+    isolation: isolate;
+    --diag-angle: 45deg;
+    --diag-band: 8px;
+    --diag-period: 16px;
+    --diag-band-alpha: 0.20;
+    --diag-top-slope: 6%;
+  }
+
+  .has-hero-with-diag-multi-gradient-background::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--primary);
+    clip-path: polygon(0 0, 100% var(--diag-top-slope), 100% 100%, 0 100%);
+    z-index: -2;
+  }
+
+  .has-hero-with-diag-multi-gradient-background::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      var(--diag-angle),
+      rgba(0, 0, 0, var(--diag-band-alpha)) 0 var(--diag-band),
+      transparent var(--diag-band) var(--diag-period)
+    );
+    opacity: 1;
+    z-index: -1;
+  }
+}

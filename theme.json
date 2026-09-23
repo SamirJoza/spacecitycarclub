@@ -1,0 +1,185 @@
+{
+  "__preprocessed__": "This file is used to build the theme.json file in the `public/build/assets` directory. The built artifact includes Tailwind's colors, fonts, and font sizes.",
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "layout": {
+      "contentSize": "52rem"
+    },
+    "background": {
+      "backgroundImage": true
+    },
+    "color": {
+      "custom": false,
+      "customDuotone": false,
+      "customGradient": false,
+      "defaultDuotone": false,
+      "defaultGradients": false,
+      "defaultPalette": false,
+      "duotone": [],
+      "palette": [
+        {
+          "slug": "primary",
+          "name": "Space City Blue",
+          "color": "#135bec"
+        },
+        {
+          "slug": "primary-600",
+          "name": "Space City Blue Dark",
+          "color": "#0d4bc4"
+        },
+        {
+          "slug": "primary-300",
+          "name": "Space City Blue Light",
+          "color": "#60a5fa"
+        },
+        {
+          "slug": "accent",
+          "name": "Muted",
+          "color": "#64748b"
+        },
+        {
+          "slug": "canvas",
+          "name": "Canvas Light",
+          "color": "#f6f6f8"
+        },
+        {
+          "slug": "canvas-dark",
+          "name": "Canvas Dark",
+          "color": "#101622"
+        },
+        {
+          "slug": "surface",
+          "name": "Surface Light",
+          "color": "#ffffff"
+        },
+        {
+          "slug": "surface-dark",
+          "name": "Surface Dark",
+          "color": "#1a2233"
+        },
+        {
+          "slug": "text",
+          "name": "Text Light",
+          "color": "#0f172a"
+        },
+        {
+          "slug": "text-dark",
+          "name": "Text Dark",
+          "color": "#ffffff"
+        },
+        {
+          "slug": "muted",
+          "name": "Muted Light",
+          "color": "#64748b"
+        },
+        {
+          "slug": "muted-dark",
+          "name": "Muted Dark",
+          "color": "#94a3b8"
+        },
+        {
+          "slug": "line",
+          "name": "Line",
+          "color": "rgba(15, 23, 42, 0.12)"
+        }
+      ],
+     "gradients": [
+        {
+          "slug": "hero-corner-glow",
+          "name": "Hero — Space City Glow",
+          "gradient": "var(--wp--preset--gradient--hero-corner-glow)"
+        },
+        {
+          "slug": "space-city-hero",
+          "name": "Space City Hero (New)",
+          "gradient": "var(--wp--preset--gradient--space-city-hero)"
+        },
+        {
+          "slug": "hero-speed-streak",
+          "name": "Hero — Speed Streak",
+          "gradient": "var(--wp--preset--gradient--hero-speed-streak)"
+        },
+        {
+          "slug": "section-bloom",
+          "name": "Section — Dual Bloom",
+          "gradient": "var(--wp--preset--gradient--section-bloom)"
+        },
+        {
+          "slug": "section-vertical",
+          "name": "Section — Vertical Glow",
+          "gradient": "var(--wp--preset--gradient--section-vertical)"
+        },
+        {
+          "slug": "band-bloom-blue-red",
+          "name": "Band — Dual Bloom (Legacy)",
+          "gradient": "var(--wp--preset--gradient--band-bloom-blue-red)"
+        },
+        {
+          "slug": "surface-bloom",
+          "name": "Surface — Subtle Bloom",
+          "gradient": "var(--wp--preset--gradient--surface-bloom)"
+        },
+        {
+          "slug": "surface-edge",
+          "name": "Surface — Edge Glow",
+          "gradient": "var(--wp--preset--gradient--surface-edge)"
+        },
+        {
+          "slug": "hero-diagonal-sheen",
+          "name": "Hero — Diagonal Sheen",
+          "gradient": "var(--wp--preset--gradient--hero-diagonal-sheen)"
+        },
+        {
+          "slug": "hero-diagonal-sheen-blue",
+          "name": "Hero — Diagonal Sheen Blue",
+          "gradient": "var(--wp--preset--gradient--hero-diagonal-sheen-blue)"
+        },
+        {
+          "slug": "neon-green-plume",
+          "name": "Plume — Neon Green (Legacy)",
+          "gradient": "var(--wp--preset--gradient--neon-green-plume)"
+        },
+        {
+          "slug": "hero-with-diag-multi",
+          "name": "Hero — Multi Diagonal (Legacy)",
+          "gradient": "var(--wp--preset--gradient--hero-with-diag-multi, linear-gradient(transparent, transparent))"
+        }
+      ]
+    },
+    "custom": {
+      "spacing": {},
+      "typography": {
+        "font-size": {},
+        "line-height": {}
+      }
+    },
+    "spacing": {
+      "padding": true,
+      "units": [
+        "px",
+        "%",
+        "em",
+        "rem",
+        "vw",
+        "vh"
+      ]
+    },
+    "typography": {
+      "defaultFontSizes": false,
+      "customFontSize": false,
+      "fontFamilies": [
+        {
+          "slug": "body",
+          "name": "Inter",
+          "fontFamily": "'Inter', ui-sans-serif, system-ui"
+        },
+        {
+          "slug": "display",
+          "name": "Space Grotesk",
+          "fontFamily": "'Space Grotesk', ui-sans-serif, system-ui"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,695 @@
+/**
+ * resources/styles/membership-confirmation.css
+ * File: resources/styles/membership-confirmation.css
+ *
+ * What this file does
+ * -----------------------------------------------------------------------------
+ * Styles ONLY the PMPro Membership Confirmation + Single Order receipt content
+ * inside <main id="main"> on the membership confirmation page.
+ *
+ * Why this exists
+ * -----------------------------------------------------------------------------
+ * The body class "membership-confirmation" applies to the entire page, including
+ * header/footer. If we style links/buttons at the body level, we will
+ * accidentally restyle navigation and global UI.
+ *
+ * So we scope ALL visuals to:
+ *   body.membership-confirmation #main .pmpro ...
+ *
+ * Theme targeting
+ * -----------------------------------------------------------------------------
+ * Uses your theme switch:
+ *   Light: html[data-theme="light"]
+ *   Dark:  html[data-theme="dark"] and/or html.dark
+ *
+ * Design intent (current)
+ * -----------------------------------------------------------------------------
+ * - Classy glass (not washed out).
+ * - Meta blocks readable and sized for content.
+ * - Paid pill larger.
+ * - Print/PDF looks like a real button (no underline).
+ * - Remove double “glass sheet” (outer section + inner card).
+ * - Meta grid should actually USE the full available width (PMPro overrides fixed).
+ * - Confirmation message text stays readable even when PMPro changes the numeric
+ *   confirmation section ID, such as #pmpro_confirmation-2 or #pmpro_confirmation-3.
+ */
+
+/* =============================================================================
+   SCCC Membership Confirmation — TUNING KNOBS (easy tweaks)
+   ============================================================================= */
+
+   body.membership-confirmation {
+    /* Layout */
+    --mc-max-w: 64rem;
+    --mc-pad-x: 1rem;
+    --mc-pad-y: 1.25rem;
+  
+    /* Shape */
+    --mc-radius: 1.1rem;
+    --mc-radius-sm: 0.9rem;
+  
+    /* Type */
+    --mc-font-body: var(--font-body, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial);
+    --mc-font-display: var(--font-display, var(--mc-font-body));
+  
+    /* Borders + glow (subtle by default) */
+    --mc-border-width: 1px;
+    --mc-border-grad: linear-gradient(135deg, rgba(168, 85, 247, 0.72), rgba(59, 130, 246, 0.72)); /* purple → blue */
+    --mc-glow: 0 10px 28px rgba(59, 130, 246, 0.18);
+  
+    /* Sheen overlay (dialed back) */
+    --mc-sheen-top: rgba(255, 255, 255, 0.08);
+    --mc-sheen-fade: rgba(255, 255, 255, 0);
+  
+    /* Motion */
+    --mc-ease: 180ms ease;
+  }
+  
+  /* =============================================================================
+     Theme values (use project tokens when they exist, fall back safely)
+     ============================================================================= */
+  
+  html[data-theme="light"] body.membership-confirmation {
+    --mc-bg: var(--color-bg, #f4f6f8);
+    --mc-surface: var(--color-surface, #ffffff);
+    --mc-text: var(--color-text, #0f172a);
+    --mc-muted: var(--color-muted, #475569);
+    --mc-line: var(--color-line, rgba(15, 23, 42, 0.12));
+  
+    --mc-primary: var(--color-primary-500, #2563eb);
+    --mc-accent: var(--color-accent-500, #7c3aed);
+    --mc-success: var(--color-success-500, #16a34a);
+  
+    /* Cards look “solid” (no washed-out bleed) */
+    --mc-card-bg: color-mix(in oklab, var(--mc-surface) 92%, rgba(37, 99, 235, 0.03));
+    --mc-card-shadow: 0 16px 44px rgba(2, 6, 23, 0.10);
+    --mc-card-hover-shadow: 0 20px 56px rgba(2, 6, 23, 0.14);
+  
+    /* Meta “cutouts” */
+    --mc-cutout-bg: rgba(15, 23, 42, 0.04);
+  
+    /* Table */
+    --mc-table-bg: rgba(255, 255, 255, 0.96);
+    --mc-table-row: rgba(15, 23, 42, 0.02);
+    --mc-table-row-alt: rgba(15, 23, 42, 0.04);
+    --mc-table-head-bg: rgba(15, 23, 42, 0.06);
+  
+    /* Sheen softer on light */
+    --mc-sheen-top: rgba(255, 255, 255, 0.10);
+    --mc-sheen-fade: rgba(255, 255, 255, 0);
+  }
+  
+  html[data-theme="dark"] body.membership-confirmation,
+  html.dark body.membership-confirmation {
+    --mc-bg: var(--color-bg, #0b1220);
+    --mc-surface: var(--color-surface, #111a2b);
+    --mc-text: var(--color-text, #eaf0ff);
+    --mc-muted: var(--color-muted, rgba(234, 240, 255, 0.72));
+    --mc-line: var(--color-line, rgba(255, 255, 255, 0.12));
+  
+    --mc-primary: var(--color-primary-500, #4f8cff);
+    --mc-accent: var(--color-accent-500, #a855f7);
+    --mc-success: var(--color-success-500, #22c55e);
+  
+    /* Cards look “deep” (less haze, more class) */
+    --mc-card-bg: rgba(17, 26, 43, 0.92);
+    --mc-card-shadow: 0 20px 64px rgba(0, 0, 0, 0.55);
+    --mc-card-hover-shadow: 0 26px 86px rgba(0, 0, 0, 0.65);
+  
+    /* Meta “cutouts” */
+    --mc-cutout-bg: rgba(255, 255, 255, 0.06);
+  
+    /* Table */
+    --mc-table-bg: rgba(17, 26, 43, 0.85);
+    --mc-table-row: rgba(255, 255, 255, 0.04);
+    --mc-table-row-alt: rgba(255, 255, 255, 0.06);
+    --mc-table-head-bg: rgba(255, 255, 255, 0.06);
+  
+    /* Sheen softer on dark too */
+    --mc-sheen-top: rgba(255, 255, 255, 0.07);
+    --mc-sheen-fade: rgba(255, 255, 255, 0);
+  }
+  
+  /* If color-mix isn’t supported, keep safe defaults */
+  @supports not (background: color-mix(in oklab, white, black)) {
+    html[data-theme="light"] body.membership-confirmation {
+      --mc-card-bg: rgba(255, 255, 255, 0.96);
+    }
+  }
+  
+  /* =============================================================================
+     Base page layout — ONLY within <main id="main">
+     ============================================================================= */
+  
+  body.membership-confirmation {
+    background: var(--mc-bg);
+  }
+  
+  body.membership-confirmation #main {
+    background: transparent;
+    color: var(--mc-text);
+    font-family: var(--mc-font-body);
+    line-height: 1.55;
+  
+    max-width: var(--mc-max-w);
+    margin-inline: auto;
+    padding: var(--mc-pad-y) var(--mc-pad-x);
+  }
+  
+  @media (min-width: 768px) {
+    body.membership-confirmation #main {
+      padding: 2rem 1.5rem;
+    }
+  }
+  
+  body.membership-confirmation #main .pmpro {
+    margin-top: 1.25rem;
+  }
+  
+  /* =============================================================================
+     Links + focus — ONLY inside the PMPro content
+     ============================================================================= */
+  
+  body.membership-confirmation #main .pmpro a {
+    color: var(--mc-primary);
+    text-decoration: none;
+    transition: color var(--mc-ease), text-decoration-color var(--mc-ease);
+  }
+  
+  body.membership-confirmation #main .pmpro a:hover {
+    color: var(--mc-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  
+  body.membership-confirmation #main .pmpro a:focus-visible,
+  body.membership-confirmation #main .pmpro button:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--mc-primary) 60%, transparent);
+    outline-offset: 2px;
+    border-radius: 0.6rem;
+  }
+  
+  /* =============================================================================
+     Glass card system (CLASSY VERSION)
+     ============================================================================= */
+  
+  body.membership-confirmation #main .pmpro .pmpro_section,
+  body.membership-confirmation #main .pmpro .pmpro_card {
+    position: relative;
+    isolation: isolate;
+    background: var(--mc-card-bg);
+    border: 1px solid var(--mc-line);
+    border-radius: var(--mc-radius);
+    box-shadow: var(--mc-card-shadow);
+    overflow: hidden;
+  }
+  
+  /* Ensure content sits above border/sheens */
+  body.membership-confirmation #main .pmpro .pmpro_section > *,
+  body.membership-confirmation #main .pmpro .pmpro_card > * {
+    position: relative;
+    z-index: 2;
+  }
+  
+  /* Subtle top sheen */
+  body.membership-confirmation #main .pmpro .pmpro_section::after,
+  body.membership-confirmation #main .pmpro .pmpro_card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: linear-gradient(180deg, var(--mc-sheen-top), var(--mc-sheen-fade) 55%);
+  }
+  
+  /* Gradient border — only when masking is supported (prevents bleed) */
+  @supports ((-webkit-mask-composite: xor) or (mask-composite: exclude)) {
+    body.membership-confirmation #main .pmpro .pmpro_section::before,
+    body.membership-confirmation #main .pmpro .pmpro_card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      padding: var(--mc-border-width);
+      border-radius: inherit;
+      background: var(--mc-border-grad);
+      pointer-events: none;
+      z-index: 0;
+  
+      /* Show gradient only on border */
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+  
+      opacity: 0.9;
+    }
+  }
+  
+  /* Backdrop blur only if supported (kept subtle) */
+  @supports (backdrop-filter: blur(8px)) {
+    body.membership-confirmation #main .pmpro .pmpro_section,
+    body.membership-confirmation #main .pmpro .pmpro_card {
+      backdrop-filter: blur(8px);
+    }
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_section {
+    padding: 1.25rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_card {
+    padding: 1.25rem 1.25rem;
+    transition: transform var(--mc-ease), box-shadow var(--mc-ease);
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--mc-card-hover-shadow);
+  }
+  
+  /* PMPro sometimes gives inner content a fill; force it transparent */
+  body.membership-confirmation #main .pmpro .pmpro_card_content {
+    background: transparent !important;
+    color: var(--mc-text) !important;
+  }
+  
+  /* Horizontal rules / separators inside the card */
+  body.membership-confirmation #main .pmpro hr {
+    border: 0;
+    border-top: 1px solid var(--mc-line) !important;
+    opacity: 1 !important;
+  }
+  
+  /* =============================================================================
+     Remove double glass sheet for the order receipt section
+     ============================================================================= */
+  
+  body.membership-confirmation #main .pmpro #pmpro_order_single.pmpro_section {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  
+  body.membership-confirmation #main .pmpro #pmpro_order_single.pmpro_section::before,
+  body.membership-confirmation #main .pmpro #pmpro_order_single.pmpro_section::after {
+    display: none !important;
+  }
+  
+  /* =============================================================================
+     Confirmation message section
+     -----------------------------------------------------------------------------
+     Important fix:
+     PMPro can render this section with changing numeric IDs, for example:
+       #pmpro_confirmation-2
+       #pmpro_confirmation-3
+     The previous CSS targeted only #pmpro_confirmation-2, which is why the text
+     in the screenshot stayed dark/invisible on the dark glass card.
+     ============================================================================= */
+  
+  body.membership-confirmation #main .pmpro [id^="pmpro_confirmation"] {
+    color: var(--mc-text) !important;
+    position: relative;
+  }
+  
+  body.membership-confirmation #main .pmpro [id^="pmpro_confirmation"] p {
+    margin: 0.35rem 0;
+    color: var(--mc-text) !important;
+  }
+  
+  body.membership-confirmation #main .pmpro [id^="pmpro_confirmation"] p:first-child {
+    font-family: var(--mc-font-display);
+    font-weight: 750;
+    letter-spacing: 0.2px;
+  }
+  
+  body.membership-confirmation #main .pmpro [id^="pmpro_confirmation"] :is(strong, b, em, span) {
+    color: inherit !important;
+  }
+  
+  body.membership-confirmation #main .pmpro [id^="pmpro_confirmation"] a {
+    color: var(--mc-primary) !important;
+  }
+  
+  /* =============================================================================
+     Card header + actions
+     ============================================================================= */
+  
+  body.membership-confirmation #main .pmpro .pmpro_card_actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.9rem;
+  }
+  
+  /* Print button: more “button”, no underline, glass highlight */
+  body.membership-confirmation #main .pmpro .pmpro_btn-plain.pmpro_btn-print {
+    appearance: none;
+    border: 1px solid color-mix(in oklab, var(--mc-primary) 34%, var(--mc-line));
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--mc-accent) 16%, transparent),
+        color-mix(in oklab, var(--mc-primary) 12%, transparent)
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--mc-surface) 52%, transparent),
+        color-mix(in oklab, var(--mc-surface) 28%, transparent)
+      );
+    color: var(--mc-text) !important;
+  
+    border-radius: 9999px;
+    padding: 0.78rem 1.05rem;
+    font-weight: 800;
+    font-size: 0.92rem;
+  
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+  
+    cursor: pointer;
+    box-shadow:
+      0 12px 28px rgba(0, 0, 0, 0.26),
+      0 0 0 3px color-mix(in oklab, var(--mc-primary) 10%, transparent);
+  
+    transition: transform var(--mc-ease), box-shadow var(--mc-ease), border-color var(--mc-ease);
+    text-decoration: none !important;
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_btn-plain.pmpro_btn-print,
+  body.membership-confirmation #main .pmpro .pmpro_btn-plain.pmpro_btn-print * {
+    text-decoration: none !important;
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_btn-plain.pmpro_btn-print svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    opacity: 0.95;
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_btn-plain.pmpro_btn-print:hover {
+    border-color: color-mix(in oklab, var(--mc-accent) 55%, var(--mc-line));
+    box-shadow:
+      var(--mc-glow),
+      0 0 0 3px color-mix(in oklab, var(--mc-accent) 14%, transparent);
+    transform: translateY(-1px);
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_btn-plain.pmpro_btn-print:active {
+    transform: translateY(0);
+  }
+  
+  /* Title row */
+  body.membership-confirmation #main .pmpro .pmpro_card_title {
+    margin: 0.35rem 0 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    font-family: var(--mc-font-display);
+    color: var(--mc-text) !important;
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_font-x-large {
+    font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+    line-height: 1.25;
+    font-weight: 800;
+  }
+  
+  /* Paid pill: larger + premium */
+  body.membership-confirmation #main .pmpro .pmpro_tag.pmpro_tag-success {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  
+    min-height: 2.15rem;
+    padding: 0.4rem 1.05rem;
+  
+    border-radius: 9999px;
+    font-weight: 900;
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+  
+    color: #ffffff !important;
+  
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--mc-success) 92%, transparent),
+      color-mix(in oklab, var(--mc-primary) 58%, transparent)
+    );
+    border: 1px solid color-mix(in oklab, var(--mc-success) 35%, rgba(255,255,255,0.12));
+    box-shadow:
+      0 12px 26px color-mix(in oklab, var(--mc-success) 18%, transparent),
+      0 0 0 3px color-mix(in oklab, var(--mc-primary) 10%, transparent);
+  }
+  
+  /* =============================================================================
+     Meta list (Order date, payment method, etc.)
+     -----------------------------------------------------------------------------
+     Fix: PMPro may constrain the meta wrapper/list/items with max-width or flex.
+     We force full-width, and force items to stretch to fill grid columns.
+     ============================================================================= */
+  
+  /* Force the meta wrapper to actually span the card width */
+  body.membership-confirmation #main .pmpro #pmpro_order_single-meta {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  
+  /* Grid layout:
+     - 1 column on small screens
+     - 2 columns on sm+
+     - 4 columns on lg+ */
+  body.membership-confirmation #main .pmpro #pmpro_order_single-meta .pmpro_list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  
+    display: grid !important;
+    width: 100% !important;
+    max-width: none !important;
+  
+    grid-template-columns: 1fr;
+    gap: 1rem 1.25rem;
+  
+    /* Critical: make grid items stretch to use the available column width */
+    justify-items: stretch;
+    align-items: stretch;
+  }
+  
+  @media (min-width: 640px) {
+    body.membership-confirmation #main .pmpro #pmpro_order_single-meta .pmpro_list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    body.membership-confirmation #main .pmpro #pmpro_order_single-meta .pmpro_list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  
+  /* Force list items to fill their grid cell (PMPro sometimes uses max-width/flex) */
+  body.membership-confirmation #main .pmpro #pmpro_order_single-meta .pmpro_list_item {
+    display: block !important;
+  
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  
+    /* In case PMPro applies flex-basis/float/column widths */
+    float: none !important;
+    flex: initial !important;
+  
+    border: 1px solid var(--mc-line);
+    border-radius: var(--mc-radius-sm);
+    padding: 1rem 1.05rem;
+    background: var(--mc-cutout-bg);
+  
+    height: auto !important;
+    min-height: 4.75rem;
+  
+    color: var(--mc-text) !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  
+  body.membership-confirmation #main .pmpro #pmpro_order_single-meta .pmpro_list_item_label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 850;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mc-muted) !important;
+  }
+  
+  /* =============================================================================
+     Amount heading
+     ============================================================================= */
+  
+  body.membership-confirmation #main .pmpro #pmpro_order_single-items h3.pmpro_font-large {
+    margin: 0.35rem 0 0.9rem;
+    font-size: 1.1rem;
+    font-weight: 850;
+    color: var(--mc-text) !important;
+  }
+  
+  /* =============================================================================
+     Table styling
+     ============================================================================= */
+  
+  body.membership-confirmation #main .pmpro table.pmpro_table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  
+    border: 1px solid var(--mc-line) !important;
+    border-radius: var(--mc-radius-sm);
+    overflow: hidden;
+  
+    background: var(--mc-table-bg) !important;
+    color: var(--mc-text) !important;
+  }
+  
+  body.membership-confirmation #main .pmpro table.pmpro_table thead th {
+    text-align: left;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  
+    padding: 0.85rem 0.95rem;
+    border-bottom: 1px solid var(--mc-line) !important;
+  
+    background: var(--mc-table-head-bg) !important;
+    color: var(--mc-muted) !important;
+  }
+  
+  body.membership-confirmation #main .pmpro table.pmpro_table tbody th,
+  body.membership-confirmation #main .pmpro table.pmpro_table tbody td,
+  body.membership-confirmation #main .pmpro table.pmpro_table tfoot td {
+    padding: 0.95rem 0.95rem;
+    border-bottom: 1px solid var(--mc-line) !important;
+    vertical-align: top;
+  
+    background: transparent !important;
+    color: var(--mc-text) !important;
+  }
+  
+  body.membership-confirmation #main .pmpro table.pmpro_table tbody tr {
+    background: var(--mc-table-row) !important;
+  }
+  
+  body.membership-confirmation #main .pmpro table.pmpro_table tbody tr:nth-child(even) {
+    background: var(--mc-table-row-alt) !important;
+  }
+  
+  body.membership-confirmation #main .pmpro table.pmpro_table tbody th {
+    font-weight: 750;
+  }
+  
+  body.membership-confirmation #main .pmpro table.pmpro_table tfoot tr:last-child td {
+    border-bottom: 0 !important;
+    font-weight: 900;
+    background: var(--mc-table-head-bg) !important;
+  }
+  
+  /* =============================================================================
+     Spacing helpers
+     ============================================================================= */
+  
+  body.membership-confirmation #main .pmpro .pmpro_spacer {
+    height: 1rem;
+  }
+  
+  /* =============================================================================
+     Actions nav
+     ============================================================================= */
+  
+  body.membership-confirmation #main .pmpro .pmpro_actions_nav {
+    margin-top: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_actions_nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.65rem 0.95rem;
+    border-radius: 9999px;
+  
+    border: 1px solid color-mix(in oklab, var(--mc-primary) 22%, var(--mc-line));
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--mc-primary) 10%, transparent),
+      color-mix(in oklab, var(--mc-surface) 60%, transparent)
+    );
+  
+    color: var(--mc-text) !important;
+    font-weight: 750;
+  
+    transition: transform var(--mc-ease), box-shadow var(--mc-ease), border-color var(--mc-ease);
+    text-decoration: none;
+  }
+  
+  body.membership-confirmation #main .pmpro .pmpro_actions_nav a:hover {
+    border-color: color-mix(in oklab, var(--mc-accent) 42%, var(--mc-line));
+    box-shadow: var(--mc-glow);
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+  
+  /* =============================================================================
+     Print rules (only affect PMPro content inside #main)
+     ============================================================================= */
+  
+  @media print {
+    body.membership-confirmation #main {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+  
+    body.membership-confirmation #main .pmpro .pmpro_section,
+    body.membership-confirmation #main .pmpro .pmpro_card {
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      background: #ffffff !important;
+      border: 1px solid #d1d5db !important;
+    }
+  
+    body.membership-confirmation #main .pmpro .pmpro_section::before,
+    body.membership-confirmation #main .pmpro .pmpro_card::before,
+    body.membership-confirmation #main .pmpro .pmpro_section::after,
+    body.membership-confirmation #main .pmpro .pmpro_card::after {
+      display: none !important;
+    }
+  
+    body.membership-confirmation #main .pmpro .pmpro_card_actions {
+      display: none !important;
+    }
+  
+    body.membership-confirmation #main .pmpro a {
+      color: #000000 !important;
+      text-decoration: underline !important;
+    }
+  
+    body.membership-confirmation #main .pmpro table.pmpro_table {
+      background: #ffffff !important;
+      color: #000000 !important;
+      border: 1px solid #d1d5db !important;
+    }
+  
+    body.membership-confirmation #main .pmpro table.pmpro_table thead th,
+    body.membership-confirmation #main .pmpro table.pmpro_table td,
+    body.membership-confirmation #main .pmpro table.pmpro_table th {
+      background: #ffffff !important;
+      color: #000000 !important;
+      border-color: #d1d5db !important;
+    }
+  }

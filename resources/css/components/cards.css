@@ -1,0 +1,78 @@
+/* Card & Container Styles - Space City Car Club */
+/* Matches mockup: rounded-xl, borders, shadows, proper backgrounds */
+
+@layer components {
+  /* Base card style matching mockup */
+  .card,
+  .wp-block-group.has-background,
+  .wp-block-columns.has-background {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xl, 0.75rem); /* rounded-xl */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .dark .card,
+  .dark .wp-block-group.has-background,
+  .dark .wp-block-columns.has-background {
+    background: var(--color-surface);
+    border-color: var(--color-slate-800, rgba(30, 41, 59, 1));
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Card with hover effect (like event cards in mockup) */
+  .card-hover {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xl, 0.75rem);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .dark .card-hover {
+    background: var(--color-surface);
+    border-color: var(--color-slate-800, rgba(30, 41, 59, 1));
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-hover:hover {
+    border-color: color-mix(in srgb, var(--color-primary-500) 50%, transparent);
+    box-shadow: 0 0 20px rgba(19, 91, 236, 0.15);
+  }
+
+  /* Card with shadow-xl (like member spotlight) */
+  .card-elevated {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xl, 0.75rem);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .dark .card-elevated {
+    background: var(--color-surface);
+    border-color: var(--color-slate-800, rgba(30, 41, 59, 1));
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .card-elevated {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Container padding utilities */
+  .card-padding {
+    padding: 1.5rem; /* p-6 */
+  }
+
+  @media (min-width: 768px) {
+    .card-padding {
+      padding: 2.5rem; /* md:p-10 */
+    }
+  }
+
+  /* Gradient section background (uses unified gradient system) */
+  .gradient-section {
+    background: var(--gradient-section-vertical, linear-gradient(180deg, rgba(16,22,34,1) 0%, rgba(19,91,236,0.15) 50%, rgba(16,22,34,1) 100%));
+  }
+}

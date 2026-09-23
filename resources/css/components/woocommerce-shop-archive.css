@@ -1,0 +1,1043 @@
+/* File path + filename: resources/css/components/woocommerce-shop-archive.css */
+/*
+|--------------------------------------------------------------------------
+| WooCommerce Shop Archive
+|--------------------------------------------------------------------------
+|
+| Purpose:
+| - Style the custom WooCommerce archive Blade templates.
+| - Keep shop product listing styles separate from the finished header/shop nav.
+| - Bring the product grid, cards, toolbar, buttons, and pagination into the SCCC
+|   glassy/neon design system.
+|
+| Template files this CSS expects:
+| - resources/views/woocommerce/archive-product.blade.php
+| - resources/views/woocommerce/content-product.blade.php
+|
+| Important:
+| - This file does not style the shop navigation.
+| - This file does not change WooCommerce pricing.
+| - This file does not add member-only filtering.
+|
+*/
+
+@layer components {
+    /*
+    |--------------------------------------------------------------------------
+    | Archive shell
+    |--------------------------------------------------------------------------
+    |
+    | Why:
+    | - Keeps the WooCommerce archive inside the same visual container width as the
+    |   rest of the site.
+    | - Adds breathing room below the sticky header/shop navigation.
+    | - Provides theme-specific variables so light mode can feel more designed
+    |   without disrupting the dark-mode look that is already working well.
+    |
+    */
+    .sccc-shop-archive {
+      --sccc-shop-archive-container: 80rem;
+      --sccc-shop-archive-bg: transparent;
+      --sccc-shop-stage-opacity: 0;
+  
+      --sccc-shop-card-bg:
+        radial-gradient(
+          520px 260px at 10% 0%,
+          color-mix(in oklab, var(--color-primary-500) 10%, transparent),
+          transparent 62%
+        ),
+        radial-gradient(
+          460px 240px at 92% 4%,
+          color-mix(in oklab, var(--color-accent-500) 8%, transparent),
+          transparent 64%
+        ),
+        color-mix(in oklab, var(--color-surface) 88%, transparent);
+  
+      --sccc-shop-card-bg-hover:
+        radial-gradient(
+          560px 280px at 10% 0%,
+          color-mix(in oklab, var(--color-primary-500) 15%, transparent),
+          transparent 62%
+        ),
+        radial-gradient(
+          480px 260px at 92% 4%,
+          color-mix(in oklab, var(--color-accent-500) 11%, transparent),
+          transparent 64%
+        ),
+        color-mix(in oklab, var(--color-surface) 91%, transparent);
+  
+      --sccc-shop-card-border: color-mix(in oklab, var(--color-line) 86%, transparent);
+      --sccc-shop-card-border-hover: color-mix(in oklab, var(--color-primary-500) 46%, var(--color-line));
+  
+      --sccc-shop-card-accent-opacity: 0.48;
+      --sccc-shop-card-accent-gradient: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in oklab, var(--color-primary-500) 54%, transparent) 18%,
+        color-mix(in oklab, var(--color-accent-500) 42%, transparent) 72%,
+        transparent 100%
+      );
+  
+      --sccc-shop-card-shadow:
+        0 18px 44px rgb(0 0 0 / 0.16),
+        inset 0 1px 0 rgb(255 255 255 / 0.06);
+  
+      --sccc-shop-card-shadow-hover:
+        0 24px 62px rgb(0 0 0 / 0.26),
+        0 0 28px color-mix(in oklab, var(--color-primary-500) 17%, transparent),
+        inset 0 1px 0 rgb(255 255 255 / 0.08);
+  
+      --sccc-shop-media-bg:
+        radial-gradient(
+          420px 220px at 50% 0%,
+          color-mix(in oklab, var(--color-primary-500) 10%, transparent),
+          transparent 62%
+        ),
+        color-mix(in oklab, var(--color-surface) 92%, transparent);
+  
+      --sccc-shop-button-bg: color-mix(in oklab, var(--color-surface) 74%, transparent);
+  
+      --sccc-shop-button-bg-hover:
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-primary-500) 82%, transparent),
+          color-mix(in oklab, var(--color-accent-500) 48%, var(--color-primary-500))
+        );
+  
+      --sccc-shop-button-border-gradient: linear-gradient(
+        135deg,
+        rgba(113, 215, 255, 0.9) 0%,
+        rgba(67, 190, 255, 0.62) 42%,
+        rgba(174, 113, 255, 0.82) 100%
+      );
+  
+      --sccc-shop-button-shadow:
+        0 12px 26px rgb(0 0 0 / 0.16),
+        0 0 0 1px rgb(255 255 255 / 0.04) inset,
+        inset 0 1px 0 rgb(255 255 255 / 0.08);
+  
+      --sccc-shop-button-shadow-hover:
+        0 18px 38px color-mix(in oklab, var(--color-primary-500) 26%, transparent),
+        0 0 24px color-mix(in oklab, var(--color-accent-500) 18%, transparent),
+        inset 0 1px 0 rgb(255 255 255 / 0.16);
+  
+      position: relative;
+      isolation: isolate;
+      padding: 1rem 0 4rem;
+      background: var(--sccc-shop-archive-bg);
+      overflow: hidden;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Light theme energy pass
+    |--------------------------------------------------------------------------
+    |
+    | Why:
+    | - The dark version already has strong contrast and glow.
+    | - Light mode needs a little more visual staging so the cards do not feel like
+    |   plain white WooCommerce cards on a plain white page.
+    |
+    */
+    html[data-theme="light"] .sccc-shop-archive {
+      --sccc-shop-stage-opacity: 1;
+  
+      --sccc-shop-archive-bg:
+        linear-gradient(
+          180deg,
+          color-mix(in oklab, var(--color-primary-500) 5%, transparent),
+          transparent 24rem
+        ),
+        radial-gradient(
+          980px 460px at 8% 0%,
+          color-mix(in oklab, var(--color-primary-500) 15%, transparent),
+          transparent 68%
+        ),
+        radial-gradient(
+          820px 400px at 94% 7%,
+          color-mix(in oklab, var(--color-accent-500) 11%, transparent),
+          transparent 66%
+        );
+  
+      --sccc-shop-card-bg:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.98),
+          rgba(255, 255, 255, 0.9)
+        ),
+        radial-gradient(
+          520px 280px at 8% 0%,
+          color-mix(in oklab, var(--color-primary-500) 12%, transparent),
+          transparent 64%
+        ),
+        radial-gradient(
+          460px 260px at 95% 4%,
+          color-mix(in oklab, var(--color-accent-500) 9%, transparent),
+          transparent 66%
+        );
+  
+      --sccc-shop-card-bg-hover:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 1),
+          rgba(255, 255, 255, 0.94)
+        ),
+        radial-gradient(
+          620px 300px at 8% 0%,
+          color-mix(in oklab, var(--color-primary-500) 18%, transparent),
+          transparent 64%
+        ),
+        radial-gradient(
+          500px 280px at 95% 4%,
+          color-mix(in oklab, var(--color-accent-500) 13%, transparent),
+          transparent 66%
+        );
+  
+      --sccc-shop-card-border: color-mix(in oklab, var(--color-primary-500) 28%, var(--color-line));
+      --sccc-shop-card-border-hover: color-mix(in oklab, var(--color-primary-500) 58%, var(--color-accent-500) 18%);
+  
+      --sccc-shop-card-accent-opacity: 0.88;
+      --sccc-shop-card-accent-gradient: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in oklab, var(--color-primary-500) 70%, transparent) 18%,
+        color-mix(in oklab, var(--color-accent-500) 56%, transparent) 72%,
+        transparent 100%
+      );
+  
+      --sccc-shop-card-shadow:
+        0 18px 44px rgba(15, 23, 42, 0.1),
+        0 0 22px color-mix(in oklab, var(--color-primary-500) 8%, transparent),
+        0 0 0 1px rgba(255, 255, 255, 0.78) inset;
+  
+      --sccc-shop-card-shadow-hover:
+        0 24px 62px rgba(15, 23, 42, 0.16),
+        0 0 40px color-mix(in oklab, var(--color-primary-500) 22%, transparent),
+        0 0 26px color-mix(in oklab, var(--color-accent-500) 14%, transparent),
+        0 0 0 1px rgba(255, 255, 255, 0.92) inset;
+  
+      --sccc-shop-media-bg:
+        radial-gradient(
+          360px 190px at 50% 0%,
+          color-mix(in oklab, var(--color-primary-500) 10%, transparent),
+          transparent 64%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.98),
+          color-mix(in oklab, var(--color-surface) 92%, #ffffff 8%)
+        );
+  
+      --sccc-shop-button-bg:
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, #ffffff 72%, var(--color-primary-500) 28%),
+          color-mix(in oklab, #ffffff 68%, var(--color-accent-500) 32%)
+        );
+  
+      --sccc-shop-button-bg-hover:
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-primary-500) 86%, #ffffff 14%),
+          color-mix(in oklab, var(--color-accent-500) 62%, var(--color-primary-500) 38%)
+        );
+  
+      --sccc-shop-button-shadow:
+        0 12px 26px rgba(15, 23, 42, 0.1),
+        0 0 20px color-mix(in oklab, var(--color-primary-500) 14%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  
+      --sccc-shop-button-shadow-hover:
+        0 18px 38px color-mix(in oklab, var(--color-primary-500) 28%, transparent),
+        0 0 30px color-mix(in oklab, var(--color-accent-500) 20%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Light mode stage accents
+    |--------------------------------------------------------------------------
+    |
+    | Why:
+    | - Adds a very soft showroom-like atmosphere behind the grid.
+    | - Sits behind the container and does not interfere with product cards.
+    |
+    */
+    .sccc-shop-archive::before,
+    .sccc-shop-archive::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      pointer-events: none;
+      opacity: var(--sccc-shop-stage-opacity);
+    }
+  
+    .sccc-shop-archive::before {
+      width: min(64rem, 78vw);
+      height: 18rem;
+      left: 50%;
+      top: 8rem;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background:
+        radial-gradient(
+          closest-side,
+          color-mix(in oklab, var(--color-primary-500) 14%, transparent),
+          transparent 72%
+        );
+      filter: blur(12px);
+    }
+  
+    .sccc-shop-archive::after {
+      width: min(50rem, 66vw);
+      height: 20rem;
+      right: -12rem;
+      top: 26rem;
+      border-radius: 999px;
+      background:
+        radial-gradient(
+          closest-side,
+          color-mix(in oklab, var(--color-accent-500) 10%, transparent),
+          transparent 74%
+        );
+      filter: blur(16px);
+    }
+  
+    .sccc-shop-archive,
+    .sccc-shop-archive * {
+      box-sizing: border-box;
+    }
+  
+    .sccc-shop-archive a {
+      text-decoration: none;
+    }
+  
+    .sccc-shop-archive__container {
+      max-width: var(--sccc-shop-archive-container);
+      margin-inline: auto;
+      padding-inline: 1rem;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Optional archive title/description
+    |--------------------------------------------------------------------------
+    */
+    .sccc-shop-archive__header {
+      margin-bottom: 1.25rem;
+    }
+  
+    .sccc-shop-archive__title {
+      margin: 0;
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+  
+    .sccc-shop-archive .term-description,
+    .sccc-shop-archive .page-description {
+      max-width: 48rem;
+      margin: 0 0 1.5rem;
+      color: var(--color-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Toolbar
+    |--------------------------------------------------------------------------
+    |
+    | Why:
+    | - Gives result count and sorting a stable row.
+    | - The result count sits on the outer left edge of the archive container,
+    |   directly under the breadcrumbs.
+    |
+    */
+    .sccc-shop-archive__toolbar {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+  
+    .sccc-shop-archive__toolbar::before,
+    .sccc-shop-archive__toolbar::after {
+      content: none !important;
+    }
+  
+    .sccc-shop-archive__toolbar-start {
+      min-width: 0;
+      justify-self: start;
+      text-align: left;
+    }
+  
+    .sccc-shop-archive__toolbar-end {
+      min-width: 0;
+      justify-self: end;
+    }
+  
+    .sccc-shop-archive__toolbar .woocommerce-result-count {
+      float: none !important;
+      margin: 0 !important;
+      color: var(--color-muted);
+      font-size: 0.94rem;
+      line-height: 1.4;
+      text-align: left;
+    }
+  
+    .sccc-shop-archive__toolbar .woocommerce-ordering {
+      float: none !important;
+      margin: 0 !important;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Sorting select
+    |--------------------------------------------------------------------------
+    |
+    | Why:
+    | - Uses a custom chevron so the arrow has proper right-side breathing room.
+    | - Keeps the select functional while replacing the cramped native arrow.
+    |
+    */
+    .sccc-shop-archive__toolbar .woocommerce-ordering select {
+      min-height: 2.75rem;
+      max-width: 100%;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 0 3.35rem 0 1rem;
+      color: var(--color-text);
+      background:
+        url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23889AAF' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 1rem center / 1rem 1rem no-repeat,
+        linear-gradient(
+          color-mix(in oklab, var(--color-surface) 78%, transparent),
+          color-mix(in oklab, var(--color-surface) 78%, transparent)
+        ) padding-box,
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-primary-500) 45%, transparent),
+          color-mix(in oklab, var(--color-accent-500) 34%, transparent)
+        ) border-box;
+      box-shadow:
+        0 12px 28px rgb(0 0 0 / 0.12),
+        inset 0 1px 0 rgb(255 255 255 / 0.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+  
+    .sccc-shop-archive__toolbar .woocommerce-ordering select::-ms-expand {
+      display: none;
+    }
+  
+    html[data-theme="light"] .sccc-shop-archive__toolbar .woocommerce-ordering select {
+      background:
+        url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%236A7C92' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 1rem center / 1rem 1rem no-repeat,
+        linear-gradient(
+          rgba(255, 255, 255, 0.86),
+          rgba(255, 255, 255, 0.86)
+        ) padding-box,
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-primary-500) 54%, transparent),
+          color-mix(in oklab, var(--color-accent-500) 42%, transparent)
+        ) border-box;
+      box-shadow:
+        0 12px 26px rgba(15, 23, 42, 0.09),
+        0 0 18px color-mix(in oklab, var(--color-primary-500) 10%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.88);
+    }
+  
+    .sccc-shop-archive__toolbar .woocommerce-ordering select:focus {
+      box-shadow:
+        0 16px 34px color-mix(in oklab, var(--color-primary-500) 16%, transparent),
+        0 0 0 3px color-mix(in oklab, var(--color-primary-500) 22%, transparent);
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Product grid
+    |--------------------------------------------------------------------------
+    */
+    .sccc-shop-archive__grid {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 2rem;
+      clear: both;
+      margin: 0 !important;
+      padding: 0 !important;
+      list-style: none;
+    }
+  
+    .sccc-shop-archive__grid::before,
+    .sccc-shop-archive__grid::after {
+      content: none !important;
+    }
+  
+    .sccc-shop-archive__grid > .sccc-product-card {
+      float: none !important;
+      width: auto !important;
+      margin: 0 !important;
+      min-width: 0;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Product card
+    |--------------------------------------------------------------------------
+    */
+    .sccc-product-card__inner {
+      position: relative;
+      height: 100%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--sccc-shop-card-border);
+      border-radius: 1.25rem;
+      padding: 0.85rem;
+      background: var(--sccc-shop-card-bg);
+      box-shadow: var(--sccc-shop-card-shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow: hidden;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease,
+        background 0.2s ease;
+    }
+  
+    .sccc-product-card__inner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-primary-500) 14%, transparent),
+          transparent 34%,
+          color-mix(in oklab, var(--color-accent-500) 10%, transparent)
+        );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Product card accent line / sheen
+    |--------------------------------------------------------------------------
+    |
+    | Why:
+    | - Gives light mode a more intentional design detail.
+    | - Stays subtle in dark mode and stronger in light mode through variables.
+    |
+    */
+    .sccc-product-card__inner::after {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 1rem;
+      right: 1rem;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--sccc-shop-card-accent-gradient);
+      opacity: var(--sccc-shop-card-accent-opacity);
+      box-shadow:
+        0 0 14px color-mix(in oklab, var(--color-primary-500) 18%, transparent),
+        0 0 18px color-mix(in oklab, var(--color-accent-500) 10%, transparent);
+      pointer-events: none;
+    }
+  
+    .sccc-product-card:hover .sccc-product-card__inner {
+      border-color: var(--sccc-shop-card-border-hover);
+      background: var(--sccc-shop-card-bg-hover);
+      box-shadow: var(--sccc-shop-card-shadow-hover);
+      transform: translateY(-3px);
+    }
+  
+    .sccc-product-card:hover .sccc-product-card__inner::before {
+      opacity: 1;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Product image
+    |--------------------------------------------------------------------------
+    */
+    .sccc-product-card__media-link {
+      position: relative;
+      z-index: 2;
+      display: block;
+      color: inherit;
+    }
+  
+    .sccc-product-card__media {
+      position: relative;
+      margin: 0 0 0.95rem;
+      border-radius: 1rem;
+      overflow: hidden;
+      background: var(--sccc-shop-media-bg);
+      box-shadow:
+        0 12px 28px rgb(0 0 0 / 0.16),
+        inset 0 1px 0 rgb(255 255 255 / 0.08);
+    }
+  
+    html[data-theme="light"] .sccc-product-card__media {
+      box-shadow:
+        0 14px 30px rgba(15, 23, 42, 0.11),
+        0 0 18px color-mix(in oklab, var(--color-primary-500) 7%, transparent),
+        0 0 0 1px rgba(255, 255, 255, 0.82) inset;
+    }
+  
+    .sccc-product-card__image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      margin: 0 !important;
+      transition:
+        transform 0.25s ease,
+        filter 0.25s ease;
+    }
+  
+    .sccc-product-card:hover .sccc-product-card__image {
+      transform: scale(1.035);
+      filter: saturate(1.06) contrast(1.03);
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Sale badge
+    |--------------------------------------------------------------------------
+    */
+    .sccc-product-card__badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 1.85rem;
+      border-radius: 999px;
+      padding: 0.42rem 0.68rem;
+      color: #fff;
+      background:
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-accent-500) 88%, #ffffff 0%),
+          color-mix(in oklab, var(--color-primary-500) 76%, #000000 0%)
+        );
+      box-shadow:
+        0 12px 26px color-mix(in oklab, var(--color-accent-500) 24%, transparent),
+        inset 0 1px 0 rgb(255 255 255 / 0.16);
+      font-size: 0.72rem;
+      line-height: 1;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Card body
+    |--------------------------------------------------------------------------
+    */
+    .sccc-product-card__body {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      gap: 0.45rem;
+      min-width: 0;
+    }
+  
+    .sccc-product-card__eyebrow {
+      margin: 0;
+      color: var(--color-accent-500);
+      font-size: 0.68rem;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+  
+    .sccc-product-card__title {
+      min-height: 2.6em;
+      padding: 0 !important;
+      margin: 0 !important;
+      color: var(--color-text);
+      font-size: 1rem !important;
+      line-height: 1.3;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+  
+    .sccc-product-card__title-link {
+      color: inherit;
+      transition: color 0.18s ease;
+    }
+  
+    .sccc-product-card__title-link:hover,
+    .sccc-product-card__title-link:focus-visible {
+      color: var(--color-accent-500);
+      outline: none;
+    }
+  
+    .sccc-product-card__price {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.4rem;
+      min-height: 1.45rem;
+      margin: 0 !important;
+      color: var(--color-accent-500) !important;
+      font-size: 0.98rem !important;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+  
+    .sccc-product-card__price del {
+      color: var(--color-muted);
+      opacity: 0.72;
+      font-weight: 600;
+    }
+  
+    .sccc-product-card__price ins {
+      text-decoration: none;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Product buttons
+    |--------------------------------------------------------------------------
+    */
+    .sccc-product-card__actions {
+      position: relative;
+      z-index: 2;
+      margin-top: auto;
+      padding-top: 1rem;
+    }
+  
+    .sccc-product-card__actions :is(
+      a.button,
+      .button,
+      .add_to_cart_button,
+      .product_type_simple,
+      .product_type_variable,
+      .product_type_grouped,
+      .product_type_external,
+      .added_to_cart
+    ) {
+      width: auto !important;
+      min-width: 0 !important;
+      min-height: 2.6rem !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.45rem !important;
+      border: 1px solid transparent !important;
+      border-radius: 999px !important;
+      margin: 0 !important;
+      padding: 0.72rem 1.08rem !important;
+      color: var(--color-text) !important;
+      background:
+        linear-gradient(var(--sccc-shop-button-bg), var(--sccc-shop-button-bg)) padding-box,
+        var(--sccc-shop-button-border-gradient) border-box !important;
+      box-shadow: var(--sccc-shop-button-shadow) !important;
+      font-family: inherit !important;
+      font-size: 0.84rem !important;
+      line-height: 1 !important;
+      font-weight: 800 !important;
+      text-align: center !important;
+      text-decoration: none !important;
+      text-shadow: none !important;
+      white-space: nowrap !important;
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      cursor: pointer !important;
+      overflow: hidden !important;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        color 0.18s ease,
+        filter 0.18s ease,
+        background 0.18s ease !important;
+    }
+  
+    .sccc-product-card__actions :is(
+      a.button,
+      .button,
+      .add_to_cart_button,
+      .product_type_simple,
+      .product_type_variable,
+      .product_type_grouped,
+      .product_type_external,
+      .added_to_cart
+    ):hover,
+    .sccc-product-card__actions :is(
+      a.button,
+      .button,
+      .add_to_cart_button,
+      .product_type_simple,
+      .product_type_variable,
+      .product_type_grouped,
+      .product_type_external,
+      .added_to_cart
+    ):focus-visible {
+      color: #fff !important;
+      background: var(--sccc-shop-button-bg-hover) !important;
+      border-color: color-mix(in oklab, var(--color-primary-500) 52%, transparent) !important;
+      box-shadow: var(--sccc-shop-button-shadow-hover) !important;
+      transform: translateY(-1px) !important;
+      filter: brightness(1.06) !important;
+      outline: none !important;
+    }
+  
+    .sccc-product-card__actions :is(.button.loading, .add_to_cart_button.loading) {
+      opacity: 0.72 !important;
+      padding-right: 2.3rem !important;
+    }
+  
+    .sccc-product-card__actions :is(.button.added, .add_to_cart_button.added) {
+      color: #fff !important;
+      background: var(--sccc-shop-button-bg-hover) !important;
+    }
+  
+    .sccc-product-card__actions .added_to_cart {
+      margin-left: 0.5rem !important;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+    .sccc-shop-archive__pagination {
+      margin-top: 2.5rem;
+    }
+  
+    .sccc-shop-archive__pagination nav.woocommerce-pagination {
+      margin: 0 !important;
+    }
+  
+    .sccc-shop-archive__pagination nav.woocommerce-pagination ul,
+    .sccc-shop-archive__pagination .page-numbers {
+      border: 0 !important;
+    }
+  
+    .sccc-shop-archive__pagination nav.woocommerce-pagination ul {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 0.55rem !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      list-style: none !important;
+    }
+  
+    .sccc-shop-archive__pagination nav.woocommerce-pagination ul li {
+      border: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      background: transparent !important;
+    }
+  
+    .sccc-shop-archive__pagination nav.woocommerce-pagination :is(a.page-numbers, span.page-numbers) {
+      min-width: 2.55rem !important;
+      min-height: 2.55rem !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border: 1px solid transparent !important;
+      border-radius: 999px !important;
+      padding: 0.66rem 0.84rem !important;
+      color: var(--color-muted) !important;
+      background:
+        linear-gradient(
+          color-mix(in oklab, var(--color-surface) 74%, transparent),
+          color-mix(in oklab, var(--color-surface) 74%, transparent)
+        ) padding-box,
+        var(--sccc-shop-button-border-gradient) border-box !important;
+      box-shadow:
+        0 10px 24px rgb(0 0 0 / 0.14),
+        inset 0 1px 0 rgb(255 255 255 / 0.06) !important;
+      font-size: 0.86rem !important;
+      line-height: 1 !important;
+      font-weight: 800 !important;
+      text-decoration: none !important;
+      text-shadow: none !important;
+      transition:
+        color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        filter 0.18s ease,
+        background 0.18s ease !important;
+    }
+  
+    .sccc-shop-archive__pagination nav.woocommerce-pagination a.page-numbers:hover,
+    .sccc-shop-archive__pagination nav.woocommerce-pagination a.page-numbers:focus-visible {
+      color: #fff !important;
+      background: var(--sccc-shop-button-bg-hover) !important;
+      box-shadow:
+        0 16px 34px color-mix(in oklab, var(--color-primary-500) 24%, transparent),
+        0 0 24px color-mix(in oklab, var(--color-accent-500) 16%, transparent),
+        inset 0 1px 0 rgb(255 255 255 / 0.12) !important;
+      transform: translateY(-1px) !important;
+      filter: brightness(1.06) !important;
+      outline: none !important;
+    }
+  
+    .sccc-shop-archive__pagination nav.woocommerce-pagination span.page-numbers.current,
+    .sccc-shop-archive__pagination nav.woocommerce-pagination .page-numbers.current {
+      color: #fff !important;
+      background:
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-primary-500) 82%, transparent),
+          color-mix(in oklab, var(--color-accent-500) 55%, transparent)
+        ) padding-box,
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-primary-500) 74%, transparent),
+          color-mix(in oklab, var(--color-accent-500) 64%, transparent)
+        ) border-box !important;
+      box-shadow:
+        0 16px 34px color-mix(in oklab, var(--color-primary-500) 22%, transparent),
+        0 0 24px color-mix(in oklab, var(--color-accent-500) 14%, transparent),
+        inset 0 1px 0 rgb(255 255 255 / 0.14) !important;
+    }
+  
+    .sccc-shop-archive__pagination nav.woocommerce-pagination .page-numbers.dots {
+      color: var(--color-muted) !important;
+      background:
+        linear-gradient(
+          color-mix(in oklab, var(--color-surface) 56%, transparent),
+          color-mix(in oklab, var(--color-surface) 56%, transparent)
+        ) padding-box,
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-line) 90%, transparent),
+          color-mix(in oklab, var(--color-line) 65%, transparent)
+        ) border-box !important;
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04) !important;
+      pointer-events: none !important;
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Empty state
+    |--------------------------------------------------------------------------
+    */
+    .sccc-shop-archive__empty {
+      border: 1px solid color-mix(in oklab, var(--color-line) 86%, transparent);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      background:
+        radial-gradient(
+          520px 260px at 10% 0%,
+          color-mix(in oklab, var(--color-primary-500) 10%, transparent),
+          transparent 62%
+        ),
+        color-mix(in oklab, var(--color-surface) 88%, transparent);
+      color: var(--color-muted);
+      box-shadow:
+        0 18px 44px rgb(0 0 0 / 0.16),
+        inset 0 1px 0 rgb(255 255 255 / 0.06);
+    }
+  
+    html[data-theme="light"] .sccc-shop-archive__empty {
+      background:
+        radial-gradient(
+          520px 260px at 10% 0%,
+          color-mix(in oklab, var(--color-primary-500) 8%, transparent),
+          transparent 62%
+        ),
+        rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 18px 44px rgba(15, 23, 42, 0.09),
+        inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    }
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Responsive layout
+    |--------------------------------------------------------------------------
+    */
+    @media (max-width: 1180px) {
+      .sccc-shop-archive__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  
+    @media (max-width: 767px) {
+      .sccc-shop-archive {
+        padding-top: 0.75rem;
+        padding-bottom: 3rem;
+      }
+  
+      .sccc-shop-archive__container {
+        padding-inline: 1rem;
+      }
+  
+      .sccc-shop-archive__toolbar {
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+        align-items: start;
+      }
+  
+      .sccc-shop-archive__toolbar-start,
+      .sccc-shop-archive__toolbar-end {
+        justify-self: stretch;
+      }
+  
+      .sccc-shop-archive__toolbar .woocommerce-ordering select {
+        width: 100%;
+      }
+  
+      .sccc-shop-archive__grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+  
+      .sccc-product-card__inner {
+        padding: 0.75rem;
+        border-radius: 1.1rem;
+      }
+  
+      .sccc-product-card__media {
+        border-radius: 0.9rem;
+      }
+  
+      .sccc-product-card__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+      }
+  
+      .sccc-product-card__actions .added_to_cart {
+        margin-left: 0 !important;
+      }
+  
+      .sccc-shop-archive__pagination nav.woocommerce-pagination ul {
+        gap: 0.4rem !important;
+      }
+  
+      .sccc-shop-archive__pagination nav.woocommerce-pagination :is(a.page-numbers, span.page-numbers) {
+        min-width: 2.35rem !important;
+        min-height: 2.35rem !important;
+        padding: 0.62rem 0.76rem !important;
+      }
+    }
+  }

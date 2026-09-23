@@ -1,0 +1,152 @@
+/* colors.css
+   ---------------------------------------------------------------------------
+   Goal of this update:
+   - Keep your existing core tokens EXACTLY as-is (no value changes)
+   - Add semantic “alias” tokens so pages/components (like Minutes Archive)
+     don’t need hard-coded hex values like #fff, #0f172a, #1c2433, etc.
+   - This is the DRY layer: components should reference semantic tokens first.
+   ---------------------------------------------------------------------------
+*/
+
+/* LIGHT (default) - Space City Car Club Color Scheme */
+@theme {
+  /* -----------------------------------------------------------------------
+     Core roles (already in use across the project)
+     --------------------------------------------------------------------- */
+  --color-canvas:   #f6f6f8;                 /* page background */
+  --color-surface:  #ffffff;                 /* cards/panels */
+  --color-surface-2:#ffffff;                 /* inputs/selects in light */
+  --color-text:     #0f172a;                 /* slate-900 */
+  --color-muted:    #64748b;                 /* slate-500 */
+  --color-line:     rgba(15, 23, 42, 0.12);  /* subtle borders */
+
+  /* -----------------------------------------------------------------------
+     Brand
+     --------------------------------------------------------------------- */
+  --color-primary-500: #135bec;
+  --color-primary-600: #0d4bc4;
+  --color-primary-300: #60a5fa;
+  --color-accent-500:  #64748b;
+
+  /* -----------------------------------------------------------------------
+     "Bloom" tints
+     --------------------------------------------------------------------- */
+  --color-bloom-blue:     rgba(19, 91, 236, 0.10);
+  --color-bloom-blue-15:  rgba(19, 91, 236, 0.15);
+
+  /* -----------------------------------------------------------------------
+     Tailwind palette (keep stable across themes)
+     IMPORTANT: Do NOT override these in .dark, or dark:bg-slate-* breaks.
+     --------------------------------------------------------------------- */
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  /* -----------------------------------------------------------------------
+     Radius + shadows
+     --------------------------------------------------------------------- */
+  --radius-card: 0.5rem;
+  --radius-xl: 0.75rem;
+  --shadow-elev: 0 14px 35px rgb(0 0 0 / .40);
+  --shadow-primary-glow: 0 0 20px rgb(19 91 236 / .50);
+
+  /* =======================================================================
+     NEW: Semantic aliases (use these in components instead of hard-coded hex)
+     ======================================================================= */
+
+  /* Text “on” colors */
+  --color-on-canvas:  var(--color-text);     /* default text on the page bg */
+  --color-on-surface: var(--color-text);     /* default text on cards/panels */
+  --color-on-primary: #ffffff;               /* text/icons on primary fills */
+
+  /* Surfaces */
+  --color-card-bg:       var(--color-surface);   /* card background */
+  --color-card-border:   var(--color-line);      /* card border */
+  --color-input-bg:      var(--color-surface-2); /* input/select background */
+  --color-input-border:  var(--color-line);      /* input/select border */
+  --color-input-text:    var(--color-text);      /* input/select text */
+  --color-input-placeholder: var(--color-slate-400);
+
+  /* “Chip” / icon badge (used in Minutes card header) */
+  --color-chip-bg:        #f1f5f9;              /* light neutral chip bg */
+  --color-chip-fg:        var(--color-slate-500);
+  --color-chip-bg-hover:  var(--color-bloom-blue);
+  --color-chip-fg-hover:  var(--color-primary-500);
+
+  /* Pagination / controls */
+  --color-control-border: var(--color-slate-300); /* visible border in light */
+  --color-control-hover:  rgba(226, 232, 240, 0.7);
+
+  /* Hover effects (component can opt in) */
+  --shadow-hover-dark: 0 18px 45px rgba(19, 91, 236, 0.14);
+}
+
+/* DARK overrides via .dark on <html> */
+@layer theme {
+  .dark {
+    /* ---------------------------------------------------------------------
+       Core roles (these drive the design)
+       ------------------------------------------------------------------- */
+    --color-canvas:   #101622;  /* page background */
+    --color-surface:  #1a2336;  /* card surface (matches your screenshot) */
+    --color-surface-2:#1c2433;  /* inputs/selects background (matches HTML) */
+    --color-text:     #ffffff;
+    --color-muted:    #9da6b9;  /* screenshot-muted */
+    --color-line:     #232a3c;  /* screenshot border */
+
+    /* Brand stays the same */
+    --color-primary-500: #135bec;
+    --color-primary-600: #0d4bc4;
+    --color-primary-300: #60a5fa;
+    --color-accent-500:  #9da6b9;
+
+    --color-bloom-blue:     rgb(19 91 236 / .15);
+    --color-bloom-blue-15:  rgb(19 91 236 / .15);
+
+    --shadow-elev: 0 14px 35px rgb(0 0 0 / .50);
+    --shadow-primary-glow: 0 0 20px rgb(19 91 236 / .50);
+
+    /* =====================================================================
+       NEW: Semantic aliases — dark values
+       (mostly inherit from the core roles above)
+       =================================================================== */
+
+    /* Text “on” colors */
+    --color-on-canvas:  var(--color-text);
+    --color-on-surface: var(--color-text);
+    --color-on-primary: #ffffff;
+
+    /* Surfaces */
+    --color-card-bg:       var(--color-surface);
+    --color-card-border:   var(--color-line);
+    --color-input-bg:      var(--color-surface-2);
+    --color-input-border:  var(--color-line);
+    --color-input-text:    var(--color-text);
+    --color-input-placeholder: var(--color-slate-500);
+
+    /* Chip / icon badge (dark should be DARK, not light) */
+    --color-chip-bg:        var(--color-surface-2); /* #1c2433 */
+    --color-chip-fg:        var(--color-slate-400); /* muted icon */
+    --color-chip-bg-hover:  var(--color-bloom-blue-15);
+    --color-chip-fg-hover:  var(--color-primary-500);
+
+    /* Pagination / controls */
+    --color-control-border: var(--color-line);
+    --color-control-hover:  rgba(19, 91, 236, 0.12);
+
+    /* Hover effects */
+    --shadow-hover-dark: 0 18px 45px rgba(19, 91, 236, 0.14);
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-canvas);
+    color: var(--color-text);
+  }
+}

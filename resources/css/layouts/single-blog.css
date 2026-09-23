@@ -1,0 +1,934 @@
+/**
+ * ============================================================
+ * File: resources/css/partials/_single.css
+ * ============================================================
+ * Single blog post styles — Space City Car Club.
+ *
+ * Import in resources/css/app.css:
+ *   @import './partials/_single.css';
+ *
+ * REQUIRED in app.css — without this, dark: Tailwind utilities
+ * fire on OS preference instead of the .dark class toggle:
+ *   @variant dark (&:where(.dark, .dark *));
+ *
+ * Theme mechanism:
+ *   Dark:  <html class="dark" data-theme="dark">
+ *   Light: <html data-theme="light">   ← no .dark class
+ *
+ * Selector authority:
+ *   Base / dark → .dark .selector
+ *   Light only  → [data-theme="light"] .selector
+ *   Both        → plain .selector (lowest specificity, defaults)
+ * ============================================================
+ */
+
+
+/* ─────────────────────────────────────────────────────────────
+   GLOBAL: REMOVE ALL LINK UNDERLINES — single post context
+   ───────────────────────────────────────────────────────────── */
+   .h-entry a,
+   .h-entry a:hover,
+   .h-entry a:focus,
+   #single-sidebar a,
+   #single-sidebar a:hover,
+   .single-author-bio a,
+   .single-author-bio a:hover,
+   .single-author-bio-inner a,
+   .single-author-bio-inner a:hover,
+   .sccc-bio-link,
+   .sccc-bio-link:hover,
+   .read-next-card,
+   .read-next-card:hover {
+     text-decoration: none !important;
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      HEADING COLOUR OVERRIDE
+      Theme globals may inject white headings. These have enough
+      specificity to win in both modes.
+      ───────────────────────────────────────────────────────────── */
+   [data-theme="light"] article.h-entry h1.p-name,
+   [data-theme="light"] article.h-entry h2,
+   [data-theme="light"] article.h-entry h3,
+   [data-theme="light"] article.h-entry h4 {
+     color: #0f172a;
+   }
+   
+   .dark article.h-entry h1.p-name,
+   .dark article.h-entry h2,
+   .dark article.h-entry h3,
+   .dark article.h-entry h4 {
+     color: #ffffff;
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      UTILITY: .gradient-text
+      ───────────────────────────────────────────────────────────── */
+   .gradient-text {
+     background: linear-gradient(135deg, #0f172a 30%, #1313ec 100%);
+     -webkit-background-clip: text;
+     -webkit-text-fill-color: transparent;
+     background-clip: text;
+   }
+   
+   .dark .gradient-text {
+     background: linear-gradient(135deg, #ffffff 30%, #a5a5f2 100%);
+     -webkit-background-clip: text;
+     -webkit-text-fill-color: transparent;
+     background-clip: text;
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      LIGHT MODE — PAGE-LEVEL ATMOSPHERE
+      A subtle primary-tinted gradient on the page background gives
+      the light theme a distinct identity rather than plain white.
+      The article container appears as a white card lifted above it.
+      ───────────────────────────────────────────────────────────── */
+   [data-theme="light"] #main {
+     background: linear-gradient(
+       170deg,
+       color-mix(in srgb, var(--color-primary, #1313ec) 5%, #ffffff) 0%,
+       #f4f5fb 25%,
+       #f9fafb 60%,
+       #ffffff 100%
+     );
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      LIGHT MODE — ARTICLE VISUAL RICHNESS
+      ───────────────────────────────────────────────────────────── */
+   
+   /* Primary gradient accent bar across the top of the article */
+   [data-theme="light"] article.h-entry {
+     border-top: 3px solid transparent;
+     border-image: linear-gradient(
+       to right,
+       var(--color-primary, #1313ec),
+       color-mix(in srgb, var(--color-primary, #1313ec) 20%, transparent)
+     ) 1;
+     padding-top: 1.5rem;
+   }
+   
+   /* H1: dark-to-primary gradient — branded + readable */
+   [data-theme="light"] article.h-entry h1.p-name {
+     background: linear-gradient(135deg, #0f172a 40%, #1313ec 100%);
+     -webkit-background-clip: text;
+     -webkit-text-fill-color: transparent;
+     background-clip: text;
+   }
+   
+   /* Category pill: solid primary in light mode */
+   [data-theme="light"] .sccc-single-cat-pill {
+     background-color: var(--color-primary, #1313ec);
+     border-color: var(--color-primary, #1313ec);
+   }
+   
+   [data-theme="light"] .sccc-single-cat-pill span {
+     color: #ffffff;
+   }
+   
+   /* Author meta row */
+   [data-theme="light"] .entry-meta a.p-author {
+     color: #0f172a;
+   }
+   
+   [data-theme="light"] .entry-meta time.dt-published {
+     color: #64748b;
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      AUTHOR BIO CARD
+      CSS owns all colors — no dark: Tailwind classes on text.
+      ───────────────────────────────────────────────────────────── */
+   
+   /* Light mode */
+   [data-theme="light"] .single-author-bio-inner {
+     background-color: #ffffff !important;
+     border-color: #e2e8f0 !important;
+     border-left: 4px solid var(--color-primary, #1313ec) !important;
+     border-radius: 0 1rem 1rem 0 !important;
+     box-shadow:
+       0 4px 6px -1px rgba(0,0,0,0.07),
+       0 10px 30px -5px rgba(0,0,0,0.05) !important;
+     background: linear-gradient(
+       to right,
+       color-mix(in srgb, var(--color-primary, #1313ec) 4%, #ffffff),
+       #ffffff 50%
+     ) !important;
+   }
+   
+   .dark .single-author-bio-inner {
+     background-color: #1a1a2e !important;
+     border-color: rgba(255, 255, 255, 0.07) !important;
+   }
+   
+   /* Author name */
+   [data-theme="light"] .sccc-bio-name {
+     color: #0f172a !important;
+   }
+   
+   .dark .sccc-bio-name {
+     color: #ffffff !important;
+   }
+   
+   /* Author bio text */
+   [data-theme="light"] .sccc-bio-text {
+     color: #475569 !important;
+   }
+   
+   .dark .sccc-bio-text {
+     color: #94a3b8 !important;
+   }
+   
+   /* "View all posts" link — no underline ever */
+   .sccc-bio-link {
+     text-decoration: none !important;
+     color: var(--color-primary, #1313ec) !important;
+   }
+   
+   .sccc-bio-link:hover {
+     text-decoration: none !important;
+     opacity: 0.75;
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      READ NEXT SECTION
+      CSS fully owns card appearance — no Tailwind dark: on text.
+      ───────────────────────────────────────────────────────────── */
+   
+   /* Section container */
+   [data-theme="light"] .sccc-read-next {
+     background: linear-gradient(
+       135deg,
+       color-mix(in srgb, var(--color-primary, #1313ec) 5%, #f8fafc) 0%,
+       #f9fafb 60%,
+       #ffffff 100%
+     );
+     border-radius: 1.5rem;
+     padding: 2.5rem;
+     margin-left: -2rem;
+     margin-right: -2rem;
+     border: 1px solid #e8ecf8;
+   }
+   
+   .dark .sccc-read-next {
+     border-color: rgba(255, 255, 255, 0.05);
+   }
+   
+   /* Section heading */
+   [data-theme="light"] .sccc-rn-heading {
+     color: #0f172a !important;
+     display: flex;
+     align-items: center;
+     gap: 0.75rem;
+   }
+   
+   [data-theme="light"] .sccc-rn-heading::before {
+     content: '';
+     display: block;
+     flex-shrink: 0;
+     width: 0.5rem;
+     height: 1.75rem;
+     background-color: var(--color-primary, #1313ec);
+     border-radius: 9999px;
+   }
+   
+   .dark .sccc-rn-heading {
+     color: #ffffff !important;
+   }
+   
+   /* ── Read Next card — LIGHT MODE ── */
+   [data-theme="light"] .read-next-card {
+     background-color: #ffffff !important;
+     border-color: #e2e8f0 !important;
+     box-shadow:
+       0 1px 3px rgba(0,0,0,0.06),
+       0 4px 12px rgba(0,0,0,0.05);
+   }
+   
+   [data-theme="light"] .read-next-card:hover {
+     box-shadow:
+       0 4px 12px rgba(0,0,0,0.10),
+       0 16px 40px rgba(0,0,0,0.08);
+     transform: translateY(-3px);
+   }
+   
+   /* Top accent on each card */
+   [data-theme="light"] .read-next-card::before {
+     content: '';
+     display: block;
+     height: 3px;
+     background: linear-gradient(
+       to right,
+       var(--color-primary, #1313ec),
+       color-mix(in srgb, var(--color-primary, #1313ec) 30%, transparent)
+     );
+   }
+   
+   [data-theme="light"] .sccc-rn-title {
+     color: #0f172a !important;
+   }
+   
+   [data-theme="light"] .read-next-card:hover .sccc-rn-title {
+     color: var(--color-primary, #1313ec) !important;
+   }
+   
+   [data-theme="light"] .sccc-rn-meta {
+     color: #64748b !important;
+   }
+   
+   /* ── Read Next card — DARK MODE ── */
+   .dark .read-next-card {
+     background-color: #1a1a2e !important;
+     border-color: rgba(255, 255, 255, 0.06) !important;
+   }
+   
+   .dark .read-next-card:hover {
+     box-shadow: 0 8px 30px rgba(19, 19, 236, 0.15);
+     transform: translateY(-3px);
+   }
+   
+   .dark .sccc-rn-title {
+     color: #ffffff !important;
+   }
+   
+   .dark .read-next-card:hover .sccc-rn-title {
+     color: #a5b4fc !important;
+   }
+   
+   .dark .sccc-rn-meta {
+     color: #94a3b8 !important;
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      TAG PILLS
+      ───────────────────────────────────────────────────────────── */
+   [data-theme="light"] .sccc-tag-pill {
+     background-color: #f1f5f9 !important;
+     border-color: #cbd5e1 !important;
+     color: #334155 !important;
+   }
+   
+   [data-theme="light"] .sccc-tag-pill:hover {
+     background-color: var(--color-primary, #1313ec) !important;
+     border-color: var(--color-primary, #1313ec) !important;
+     color: #ffffff !important;
+   }
+   
+   .dark .sccc-tag-pill {
+     background-color: rgba(255,255,255,0.06) !important;
+     border-color: rgba(255,255,255,0.12) !important;
+     color: #d1d5db !important;
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      SIDEBAR WIDGETS
+      ───────────────────────────────────────────────────────────── */
+   .sidebar-widget {
+     background-color: #ffffff;
+     border: 1px solid #e2e8f0;
+     border-radius: 1rem;
+     padding: 1.25rem 1.5rem;
+     margin-bottom: 1.5rem;
+     box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+   }
+   
+   .dark .sidebar-widget {
+     background-color: #1a1a2e;
+     border-color: rgba(255,255,255,0.07);
+     box-shadow: none;
+   }
+   
+   [data-theme="light"] .sidebar-widget {
+     background-color: #ffffff !important;
+   }
+   
+   .sidebar-widget__title {
+     font-family: var(--font-display, 'Space Grotesk', sans-serif);
+     font-size: 0.7rem;
+     font-weight: 700;
+     text-transform: uppercase;
+     letter-spacing: 0.1em;
+     color: #64748b;
+     margin-top: 0;
+     margin-bottom: 0.875rem;
+     padding-bottom: 0.75rem;
+     border-bottom: 1px solid #e2e8f0;
+   }
+   
+   .dark .sidebar-widget__title {
+     color: #94a3b8;
+     border-bottom-color: rgba(255,255,255,0.08);
+   }
+   
+   .sidebar-widget ul {
+     list-style: none;
+     padding: 0;
+     margin: 0;
+   }
+   
+   .sidebar-widget li {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     border-bottom: 1px solid #f1f5f9;
+   }
+   
+   .dark .sidebar-widget li {
+     border-bottom-color: rgba(255,255,255,0.05);
+   }
+   
+   .sidebar-widget li:last-child {
+     border-bottom: none;
+   }
+   
+   .sidebar-widget li a {
+     font-size: 0.875rem;
+     font-weight: 500;
+     color: #334155;
+     text-decoration: none !important;
+     padding: 0.4rem 0;
+     flex: 1;
+     transition: color 0.15s ease;
+   }
+   
+   .dark .sidebar-widget li a {
+     color: #cbd5e1;
+   }
+   
+   [data-theme="light"] .sidebar-widget li a {
+     color: #334155 !important;
+   }
+   
+   .sidebar-widget li a:hover {
+     color: var(--color-primary, #1313ec);
+   }
+   
+   .sidebar-widget li .post-count,
+   .sidebar-widget li .count {
+     font-size: 0.7rem;
+     font-weight: 600;
+     color: #94a3b8;
+     background-color: #f1f5f9;
+     border-radius: 9999px;
+     padding: 0.1rem 0.5rem;
+     min-width: 1.5rem;
+     text-align: center;
+   }
+   
+   .dark .sidebar-widget li .post-count,
+   .dark .sidebar-widget li .count {
+     background-color: rgba(255,255,255,0.08);
+   }
+   
+   .sidebar-widget p {
+     font-size: 0.875rem;
+     color: #475569;
+     line-height: 1.65;
+     margin-bottom: 0.75rem;
+   }
+   
+   .dark .sidebar-widget p {
+     color: #94a3b8;
+   }
+   
+   .sidebar-widget .search-form {
+     display: flex;
+     gap: 0.5rem;
+   }
+   
+   .sidebar-widget .search-field {
+     flex: 1;
+     padding: 0.5rem 0.75rem;
+     border-radius: 0.5rem;
+     border: 1px solid #e2e8f0;
+     background-color: #f8fafc;
+     font-size: 0.875rem;
+     color: #0f172a;
+     outline: none;
+     transition: border-color 0.15s ease, box-shadow 0.15s ease;
+   }
+   
+   .dark .sidebar-widget .search-field {
+     background-color: #101022;
+     border-color: rgba(255,255,255,0.1);
+     color: #ffffff;
+   }
+   
+   .sidebar-widget .search-field:focus {
+     border-color: var(--color-primary, #1313ec);
+     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #1313ec) 15%, transparent);
+   }
+   
+   .sidebar-widget .search-submit {
+     padding: 0.5rem 1rem;
+     background-color: var(--color-primary, #1313ec);
+     color: #ffffff;
+     border: none;
+     border-radius: 0.5rem;
+     font-size: 0.875rem;
+     font-weight: 600;
+     cursor: pointer;
+     transition: background-color 0.15s ease;
+   }
+   
+   .sidebar-widget .search-submit:hover {
+     background-color: var(--color-primary-hover, #0f0fbf);
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      ENTRY CONTENT — PROSE OVERRIDES
+      ───────────────────────────────────────────────────────────── */
+   .entry-content {
+     color: #334155;
+     line-height: 2;
+     font-family: var(--font-body, 'Noto Sans', sans-serif);
+   }
+   
+   .dark .entry-content {
+     color: #d1d5db;
+   }
+   
+   [data-theme="light"] .entry-content {
+     color: #334155 !important;
+   }
+   
+   /* ── Lead paragraph ── */
+   .entry-content > p:first-of-type {
+     font-family: var(--font-display, 'Space Grotesk', sans-serif);
+     font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+     font-weight: 500;
+     line-height: 1.65;
+     color: #0f172a;
+     margin-bottom: 2rem;
+   }
+   
+   .dark .entry-content > p:first-of-type {
+     color: #ffffff;
+   }
+   
+   [data-theme="light"] .entry-content > p:first-of-type {
+     color: #0f172a !important;
+   }
+   
+   .entry-content p {
+     margin-bottom: 1.5rem;
+   }
+   
+   /* ── H2 — primary pill accent ── */
+   .entry-content h2 {
+     display: flex;
+     align-items: center;
+     gap: 0.75rem;
+     font-family: var(--font-display, 'Space Grotesk', sans-serif);
+     font-size: clamp(1.5rem, 3vw, 1.875rem);
+     font-weight: 700;
+     color: #0f172a;
+     margin-top: 3rem;
+     margin-bottom: 1.5rem;
+     line-height: 1.25;
+   }
+   
+   .dark .entry-content h2 {
+     color: #ffffff;
+   }
+   
+   [data-theme="light"] .entry-content h2 {
+     color: #0f172a !important;
+   }
+   
+   .entry-content h2::before {
+     content: '';
+     display: block;
+     flex-shrink: 0;
+     width: 0.5rem;
+     height: 2rem;
+     background-color: var(--color-primary, #1313ec);
+     border-radius: 9999px;
+   }
+   
+   /* ── H3 ── */
+   .entry-content h3 {
+     font-family: var(--font-display, 'Space Grotesk', sans-serif);
+     font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+     font-weight: 700;
+     color: #0f172a;
+     margin-top: 2.5rem;
+     margin-bottom: 1rem;
+   }
+   
+   .dark .entry-content h3 {
+     color: #ffffff;
+   }
+   
+   [data-theme="light"] .entry-content h3 {
+     color: #0f172a !important;
+   }
+   
+   /* ── Blockquote ── */
+   .entry-content blockquote {
+     margin: 2.5rem 0;
+     padding: 1rem 1rem 1rem 1.5rem;
+     border-left: 4px solid var(--color-primary, #1313ec);
+     border-radius: 0 0.75rem 0.75rem 0;
+     font-style: italic;
+     font-family: var(--font-display, 'Space Grotesk', sans-serif);
+     font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+     color: #1e293b;
+     background: linear-gradient(
+       to right,
+       color-mix(in srgb, var(--color-primary, #1313ec) 6%, transparent),
+       transparent
+     );
+   }
+   
+   .dark .entry-content blockquote {
+     color: #ffffff;
+     background: linear-gradient(
+       to right,
+       color-mix(in srgb, var(--color-primary, #1313ec) 12%, transparent),
+       transparent
+     );
+   }
+   
+   [data-theme="light"] .entry-content blockquote {
+     color: #1e293b !important;
+   }
+   
+   .entry-content blockquote p {
+     margin: 0;
+     font-size: inherit;
+     color: inherit;
+     line-height: inherit;
+   }
+   
+   /* ── Links — no underlines ── */
+   .entry-content a {
+     color: var(--color-primary, #1313ec);
+     text-decoration: none;
+     font-weight: 500;
+     transition: opacity 0.15s ease;
+   }
+   
+   .entry-content a:hover {
+     opacity: 0.8;
+   }
+   
+   .dark .entry-content a {
+     color: #818cf8;
+   }
+   
+   /* ── Inline code ── */
+   .entry-content code {
+     background-color: #f1f5f9;
+     color: #0f172a;
+     padding: 0.15em 0.4em;
+     border-radius: 0.25rem;
+     font-size: 0.875em;
+     font-family: ui-monospace, 'Courier New', monospace;
+   }
+   
+   .dark .entry-content code {
+     background-color: rgba(255,255,255,0.08);
+     color: #e2e8f0;
+   }
+   
+   /* ── Code blocks ── */
+   .entry-content pre {
+     background-color: #0f172a;
+     color: #e2e8f0;
+     border-radius: 0.75rem;
+     padding: 1.25rem 1.5rem;
+     overflow-x: auto;
+     font-size: 0.875rem;
+     margin: 1.5rem 0;
+   }
+   
+   .entry-content pre code {
+     background: none;
+     color: inherit;
+     padding: 0;
+     font-size: inherit;
+   }
+   
+   /* ── Images ── */
+   .entry-content img {
+     border-radius: 0.75rem;
+     width: 100%;
+     height: auto;
+     margin: 1.5rem 0;
+   }
+   
+   .entry-content .wp-caption,
+   .entry-content figure {
+     margin: 1.5rem 0;
+   }
+   
+   .entry-content .wp-caption-text,
+   .entry-content figcaption {
+     font-size: 0.8rem;
+     color: #94a3b8;
+     text-align: center;
+     margin-top: 0.5rem;
+     font-family: ui-monospace, monospace;
+   }
+   
+   .entry-content hr {
+     border: none;
+     border-top: 1px solid #e2e8f0;
+     margin: 2.5rem 0;
+   }
+   
+   .dark .entry-content hr {
+     border-top-color: rgba(255,255,255,0.1);
+   }
+   
+   .entry-content ul {
+     list-style: disc;
+     padding-left: 1.5rem;
+     margin-bottom: 1.5rem;
+   }
+   
+   .entry-content ol {
+     list-style: decimal;
+     padding-left: 1.5rem;
+     margin-bottom: 1.5rem;
+   }
+   
+   .entry-content li {
+     margin-bottom: 0.5rem;
+     color: inherit;
+   }
+   
+   .entry-content .wp-block-pullquote {
+     border-left: 4px solid var(--color-primary, #1313ec);
+     border-right: none;
+     border-top: none;
+     border-bottom: none;
+     background: linear-gradient(to right, color-mix(in srgb, var(--color-primary, #1313ec) 6%, transparent), transparent);
+     border-radius: 0 0.75rem 0.75rem 0;
+     padding: 1rem 1rem 1rem 1.5rem;
+   }
+   
+   .entry-content .wp-block-image img {
+     border-radius: 0.75rem;
+   }
+   
+   .entry-content .wp-block-gallery {
+     gap: 1rem;
+     border-radius: 0.75rem;
+     overflow: hidden;
+     margin: 2.5rem 0;
+   }
+   
+   
+   /* ─────────────────────────────────────────────────────────────
+      COMMENTS
+      ───────────────────────────────────────────────────────────── */
+   #comments h3.comments-title {
+     font-family: var(--font-display, 'Space Grotesk', sans-serif);
+     font-size: 1.5rem;
+     font-weight: 700;
+     color: #0f172a;
+     display: flex;
+     align-items: center;
+     gap: 0.5rem;
+     margin-bottom: 2rem;
+   }
+   
+   .dark #comments h3.comments-title {
+     color: #ffffff;
+   }
+   
+   [data-theme="light"] #comments h3.comments-title {
+     color: #0f172a !important;
+   }
+   
+   #comments .comment-list {
+     list-style: none;
+     padding: 0;
+     margin: 0 0 2.5rem;
+     display: flex;
+     flex-direction: column;
+     gap: 2rem;
+   }
+   
+   #comments .comment-body {
+     background-color: #f8fafc;
+     border: 1px solid #e2e8f0;
+     border-radius: 0.75rem;
+     border-top-left-radius: 0;
+     padding: 1rem;
+   }
+   
+   .dark #comments .comment-body {
+     background-color: #1a1a2e;
+     border-color: rgba(255,255,255,0.05);
+   }
+   
+   [data-theme="light"] #comments .comment-body {
+     background-color: #f8fafc !important;
+     border-color: #e2e8f0 !important;
+   }
+   
+   #comments .comment-author .fn {
+     font-weight: 700;
+     font-size: 0.875rem;
+     color: #0f172a;
+     text-decoration: none !important;
+   }
+   
+   .dark #comments .comment-author .fn {
+     color: #ffffff;
+   }
+   
+   [data-theme="light"] #comments .comment-author .fn {
+     color: #0f172a !important;
+   }
+   
+   #comments .comment-metadata a,
+   #comments .comment-metadata time {
+     font-size: 0.75rem;
+     color: #94a3b8;
+     text-decoration: none !important;
+   }
+   
+   #comments .comment-content p {
+     font-size: 0.875rem;
+     color: #475569;
+     margin: 0.5rem 0 0;
+   }
+   
+   .dark #comments .comment-content p {
+     color: #d1d5db;
+   }
+   
+   [data-theme="light"] #comments .comment-content p {
+     color: #475569 !important;
+   }
+   
+   #comments .comment-reply-link,
+   #comments .reply a {
+     font-size: 0.75rem;
+     font-weight: 600;
+     color: #64748b;
+     text-decoration: none !important;
+     transition: color 0.15s ease;
+     display: inline-flex;
+     align-items: center;
+     gap: 0.25rem;
+     margin-top: 0.5rem;
+   }
+   
+   #comments .comment-reply-link:hover,
+   #comments .reply a:hover {
+     color: var(--color-primary, #1313ec);
+   }
+   
+   #respond {
+     background-color: #f8fafc;
+     border: 1px solid #e2e8f0;
+     border-radius: 1rem;
+     padding: 1.5rem;
+     margin-bottom: 2.5rem;
+   }
+   
+   .dark #respond {
+     background-color: #1a1a2e;
+     border-color: rgba(255,255,255,0.05);
+   }
+   
+   [data-theme="light"] #respond {
+     background-color: #f8fafc !important;
+     border-color: #e2e8f0 !important;
+   }
+   
+   #respond #reply-title {
+     font-family: var(--font-display, 'Space Grotesk', sans-serif);
+     font-size: 0.75rem;
+     font-weight: 700;
+     text-transform: uppercase;
+     letter-spacing: 0.1em;
+     color: #64748b;
+     margin-bottom: 1rem;
+   }
+   
+   .dark #respond #reply-title {
+     color: #94a3b8;
+   }
+   
+   #respond textarea,
+   #respond input[type='text'],
+   #respond input[type='email'],
+   #respond input[type='url'] {
+     width: 100%;
+     background-color: #ffffff;
+     border: 1px solid #e2e8f0;
+     border-radius: 0.75rem;
+     padding: 1rem;
+     font-size: 0.875rem;
+     font-family: var(--font-body, 'Noto Sans', sans-serif);
+     color: #0f172a;
+     outline: none;
+     transition: border-color 0.15s ease, box-shadow 0.15s ease;
+     margin-bottom: 0.75rem;
+     display: block;
+   }
+   
+   .dark #respond textarea,
+   .dark #respond input[type='text'],
+   .dark #respond input[type='email'],
+   .dark #respond input[type='url'] {
+     background-color: #101022;
+     border-color: rgba(255,255,255,0.1);
+     color: #ffffff;
+   }
+   
+   [data-theme="light"] #respond textarea,
+   [data-theme="light"] #respond input[type='text'],
+   [data-theme="light"] #respond input[type='email'],
+   [data-theme="light"] #respond input[type='url'] {
+     background-color: #ffffff !important;
+     border-color: #e2e8f0 !important;
+     color: #0f172a !important;
+   }
+   
+   #respond textarea:focus,
+   #respond input[type='text']:focus,
+   #respond input[type='email']:focus,
+   #respond input[type='url']:focus {
+     border-color: var(--color-primary, #1313ec);
+     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #1313ec) 15%, transparent);
+   }
+   
+   #respond textarea {
+     min-height: 100px;
+     resize: vertical;
+   }
+   
+   #respond #submit {
+     background-color: var(--color-primary, #1313ec);
+     color: #ffffff;
+     font-family: var(--font-display, 'Space Grotesk', sans-serif);
+     font-weight: 700;
+     font-size: 0.875rem;
+     padding: 0.5rem 1.5rem;
+     border-radius: 9999px;
+     border: none;
+     cursor: pointer;
+     transition: background-color 0.15s ease;
+     box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary, #1313ec) 30%, transparent);
+   }
+   
+   #respond #submit:hover {
+     background-color: var(--color-primary-hover, #0f0fbf);
+   }

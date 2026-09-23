@@ -1,0 +1,331 @@
+/* minutes-archive.css
+   ============================================================================
+   Minutes Archive — scoped, DRY, token-driven
+   ----------------------------------------------------------------------------
+   Goal:
+   - Match the approved screenshots (light + dark)
+   - Keep styling isolated to the Minutes archive page
+   - Use your global design tokens from tokens/colors.css (no random hex)
+   - Avoid risky “structural” selectors by using the semantic pagination hook:
+       .minutes-archive-pagination   (added in Blade)
+
+   Assumptions / token expectations (defined in colors.css):
+   - --color-canvas              : page background (light/dark)
+   - --color-text / --color-muted: base text
+   - --color-primary-500         : brand blue
+   - --color-slate-*             : slate scale (light/dark remapped in theme)
+   - The following semantic tokens are expected for this page:
+       --color-card-bg
+       --color-card-border
+       --color-on-surface
+       --color-on-primary
+       --color-input-bg
+       --color-input-text
+       --color-input-border
+       --color-control-border
+       --color-control-hover
+       --color-chip-bg
+       --color-chip-fg
+       --color-chip-bg-hover
+       --color-chip-fg-hover
+       --shadow-hover-dark
+
+   If any of those semantic tokens are missing in colors.css, you have 2 options:
+   1) Add them (recommended; best practice)
+   2) Swap to closest existing tokens (fallbacks noted inline)
+
+   Notes on `!important`:
+   - Kept only where global styles or Tailwind utilities can be overridden by
+     other stylesheet layers (inputs/links/hover effects). If you later confirm
+     nothing is fighting these rules, you can remove many `!important`s.
+   ============================================================================
+*/
+
+/* ----------------------------------------------------------------------------
+   1) PAGE SCOPE (safe reinforcement)
+   ----------------------------------------------------------------------------
+   We only style minutes archive contexts. These body classes cover common WP
+   archive layouts for the Minutes CPT.
+---------------------------------------------------------------------------- */
+body.post-type-archive-minutes,
+body.post-type-archive-meeting-minutes,
+body.archive-minutes {
+  background: var(--color-canvas);
+  color: var(--color-text);
+}
+
+/* ----------------------------------------------------------------------------
+   2) CARD BASE (surface + border + no underline)
+   ----------------------------------------------------------------------------
+   Light mode comp: clean cards, soft borders, no hover shadow.
+   Dark mode comp: darker surface + darker border, with a subtle blue glow on hover.
+---------------------------------------------------------------------------- */
+body.post-type-archive-minutes .minutes-archive-card,
+body.post-type-archive-meeting-minutes .minutes-archive-card,
+body.archive-minutes .minutes-archive-card {
+  /* Card surface */
+  background: var(--color-card-bg);
+  /* Light mode border: use slate-200 for the “soft border” look */
+  border-color: var(--color-slate-200) !important;
+
+  /* Light mode: no drop shadow; hover is sold by bottom accent */
+  box-shadow: none !important;
+
+  /* Never underline cards */
+  text-decoration: none !important;
+}
+
+/* Dark mode surface + border (token-driven) */
+.dark body.post-type-archive-minutes .minutes-archive-card,
+.dark body.post-type-archive-meeting-minutes .minutes-archive-card,
+.dark body.archive-minutes .minutes-archive-card {
+  background: var(--color-card-bg) !important;
+  border-color: var(--color-card-border) !important;
+}
+
+/* ----------------------------------------------------------------------------
+   3) HOVER BEHAVIOR
+   ----------------------------------------------------------------------------
+   Light mode:
+   - “Thick blue underline” effect (border-bottom becomes thicker and blue)
+   - No shadow
+
+   Dark mode:
+   - Keep underline normal thickness
+   - Use a soft blue glow/lift shadow
+---------------------------------------------------------------------------- */
+body.post-type-archive-minutes .minutes-archive-card:hover,
+body.post-type-archive-meeting-minutes .minutes-archive-card:hover,
+body.archive-minutes .minutes-archive-card:hover {
+  border-bottom-width: 6px !important;
+  border-bottom-color: var(--color-primary-500) !important;
+  transform: translateY(-1px);
+  box-shadow: none !important;
+}
+
+.dark body.post-type-archive-minutes .minutes-archive-card:hover,
+.dark body.post-type-archive-meeting-minutes .minutes-archive-card:hover,
+.dark body.archive-minutes .minutes-archive-card:hover {
+  /* Dark comp: no “thick underline” */
+  border-bottom-width: 1px !important;
+
+  /* Dark comp: subtle lift/glow */
+  box-shadow: var(--shadow-hover-dark) !important;
+
+  transform: translateY(-1px);
+}
+
+/* ----------------------------------------------------------------------------
+   4) TITLE COLOR FIX (dark mode)
+   ----------------------------------------------------------------------------
+   Blade uses: `dark:text-primary-500` on <h3> for current-month cards.
+   The comp wants:
+   - Title is white in dark mode by default
+   - Turns blue on hover
+---------------------------------------------------------------------------- */
+.dark body.post-type-archive-minutes .minutes-archive-card h3,
+.dark body.post-type-archive-meeting-minutes .minutes-archive-card h3,
+.dark body.archive-minutes .minutes-archive-card h3 {
+  color: var(--color-on-surface) !important;
+}
+
+.dark body.post-type-archive-minutes .minutes-archive-card.group:hover h3,
+.dark body.post-type-archive-meeting-minutes .minutes-archive-card.group:hover h3,
+.dark body.archive-minutes .minutes-archive-card.group:hover h3 {
+  color: var(--color-primary-500) !important;
+}
+
+/* Optional: tighten excerpt tone in dark to match comp (slightly muted) */
+.dark body.post-type-archive-minutes .minutes-archive-card p,
+.dark body.post-type-archive-meeting-minutes .minutes-archive-card p,
+.dark body.archive-minutes .minutes-archive-card p {
+  /* If you want full token purity, add a token in colors.css like:
+     --color-minute-excerpt: rgb(157 166 185 / 0.9)
+     and replace this line. */
+  color: rgb(157 166 185 / 0.9);
+}
+
+/* ----------------------------------------------------------------------------
+   5) UNDERLINE REMOVAL (DRY)
+   ----------------------------------------------------------------------------
+   We keep this minimal:
+   - Cards themselves
+   - The `.no-underline` helper links used across the template
+---------------------------------------------------------------------------- */
+body.post-type-archive-minutes .minutes-archive-card,
+body.post-type-archive-meeting-minutes .minutes-archive-card,
+body.archive-minutes .minutes-archive-card,
+body.post-type-archive-minutes a.no-underline,
+body.post-type-archive-meeting-minutes a.no-underline,
+body.archive-minutes a.no-underline {
+  text-decoration: none !important;
+}
+
+body.post-type-archive-minutes a.no-underline:hover,
+body.post-type-archive-meeting-minutes a.no-underline:hover,
+body.archive-minutes a.no-underline:hover {
+  text-decoration: none !important;
+}
+
+/* ----------------------------------------------------------------------------
+   6) FORM CONTROLS (Jump To + Search)
+   ----------------------------------------------------------------------------
+   Issue we fixed:
+   - Controls were showing a black background in light mode.
+   Fix:
+   - Force input surface + text + border using tokens (light/dark).
+---------------------------------------------------------------------------- */
+body.post-type-archive-minutes #jump-to-month,
+body.post-type-archive-minutes #minutes-search,
+body.post-type-archive-meeting-minutes #jump-to-month,
+body.post-type-archive-meeting-minutes #minutes-search,
+body.archive-minutes #jump-to-month,
+body.archive-minutes #minutes-search {
+  background: var(--color-input-bg) !important;
+  color: var(--color-input-text) !important;
+
+  /* Light border: soft */
+  border-color: var(--color-slate-200) !important;
+}
+
+/* Dark border: use semantic input border token for consistency */
+.dark body.post-type-archive-minutes #jump-to-month,
+.dark body.post-type-archive-minutes #minutes-search,
+.dark body.post-type-archive-meeting-minutes #jump-to-month,
+.dark body.post-type-archive-meeting-minutes #minutes-search,
+.dark body.archive-minutes #jump-to-month,
+.dark body.archive-minutes #minutes-search {
+  background: var(--color-input-bg) !important;
+  color: var(--color-input-text) !important;
+  border-color: var(--color-input-border) !important;
+}
+
+/* ----------------------------------------------------------------------------
+   7) ICON CHIP (top-left badge)
+   ----------------------------------------------------------------------------
+   Requirements:
+   - Light: neutral chip + blue-on-hover
+   - Dark: dark chip (not light) + blue-on-hover
+   - Fix proportions: center icon and reduce whitespace around it
+---------------------------------------------------------------------------- */
+body.post-type-archive-minutes .minutes-archive-card .mb-6 .rounded-lg,
+body.post-type-archive-meeting-minutes .minutes-archive-card .mb-6 .rounded-lg,
+body.archive-minutes .minutes-archive-card .mb-6 .rounded-lg {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  /* Tighten chip to reduce “too much padding” look */
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 !important;
+
+  /* Theme-driven colors */
+  background: var(--color-chip-bg) !important;
+  color: var(--color-chip-fg) !important;
+}
+
+/* Hover chip state */
+body.post-type-archive-minutes .minutes-archive-card:hover .mb-6 .rounded-lg,
+body.post-type-archive-meeting-minutes .minutes-archive-card:hover .mb-6 .rounded-lg,
+body.archive-minutes .minutes-archive-card:hover .mb-6 .rounded-lg {
+  background: var(--color-chip-bg-hover) !important;
+  color: var(--color-chip-fg-hover) !important;
+}
+
+/* Icon sizing inside chip to better “fill” the container */
+body.post-type-archive-minutes .minutes-archive-card .mb-6 .rounded-lg .material-symbols-outlined,
+body.post-type-archive-meeting-minutes .minutes-archive-card .mb-6 .rounded-lg .material-symbols-outlined,
+body.archive-minutes .minutes-archive-card .mb-6 .rounded-lg .material-symbols-outlined {
+  font-size: 1.35rem !important;
+  line-height: 1 !important;
+}
+
+/* ----------------------------------------------------------------------------
+   8) PAGINATION READABILITY (page number pills + prev/next chevrons)
+   ----------------------------------------------------------------------------
+   We use `.minutes-archive-pagination` to avoid brittle “structure selectors”.
+   This block ensures:
+   - Light theme: chevrons visible even before hover
+   - Page number links readable
+   - Active page pill stays blue/white
+---------------------------------------------------------------------------- */
+
+/* General text/icon readability inside pagination controls */
+body.post-type-archive-minutes .minutes-archive-pagination,
+body.post-type-archive-meeting-minutes .minutes-archive-pagination,
+body.archive-minutes .minutes-archive-pagination {
+  color: var(--color-slate-900);
+}
+
+.dark body.post-type-archive-minutes .minutes-archive-pagination,
+.dark body.post-type-archive-meeting-minutes .minutes-archive-pagination,
+.dark body.archive-minutes .minutes-archive-pagination {
+  color: var(--color-on-surface);
+}
+
+/* Page number links (the “2”, “3”, etc.) — prevent global link styles from dimming */
+body.post-type-archive-minutes .minutes-archive-pagination .flex.gap-1 > a.no-underline,
+body.post-type-archive-meeting-minutes .minutes-archive-pagination .flex.gap-1 > a.no-underline,
+body.archive-minutes .minutes-archive-pagination .flex.gap-1 > a.no-underline {
+  color: var(--color-slate-900) !important;
+  opacity: 1 !important;
+}
+
+.dark body.post-type-archive-minutes .minutes-archive-pagination .flex.gap-1 > a.no-underline,
+.dark body.post-type-archive-meeting-minutes .minutes-archive-pagination .flex.gap-1 > a.no-underline,
+.dark body.archive-minutes .minutes-archive-pagination .flex.gap-1 > a.no-underline {
+  color: var(--color-on-surface) !important;
+  opacity: 1 !important;
+}
+
+/* Active page pill
+   Note: current page is rendered as a <span> with bg-primary-500 already.
+   This rule is future-proof if you ever add a `.is-current` class. */
+body.post-type-archive-minutes .minutes-archive-pagination .is-current,
+body.post-type-archive-meeting-minutes .minutes-archive-pagination .is-current,
+body.archive-minutes .minutes-archive-pagination .is-current {
+  background: var(--color-primary-500) !important;
+  color: var(--color-on-primary) !important;
+}
+
+/* Prev/Next round buttons: ensure visible border in light */
+body.post-type-archive-minutes .minutes-archive-pagination > a.rounded-full,
+body.post-type-archive-minutes .minutes-archive-pagination > button.rounded-full,
+body.post-type-archive-meeting-minutes .minutes-archive-pagination > a.rounded-full,
+body.post-type-archive-meeting-minutes .minutes-archive-pagination > button.rounded-full,
+body.archive-minutes .minutes-archive-pagination > a.rounded-full,
+body.archive-minutes .minutes-archive-pagination > button.rounded-full {
+  border-color: var(--color-control-border) !important;
+}
+
+/* Prev/Next chevrons: visible by default in light */
+body.post-type-archive-minutes .minutes-archive-pagination > a.rounded-full > .material-symbols-outlined,
+body.post-type-archive-minutes .minutes-archive-pagination > button.rounded-full > .material-symbols-outlined,
+body.post-type-archive-meeting-minutes .minutes-archive-pagination > a.rounded-full > .material-symbols-outlined,
+body.post-type-archive-meeting-minutes .minutes-archive-pagination > button.rounded-full > .material-symbols-outlined,
+body.archive-minutes .minutes-archive-pagination > a.rounded-full > .material-symbols-outlined,
+body.archive-minutes .minutes-archive-pagination > button.rounded-full > .material-symbols-outlined {
+  color: var(--color-slate-900) !important;
+  opacity: 1 !important;
+}
+
+/* Dark chevrons */
+.dark body.post-type-archive-minutes .minutes-archive-pagination > a.rounded-full > .material-symbols-outlined,
+.dark body.post-type-archive-minutes .minutes-archive-pagination > button.rounded-full > .material-symbols-outlined,
+.dark body.post-type-archive-meeting-minutes .minutes-archive-pagination > a.rounded-full > .material-symbols-outlined,
+.dark body.post-type-archive-meeting-minutes .minutes-archive-pagination > button.rounded-full > .material-symbols-outlined,
+.dark body.archive-minutes .minutes-archive-pagination > a.rounded-full > .material-symbols-outlined,
+.dark body.archive-minutes .minutes-archive-pagination > button.rounded-full > .material-symbols-outlined {
+  color: var(--color-on-surface) !important;
+}
+
+/* Light hover background for prev/next (subtle) */
+body.post-type-archive-minutes .minutes-archive-pagination > a.rounded-full:hover,
+body.post-type-archive-minutes .minutes-archive-pagination > button.rounded-full:hover,
+body.post-type-archive-meeting-minutes .minutes-archive-pagination > a.rounded-full:hover,
+body.post-type-archive-meeting-minutes .minutes-archive-pagination > button.rounded-full:hover,
+body.archive-minutes .minutes-archive-pagination > a.rounded-full:hover,
+body.archive-minutes .minutes-archive-pagination > button.rounded-full:hover {
+  background: var(--color-control-hover) !important;
+}

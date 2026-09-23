@@ -1,0 +1,49 @@
+/* tailwind-safelist.css
+   ============================================================================
+   Tailwind CSS v4 Safelist
+   ----------------------------------------------------------------------------
+   This file ensures dynamic classes generated in PHP are never purged.
+   
+   Classes listed here are always included in the final CSS bundle, even if
+   Tailwind's content scanner doesn't find them in static templates.
+   
+   ============================================================================
+*/
+
+/* Avatar Colors (from SingleMinutes.php::getAvatarColor())
+   ----------------------------------------------------------------------------
+   These classes are generated dynamically based on attendee names.
+   Location: resources/views/partials/content-single-minutes.blade.php:283
+*/
+@layer utilities {
+  .bg-primary-500 {}
+  .bg-indigo-500 {}
+  .bg-emerald-500 {}
+  .bg-slate-400 {}
+}
+
+/* Conditional Classes (commonly used in Blade conditionals)
+   ----------------------------------------------------------------------------
+   These may be missed if Tailwind doesn't detect both branches of conditionals.
+*/
+@layer utilities {
+  /* Archive page conditional classes */
+  .text-primary-500 {}
+  .text-slate-400 {}
+  .dark\:text-slate-600 {}
+  .bg-slate-200 {}
+  .dark\:bg-slate-800 {}
+  .hover\:bg-slate-200 {}
+  .dark\:hover\:bg-slate-800 {}
+  .bg-primary-500 {}
+  .bg-slate-200 {}
+  .dark\:bg-slate-800 {}
+}
+
+/* Note: In Tailwind v4, empty utility blocks like above ensure classes are
+   included. If you need pattern-based safelisting, use:
+   
+   @utility bg-{primary-500,indigo-500,emerald-500,slate-400};
+   
+   (Check Tailwind v4 docs for exact syntax)
+*/

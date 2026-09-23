@@ -1,0 +1,155 @@
+/* Import the Material Symbols variable font (outlined by default) */
+@import "material-symbols";
+
+/* resources/styles/app.css */
+@import "tailwindcss";          /* runtime variables (no theme(static)) */
+@source "../views/";
+@source "../../app/";
+
+/* Single source of truth: Major Third (1.25) fluid type scale
+   Root stays 16px (1rem = 16px); visual body base ≈ 18px (1.125rem). */
+
+@import "./tokens/colors.css";
+/* @import "./tokens/fonts.css";         👈 self-hosted faces */
+@import "./tokens/typography.css";    /* maps to --font-sans / --font-display */
+@import "./utilities/gradients.css";
+@import "./utilities/text-gradients.css";
+@import "./components/buttons.css";
+@import "./components/cards.css";
+@import "./components/header-nav.css";
+@import "./components/footer-nav.css";
+@import "./components/woocommerce-account-address.css";
+@import "./components/woocommerce-shop-archive.css";
+@import "./components/comments.css";
+@import "./layouts/minutes-archive.css";
+@import "./layouts/mage-event-grid.css";
+@import "./layouts/mage-event-single.css";
+@import "./layouts/woo-checkout.css";
+@import "./layouts/woocommerce-order-received.css";
+@import "./layouts/membership-confirmation.css";
+@import "./layouts/thank-you.css";
+@import "./layouts/pmpro-login.css";
+@import "./layouts/blog-list.css";
+@import "./layouts/single-blog.css";
+/* Safelist for dynamic classes generated in PHP */
+@import "./tailwind-safelist.css";
+
+
+@layer base {
+  #app { min-height: 100dvh; display: flex; flex-direction: column; }
+  /* Fallback for old browsers */
+  @supports not (min-height: 100dvh) {
+    #app { min-height: 100vh; }
+  }
+}
+@layer utilities {
+  .site-footer { margin-top: auto; } /* same as Tailwind’s mt-auto */
+}
+
+.material-symbols-outlined,
+.material-symbols-rounded,
+.material-symbols-sharp {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.25rem; /* tweak as you like, or override with Tailwind */
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+@layer components {
+  /* Mage EventPress — force theme canvas on single events */
+  body.mep_events-template-default {
+    background-color: var(--color-canvas, var(--wp--preset--color--canvas)) !important;
+  }
+
+  /* The plugin wrapper is what’s painting the page white */
+  body.mep_events-template-default .mpwem_style,
+  body.mep_events-template-default .mpwem_wrapper,
+  body.mep_events-template-default .mep-events-wrapper,
+  body.mep_events-template-default .wrapper {
+    background: transparent !important;
+  }
+
+  /* Just in case something targets main */
+  body.mep_events-template-default #main {
+    background: transparent !important;
+  }
+}
+/* Mage EventPress — Single Event: kill the blaring white backgrounds first
+   Safe scope: ONLY single event pages
+*/
+@layer components {
+  :root {
+    /* Use your theme tokens if present, otherwise WP preset colors, otherwise fallbacks */
+    --sccc-canvas: var(--color-canvas, var(--wp--preset--color--canvas, #0b1220));
+    --sccc-surface: var(--color-surface, var(--wp--preset--color--surface, #111827));
+    --sccc-text: var(--color-text, var(--wp--preset--color--text, #e5e7eb));
+    --sccc-muted: var(--color-muted, var(--wp--preset--color--muted, #9ca3af));
+    --sccc-line: var(--color-line, var(--wp--preset--color--line, rgba(255,255,255,.12)));
+  }
+
+  /* 1) REMOVE the plugin’s “page background” */
+  body.single-mep_events .mep-events-wrapper,
+  body.single-mep_events .mpwem_wrapper,
+  body.single-mep_events .mpwem_container,
+  body.single-mep_events .default_theme,
+  body.single-mep_events .default_theme .content_area {
+    background: transparent !important;
+  }
+
+  /* 2) “Related Events” strip: make the STRIP transparent (no giant white slab) */
+  body.single-mep_events .mpwem_related_area {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-top: 2.5rem;
+  }
+  body.single-mep_events .mpwem_related_area .related_title h3 {
+    color: var(--sccc-text) !important;
+  }
+
+  /* 3) Turn the plugin blocks/cards into your surface */
+  body.single-mep_events .default_theme .mep-default-content,
+  body.single-mep_events .default_theme .mep-default-sidebar .df-sidebar-part,
+  body.single-mep_events .mpwem_related_area .filter_item,
+  body.single-mep_events .mpwem_related_area .mep_event_grid_item {
+    background: color-mix(in oklab, var(--sccc-surface) 82%, transparent) !important;
+    border: 1px solid var(--sccc-line) !important;
+    border-radius: 1rem !important;
+    color: var(--sccc-text) !important;
+  }
+
+  /* 4) Fix “white text on white-ish backgrounds” inside cards */
+  body.single-mep_events .default_theme h1,
+  body.single-mep_events .default_theme h2,
+  body.single-mep_events .default_theme h3,
+  body.single-mep_events .default_theme h4,
+  body.single-mep_events .default_theme h5 {
+    color: var(--sccc-text) !important;
+  }
+  body.single-mep_events .default_theme p,
+  body.single-mep_events .default_theme li,
+  body.single-mep_events .default_theme .list_content {
+    color: var(--sccc-muted) !important;
+  }
+
+  /* Optional: tighten the related-event card spacing a bit */
+  body.single-mep_events .mpwem_related_area .related_item {
+    gap: 14px;
+  }
+}

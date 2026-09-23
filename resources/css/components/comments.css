@@ -1,0 +1,252 @@
+/**
+ * File: resources/styles/components/comments.css
+ *
+ * Purpose:
+ * Styles the native WordPress comments section for Space City Car Club posts.
+ *
+ * Why this file exists:
+ * WordPress outputs the comments headline, comment list, and reply form using
+ * core comment template markup. The rendered HTML currently gives us a clean,
+ * reliable wrapper:
+ *
+ * .entry-comments
+ *   #comments.comments
+ *     > h2
+ *     > .comment-list
+ *     > #respond
+ *
+ * This file keeps the styling scoped to that comments area so the article title,
+ * Gutenberg headings, WooCommerce headings, and other theme headings are not
+ * affected.
+ *
+ * Design note:
+ * The comments heading remains an H2 semantically, but it is intentionally styled
+ * closer to an H3/H4 so it reads as a comments-section heading instead of another
+ * large article headline.
+ *
+ * Assumptions:
+ * - The project theme exposes common design tokens such as:
+ *   --font-display
+ *   --font-body
+ *   --color-text
+ *   --color-muted
+ *   --color-surface
+ *   --color-line
+ *   --color-accent-500
+ *   --color-primary-500
+ * - The project may use either html[data-theme="light"], html[data-theme="dark"],
+ *   or the .dark class for theme switching.
+ */
+
+ @layer components {
+    /**
+     * Comments Section Wrapper
+     *
+     * Keeps spacing predictable without changing the existing WordPress markup.
+     */
+    .entry-comments {
+      --sccc-comments-heading-bg:
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-primary-500, #43beff) 12%, transparent) 0%,
+          color-mix(in oklab, var(--color-accent-500, #ae71ff) 10%, transparent) 48%,
+          color-mix(in oklab, var(--color-surface, #171729) 92%, transparent) 100%
+        );
+  
+      --sccc-comments-heading-glow:
+        0 1rem 2.25rem color-mix(in oklab, #000 24%, transparent);
+  
+      --sccc-comments-pill-bg:
+        color-mix(in oklab, var(--color-accent-500, #ae71ff) 14%, transparent);
+  
+      --sccc-comments-pill-border:
+        color-mix(in oklab, var(--color-accent-500, #ae71ff) 32%, transparent);
+  
+      --sccc-comments-accent-line:
+        var(
+          --sccc-header-underline-gradient,
+          linear-gradient(
+            90deg,
+            rgba(113, 215, 255, 0) 0%,
+            rgba(113, 215, 255, 0.96) 18%,
+            rgba(67, 190, 255, 0.98) 48%,
+            rgba(174, 113, 255, 0.92) 82%,
+            rgba(174, 113, 255, 0) 100%
+          )
+        );
+    }
+  
+    /**
+     * Native WordPress Comments Heading
+     *
+     * Targets only:
+     * <section id="comments" class="comments">
+     *   <h2>2 responses to “Post Title”</h2>
+     *
+     * The font size is intentionally restrained. This remains an H2 for screen
+     * readers and document structure, but visually behaves more like a polished
+     * H3/H4 section heading.
+     */
+    .entry-comments #comments.comments > h2 {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      gap: 0.7rem;
+  
+      margin: 0 0 clamp(1.35rem, 2.5vw, 2rem);
+      padding: clamp(1rem, 2vw, 1.35rem);
+  
+      overflow: hidden;
+      border: 1px solid var(--color-line, rgba(255, 255, 255, 0.12));
+      border-radius: 1.1rem;
+  
+      background:
+        radial-gradient(
+          34rem 14rem at 0% 0%,
+          color-mix(in oklab, var(--color-primary-500, #43beff) 16%, transparent) 0%,
+          transparent 58%
+        ),
+        radial-gradient(
+          30rem 14rem at 100% 0%,
+          color-mix(in oklab, var(--color-accent-500, #ae71ff) 14%, transparent) 0%,
+          transparent 60%
+        ),
+        var(--sccc-comments-heading-bg),
+        var(--color-surface, #171729);
+  
+      box-shadow: var(--sccc-comments-heading-glow);
+  
+      color: var(--color-text, #ffffff);
+      font-family: var(--font-display, system-ui, sans-serif);
+      font-size: clamp(1.15rem, 1.65vw, 1.45rem);
+      font-weight: 750;
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+  
+    /**
+     * Visual eyebrow label
+     *
+     * Adds context without changing the PHP template.
+     */
+    .entry-comments #comments.comments > h2::before {
+      content: "Club conversation";
+  
+      display: inline-flex;
+      width: max-content;
+      max-width: 100%;
+      align-items: center;
+  
+      padding: 0.38rem 0.68rem;
+      border: 1px solid var(--sccc-comments-pill-border);
+      border-radius: 999rem;
+  
+      background: var(--sccc-comments-pill-bg);
+      color: var(--color-accent-500, #ae71ff);
+  
+      font-family: var(--font-body, system-ui, sans-serif);
+      font-size: 0.66rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+  
+    /**
+     * Neon underline accent
+     *
+     * Keeps the Space City Car Club visual language without making the heading
+     * feel loud or hard to read.
+     */
+    .entry-comments #comments.comments > h2::after {
+      content: "";
+  
+      display: block;
+      width: min(10rem, 48%);
+      height: 0.16rem;
+      border-radius: 999rem;
+  
+      background: var(--sccc-comments-accent-line);
+      box-shadow:
+        0 0 1rem color-mix(in oklab, var(--color-primary-500, #43beff) 30%, transparent),
+        0 0 1.35rem color-mix(in oklab, var(--color-accent-500, #ae71ff) 20%, transparent);
+    }
+  
+    /**
+     * Text selection treatment
+     *
+     * Keeps selected heading text readable across both themes.
+     */
+    .entry-comments #comments.comments > h2::selection {
+      background: color-mix(in oklab, var(--color-accent-500, #ae71ff) 36%, transparent);
+      color: var(--color-text, #ffffff);
+    }
+  
+    /**
+     * Light Theme Adjustments
+     *
+     * Keeps the heading readable and less heavy on light backgrounds.
+     */
+    html[data-theme="light"] .entry-comments {
+      --sccc-comments-heading-bg:
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--color-primary-500, #2979ff) 10%, #ffffff) 0%,
+          color-mix(in oklab, var(--color-accent-500, #7c3aed) 8%, #ffffff) 52%,
+          var(--color-surface, #ffffff) 100%
+        );
+  
+      --sccc-comments-heading-glow:
+        0 0.85rem 2rem color-mix(in oklab, #111827 10%, transparent);
+  
+      --sccc-comments-pill-bg:
+        color-mix(in oklab, var(--color-primary-500, #2979ff) 9%, #ffffff);
+  
+      --sccc-comments-pill-border:
+        color-mix(in oklab, var(--color-primary-500, #2979ff) 24%, transparent);
+    }
+  
+    html[data-theme="light"] .entry-comments #comments.comments > h2 {
+      color: var(--color-text, #111827);
+    }
+  
+    /**
+     * Dark Theme Adjustments
+     *
+     * Supports both theme approaches used across the project:
+     * - html[data-theme="dark"]
+     * - .dark
+     */
+    html[data-theme="dark"] .entry-comments #comments.comments > h2,
+    .dark .entry-comments #comments.comments > h2 {
+      border-color: color-mix(in oklab, var(--color-line, rgba(255, 255, 255, 0.12)) 78%, transparent);
+    }
+  
+    /**
+     * Mobile Tightening
+     *
+     * Prevents long post titles inside the comment heading from feeling oversized
+     * on narrow screens.
+     */
+    @media (max-width: 640px) {
+      .entry-comments #comments.comments > h2 {
+        gap: 0.62rem;
+        padding: 0.95rem;
+        border-radius: 1rem;
+  
+        font-size: clamp(1.08rem, 5.2vw, 1.28rem);
+        line-height: 1.24;
+        letter-spacing: -0.015em;
+      }
+  
+      .entry-comments #comments.comments > h2::before {
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+      }
+  
+      .entry-comments #comments.comments > h2::after {
+        width: 62%;
+      }
+    }
+  }

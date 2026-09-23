@@ -1,0 +1,56 @@
+/* text-gradients.css
+   - Text gradient utilities used by [[token]] highlights
+   - Uses unified gradient system from gradients.css
+   - Space City Car Club themed text gradients
+*/
+
+@layer utilities {
+  /* base utility */
+  .text-gradient {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Variant: Primary (Space City Blue gradient) */
+  .text-gradient--primary {
+    background-image: var(--gradient-text-primary, linear-gradient(90deg, #135bec 0%, #60a5fa 50%, #135bec 100%));
+  }
+
+  /* Variant: Speed (motion effect - high impact) */
+  .text-gradient--speed {
+    background-image: var(--gradient-text-speed, linear-gradient(90deg, #135bec 0%, #60a5fa 30%, #135bec 60%, #60a5fa 100%));
+  }
+
+  /* Variant: Glow (bright center - maximum impact) */
+  .text-gradient--glow {
+    background-image: var(--gradient-text-glow, linear-gradient(90deg, #0d4bc4 0%, #135bec 25%, #60a5fa 50%, #135bec 75%, #0d4bc4 100%));
+  }
+
+  /* Legacy variants (backward compatibility) */
+  .text-gradient--aurora {
+    background-image: linear-gradient(
+      90deg,
+      var(--primary),
+      var(--primary-light)
+    );
+  }
+
+  .text-gradient--sunset {
+    background-image: linear-gradient(
+      90deg,
+      var(--primary-dark),
+      var(--primary),
+      var(--primary-light)
+    );
+  }
+
+  .text-gradient--neon {
+    background-image: linear-gradient(
+      90deg,
+      var(--primary),
+      var(--primary-light),
+      var(--primary)
+    );
+  }
+}

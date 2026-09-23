@@ -1,0 +1,188 @@
+---
+description: Theme versioning and changelog rules for WordPress Sage themes.
+alwaysApply: true
+---
+
+# Theme Versioning and Changelog Rules
+
+These rules control how completed theme changes are versioned and documented.
+
+## Version Source of Truth
+
+The official WordPress theme version lives in:
+
+`style.css`
+
+Inside the root theme header:
+
+`Version:            X.X.X`
+
+Do not treat `package.json`, `composer.json`, lock files, compiled asset filenames, or deployment tags as the official WordPress theme version unless the user explicitly says otherwise.
+
+## Changelog Source of Truth
+
+The changelog lives in:
+
+`CHANGELOG.md`
+
+Every completed version bump must have a matching changelog entry.
+
+The changelog version must match the version in `style.css`.
+
+## Starting Version
+
+New projects start at:
+
+`1.0.0`
+
+## Semantic Versioning
+
+Use semantic versioning.
+
+Patch version:
+
+- Small fixes
+- Styling fixes
+- Accessibility fixes
+- Copy updates
+- Template adjustments
+- Bug fixes
+- Small behavior corrections
+
+Example:
+
+`1.0.0` to `1.0.1`
+
+Minor version:
+
+- Completed new Gutenberg blocks
+- Completed new templates
+- Completed new reusable components
+- Completed new theme sections
+- Completed plugin integrations
+- Completed feature work
+
+Example:
+
+`1.0.1` to `1.1.0`
+
+Major version:
+
+- Breaking changes
+- Large architecture changes
+- Major compatibility changes
+- Major theme restructuring
+
+Example:
+
+`1.1.0` to `2.0.0`
+
+## Iteration Rule
+
+Do not bump the theme version for every small adjustment during an active task.
+
+If the user is actively building or refining the same Gutenberg block, template, component, layout, or feature, do not bump the version for each iteration.
+
+Only bump the version when the full change set is complete.
+
+A version bump represents a completed change set, not every message, edit, or adjustment.
+
+## When to Bump
+
+Bump the version when:
+
+- A requested feature is complete.
+- A requested fix is complete.
+- A requested Gutenberg block is complete.
+- A requested template is complete.
+- A requested integration is complete.
+- The user says the current task is done.
+- The user moves on to a separate work area after the current work is complete.
+
+Do not bump the version when:
+
+- The user is still iterating on the same task.
+- The user asks for spacing, color, field, copy, layout, or visual tweaks within the same active task.
+- The user asks for planning only.
+- The user asks for a prompt only.
+- The user asks for recommendations only.
+- The work is exploratory and not accepted yet.
+
+## Required style.css Header
+
+When creating a new `style.css`, use the project values from:
+
+`.cursor/project-settings.md`
+
+The required header format is:
+
+/*
+Theme Name:         [Project Name] - Theme
+Theme URI:          [Project URL]
+Description:        Theme based on Sage 11.0.1
+Version:            1.0.0
+Author:             Samir Joza
+Author URI:         https://samirjoza.dev
+Text Domain:        sage
+License:            MIT License
+License URI:        https://opensource.org/licenses/MIT
+Requires PHP:       8.2
+Requires at least:  6.6
+*/
+
+Replace placeholder values with the project-specific values from `.cursor/project-settings.md`.
+
+## Changelog Format
+
+Use this changelog format:
+
+# Changelog
+
+All notable completed theme changes should be documented in this file.
+
+## [1.0.1] - YYYY-MM-DD
+
+### Added
+
+- Description of newly added functionality.
+
+### Changed
+
+- Description of completed changes.
+
+### Fixed
+
+- Description of completed fixes.
+
+Only include sections that apply.
+
+Allowed sections:
+
+- Added
+- Changed
+- Fixed
+- Removed
+- Security
+
+## Version Bump Workflow
+
+When a completed change set requires a version bump:
+
+1. Read `.cursor/project-settings.md`.
+2. Read the current version from `style.css`.
+3. Decide whether the completed change is patch, minor, or major.
+4. Update only the `Version:` field in `style.css`.
+5. Add a matching entry to `CHANGELOG.md`.
+6. Use the current date for the changelog entry.
+7. Keep the changelog entry clear and human-readable.
+8. Do not log every iteration from the same active task.
+9. Do not create fake history.
+
+## Final Check
+
+Before completing a versioned task:
+
+- Confirm `style.css` has the correct version.
+- Confirm `CHANGELOG.md` has the same version.
+- Confirm the changelog date is correct.
+- Confirm the version was bumped only once for the completed change set.

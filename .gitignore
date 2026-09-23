@@ -1,0 +1,45 @@
+# ---------------------------------------------------------------------------
+# Space City Car Club theme — git ignore rules
+# Repo root = this theme folder. WordPress core, plugins, uploads, database
+# dumps and wp-config.php live outside this folder and are never tracked.
+# vendor/ and public/build/ ARE committed on purpose so the theme can be
+# deployed straight from git without a build step on the server.
+# ---------------------------------------------------------------------------
+
+# Node dependencies (rebuilt locally with `npm install`)
+node_modules/
+
+# Vite dev-server marker — must never reach production
+public/hot
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.TemporaryItems
+Icon?
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Editors / IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# Environment and secrets
+.env
+.env.*
+*.local
+
+# Logs and dumps
+*.log
+npm-debug.log*
+*.sql
+*.sql.gz

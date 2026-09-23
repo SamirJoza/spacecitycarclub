@@ -1,0 +1,96 @@
+---
+description: Output format, file delivery, and safe change behavior for theme work.
+alwaysApply: true
+---
+
+# Output and Change Discipline
+
+These rules control how code changes should be delivered.
+
+## Full File Delivery
+
+When creating or changing a file, provide:
+
+- The full file path.
+- The full file contents.
+- No omitted unchanged sections.
+- No patch-only output.
+- No diff-only output.
+
+The user should be able to copy and paste the file directly.
+
+## File Path Requirement
+
+Always put the file path and filename before the file content.
+
+Example:
+
+`resources/views/blocks/example.blade.php`
+
+Then provide the complete file.
+
+## No Partial Snippets Unless Requested
+
+Do not provide partial snippets unless the user explicitly asks for a snippet.
+
+If the user asks to modify a file, return the complete modified file.
+
+## Keep Changes Scoped
+
+Make only the requested changes.
+
+Do not perform unrelated cleanup.
+
+Do not refactor unrelated code.
+
+Do not rename files, classes, functions, CSS selectors, handles, variables, or fields unless the task requires it.
+
+Do not reorganize markup unless the task requires it.
+
+## Preserve Existing Work
+
+If the user provides a file, treat that file as the source of truth.
+
+Preserve existing:
+
+- Structure
+- Comments
+- Naming
+- Classes
+- Hooks
+- Filters
+- Design tokens
+- Conditionals
+- Escaping
+- Accessibility behavior
+
+Only change what is needed for the requested task.
+
+## Comments and Documentation
+
+When outputting full files, keep comments useful.
+
+Comment why major sections exist.
+
+Do not over-comment obvious code.
+
+Do not remove existing comments unless they are wrong or obsolete because of the requested change.
+
+## Assumptions
+
+If something is unknown, use a safe default and clearly mark the assumption.
+
+Ask a question only when the missing information blocks the work.
+
+When possible, continue with the safest minimal implementation.
+
+## Final Response
+
+After providing files, briefly summarize:
+
+- What changed.
+- Whether versioning was bumped.
+- Whether changelog was updated.
+- Any assumptions made.
+
+Keep the summary short.

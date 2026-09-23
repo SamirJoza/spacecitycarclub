@@ -1,0 +1,59 @@
+{
+  "editor.deps.json": {
+    "file": "assets/editor.deps-DxpY22xl.json",
+    "src": "editor.deps.json"
+  },
+  "node_modules/material-symbols/material-symbols-outlined.woff2": {
+    "file": "assets/material-symbols-outlined-Bgl3Icaq.woff2",
+    "src": "node_modules/material-symbols/material-symbols-outlined.woff2"
+  },
+  "node_modules/material-symbols/material-symbols-rounded.woff2": {
+    "file": "assets/material-symbols-rounded-GzsEeY_J.woff2",
+    "src": "node_modules/material-symbols/material-symbols-rounded.woff2"
+  },
+  "node_modules/material-symbols/material-symbols-sharp.woff2": {
+    "file": "assets/material-symbols-sharp-0IfmRZ0c.woff2",
+    "src": "node_modules/material-symbols/material-symbols-sharp.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-Buh6UhL1.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/blocks/my-block.css": {
+    "file": "assets/my-block-DuGiIjSb.css",
+    "src": "resources/css/blocks/my-block.css",
+    "isEntry": true
+  },
+  "resources/css/editor.css": {
+    "file": "assets/editor-BDaSuxxu.css",
+    "src": "resources/css/editor.css",
+    "isEntry": true
+  },
+  "resources/images/admin/admin-dashboard-bg.webp": {
+    "file": "assets/admin-dashboard-bg-DPuno1-U.webp",
+    "src": "resources/images/admin/admin-dashboard-bg.webp"
+  },
+  "resources/images/logo.svg": {
+    "file": "assets/logo-D_Vrbsoi.svg",
+    "src": "resources/images/logo.svg"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-CbfNNJdU.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/blocks/my-block.js": {
+    "file": "assets/my-block-CvGua6-T.js",
+    "name": "my-block",
+    "src": "resources/js/blocks/my-block.js",
+    "isEntry": true
+  },
+  "resources/js/editor.js": {
+    "file": "assets/editor-CfU4GbSP.js",
+    "name": "editor",
+    "src": "resources/js/editor.js",
+    "isEntry": true
+  }
+}

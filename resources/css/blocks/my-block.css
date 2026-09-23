@@ -1,0 +1,3 @@
+.my-block { padding: 1rem; border-radius: 6px; }
+.my-block__title { margin: 0 0 .5rem 0; font-weight:700; }
+.my-block__content { color: var(--wp--preset--color--muted, #a0a7b2); }

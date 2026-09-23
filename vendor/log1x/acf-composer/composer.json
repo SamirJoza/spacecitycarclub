@@ -1,0 +1,33 @@
+{
+  "name": "log1x/acf-composer",
+  "type": "package",
+  "description": "Create fields, blocks, option pages, and widgets using ACF Builder and Sage 10",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Brandon Nifong",
+      "email": "brandon@tendency.me"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Log1x\\AcfComposer\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^8.0",
+    "stoutlogic/acf-builder": "^1.11",
+    "laravel/prompts": "*"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.14",
+    "roots/acorn": "^3.0|^4.0"
+  },
+  "extra": {
+    "acorn": {
+      "providers": [
+        "Log1x\\AcfComposer\\Providers\\AcfComposerServiceProvider"
+      ]
+    }
+  }
+}

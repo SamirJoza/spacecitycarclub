@@ -1,0 +1,734 @@
+/**
+ * resources/css/layouts/thank-you.css
+ * Thank You CPT (`thank_you`) — content-area hero + optional featured image background.
+ * Scoped with `body.single-thank_you` so site header/footer from `layouts.app` stay default.
+ * Theme: html[data-theme="light"] | :is(html.dark, html[data-theme="dark"]) (matches project).
+ */
+
+/* --------------------------------------------------------------------------
+ * Link reset — MUST sit outside @layer.
+ * The global theme can ship unlayered `a { text-decoration: underline }`, which
+ * beats any @layer components rule (including `.btn`). Same approach as
+ * `blog-list.css` section 0.
+ * -------------------------------------------------------------------------- */
+body.single-thank_you .sccc-thank-you__cta-row a,
+body.single-thank_you .sccc-thank-you__cta-row a:visited,
+body.single-thank_you .sccc-thank-you__cta-row a:hover,
+body.single-thank_you .sccc-thank-you__cta-row a:active,
+body.single-thank_you .sccc-thank-you__cta-row a:focus,
+body.single-thank_you .sccc-thank-you__cta-row a:focus-visible {
+  text-decoration: none;
+}
+
+@layer components {
+  /* Let the thank-you hero fill space between site header and newsletter/footer */
+  body.single-thank_you #app > main#main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .sccc-thank-you__bg {
+    isolation: isolate;
+  }
+
+  .sccc-thank-you__bg-img {
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Nebula (default): cool, slightly desaturated hero photo */
+  body.single-thank_you .sccc-thank-you--nebula .sccc-thank-you__bg-img {
+    filter: saturate(1.05);
+  }
+
+  html[data-theme="light"] body.single-thank_you .sccc-thank-you--nebula .sccc-thank-you__bg-img {
+    opacity: 0.2;
+  }
+
+  :is(html.dark, html[data-theme="dark"]) body.single-thank_you .sccc-thank-you--nebula .sccc-thank-you__bg-img {
+    opacity: 0.3;
+    filter: grayscale(1) contrast(1.06);
+  }
+
+  /* Aurora: shift the photo toward teal / violet */
+  html[data-theme="light"] body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__bg-img {
+    opacity: 0.26;
+    filter: saturate(1.35) hue-rotate(18deg) contrast(1.05);
+  }
+
+  :is(html.dark, html[data-theme="dark"]) body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__bg-img {
+    opacity: 0.34;
+    filter: saturate(1.2) hue-rotate(22deg) contrast(1.08);
+  }
+
+  /* Signal: warmer, higher-energy photo treatment */
+  html[data-theme="light"] body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__bg-img {
+    opacity: 0.24;
+    filter: saturate(1.45) hue-rotate(-12deg) sepia(0.12) contrast(1.08);
+  }
+
+  :is(html.dark, html[data-theme="dark"]) body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__bg-img {
+    opacity: 0.34;
+    filter: saturate(1.35) hue-rotate(-18deg) sepia(0.18) contrast(1.1);
+  }
+
+  /* Colour wash between photo and vignette (hidden on Nebula) */
+  body.single-thank_you .sccc-thank-you__bg-tint--nebula {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  body.single-thank_you .sccc-thank-you__bg-tint--aurora {
+    background:
+      radial-gradient(ellipse 85% 65% at 18% 22%, rgb(45 212 191 / 0.38) 0%, transparent 55%),
+      radial-gradient(ellipse 70% 55% at 88% 78%, rgb(167 139 250 / 0.42) 0%, transparent 58%),
+      linear-gradient(155deg, rgb(34 211 238 / 0.14) 0%, transparent 42%, rgb(139 92 246 / 0.16) 100%);
+    mix-blend-mode: soft-light;
+  }
+
+  body.single-thank_you .sccc-thank-you__bg-tint--signal {
+    background:
+      radial-gradient(ellipse 80% 60% at 72% 18%, rgb(251 113 133 / 0.42) 0%, transparent 52%),
+      radial-gradient(ellipse 65% 50% at 12% 88%, rgb(251 146 60 / 0.28) 0%, transparent 55%),
+      linear-gradient(195deg, rgb(19 91 236 / 0.12) 0%, transparent 48%, rgb(220 38 38 / 0.2) 100%);
+    mix-blend-mode: soft-light;
+  }
+
+  /* Vignette uses canvas token so edges match light/dark */
+  .sccc-thank-you__bg-vignette {
+    background:
+      linear-gradient(
+        to bottom,
+        var(--color-canvas) 0%,
+        transparent 38%,
+        transparent 62%,
+        var(--color-canvas) 100%
+      ),
+      linear-gradient(
+        to right,
+        var(--color-canvas) 0%,
+        transparent 42%,
+        transparent 58%,
+        var(--color-canvas) 100%
+      );
+  }
+
+  .sccc-thank-you__glass {
+    background: color-mix(in srgb, var(--color-surface) 74%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid color-mix(in srgb, var(--color-line) 85%, transparent);
+  }
+
+  html[data-theme="light"] body.single-thank_you .sccc-thank-you__glass {
+    background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+    box-shadow: 0 12px 40px rgb(15 23 42 / 0.08);
+  }
+
+  body.single-thank_you .sccc-thank-you--nebula .sccc-thank-you__kinetic {
+    background: radial-gradient(
+      circle at center,
+      rgb(19 91 236 / 0.16) 0%,
+      transparent 70%
+    );
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__kinetic {
+    background: radial-gradient(
+      circle at center,
+      rgb(52 211 153 / 0.18) 0%,
+      rgb(124 58 237 / 0.14) 48%,
+      transparent 72%
+    );
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__kinetic {
+    background: radial-gradient(
+      circle at center,
+      rgb(244 63 94 / 0.16) 0%,
+      rgb(19 91 236 / 0.14) 52%,
+      transparent 72%
+    );
+  }
+
+  html[data-theme="light"] body.single-thank_you .sccc-thank-you--nebula .sccc-thank-you__kinetic {
+    background: radial-gradient(
+      circle at center,
+      rgb(19 91 236 / 0.1) 0%,
+      transparent 72%
+    );
+  }
+
+  html[data-theme="light"] body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__kinetic {
+    background: radial-gradient(
+      circle at center,
+      rgb(45 212 191 / 0.12) 0%,
+      rgb(167 139 250 / 0.08) 48%,
+      transparent 74%
+    );
+  }
+
+  html[data-theme="light"] body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__kinetic {
+    background: radial-gradient(
+      circle at center,
+      rgb(244 63 94 / 0.1) 0%,
+      rgb(19 91 236 / 0.08) 52%,
+      transparent 74%
+    );
+  }
+
+  /* Rotating “radar” wedge on the hero disk (all styles; Nebula matches Aurora/Signal energy) */
+  body.single-thank_you .sccc-thank-you__radar-sweep {
+    transform-origin: 50% 50%;
+    opacity: 0.52;
+    mask-image: radial-gradient(circle, transparent 46%, black 50%, black 100%);
+    -webkit-mask-image: radial-gradient(circle, transparent 46%, black 50%, black 100%);
+    background: conic-gradient(
+      from 0deg at 50% 50%,
+      transparent 0deg 276deg,
+      rgb(56 189 248 / 0.42) 298deg,
+      rgb(19 91 236 / 0.52) 316deg,
+      rgb(34 211 238 / 0.38) 332deg,
+      transparent 360deg
+    );
+    animation: sccc-thank-you-radar-spin 3.75s linear infinite;
+  }
+
+  body.single-thank_you .sccc-thank-you--nebula .sccc-thank-you__radar-sweep {
+    opacity: 0.5;
+    animation-duration: 3.6s;
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__radar-sweep {
+    opacity: 0.48;
+    background: conic-gradient(
+      from 0deg at 50% 50%,
+      transparent 0deg 274deg,
+      rgb(45 212 191 / 0.48) 296deg,
+      rgb(167 139 250 / 0.42) 314deg,
+      rgb(52 211 153 / 0.36) 330deg,
+      transparent 360deg
+    );
+    animation-duration: 4.2s;
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__radar-sweep {
+    opacity: 0.45;
+    background: conic-gradient(
+      from 0deg at 50% 50%,
+      transparent 0deg 275deg,
+      rgb(251 113 133 / 0.44) 300deg,
+      rgb(251 146 60 / 0.4) 316deg,
+      rgb(59 130 246 / 0.36) 332deg,
+      transparent 360deg
+    );
+    animation-duration: 3.2s;
+  }
+
+  @keyframes sccc-thank-you-radar-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Visual variations: vignette tint (Nebula = default canvas-only above) */
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__bg-vignette {
+    background:
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-canvas) 82%, rgb(45 212 191)) 0%,
+        transparent 36%,
+        transparent 64%,
+        color-mix(in srgb, var(--color-canvas) 88%, rgb(124 58 237)) 100%
+      ),
+      linear-gradient(
+        to right,
+        color-mix(in srgb, var(--color-canvas) 80%, rgb(52 211 153)) 0%,
+        transparent 40%,
+        transparent 60%,
+        color-mix(in srgb, var(--color-canvas) 85%, rgb(167 139 250)) 100%
+      );
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__bg-vignette {
+    background:
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-canvas) 88%, rgb(244 63 94)) 0%,
+        transparent 40%,
+        transparent 58%,
+        color-mix(in srgb, var(--color-canvas) 90%, rgb(251 146 60)) 100%
+      ),
+      linear-gradient(
+        to right,
+        color-mix(in srgb, var(--color-canvas) 92%, rgb(19 91 236)) 0%,
+        transparent 42%,
+        transparent 58%,
+        color-mix(in srgb, var(--color-canvas) 85%, rgb(244 63 94)) 100%
+      );
+  }
+
+  body.single-thank_you .sccc-thank-you__badge {
+    color: var(--color-primary-500);
+  }
+
+  body.single-thank_you .sccc-thank-you__badge-dot,
+  body.single-thank_you .sccc-thank-you__badge-ping {
+    background-color: var(--color-primary-500);
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__badge {
+    color: #34d399;
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__badge-dot,
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__badge-ping {
+    background-color: #34d399;
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__badge {
+    color: #f43f5e;
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__badge-dot,
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__badge-ping {
+    background-color: #f43f5e;
+  }
+
+  .sccc-thank-you__head-accent--aurora {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(102deg, #22d3ee 0%, #a78bfa 46%, #34d399 100%);
+  }
+
+  .sccc-thank-you__head-accent--signal {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(102deg, #135bec 0%, #fb7185 48%, #fb923c 100%);
+  }
+
+  body.single-thank_you .sccc-thank-you__glass-callout {
+    border-left: 4px solid var(--color-primary-500);
+  }
+
+  body.single-thank_you .sccc-thank-you__callout-icon {
+    color: var(--color-primary-500);
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__callout-icon {
+    color: #2dd4bf;
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__callout-icon {
+    color: #f43f5e;
+  }
+
+  body.single-thank_you .sccc-thank-you__orbit {
+    border-width: 1px;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--color-primary-500) 22%, transparent);
+  }
+
+  body.single-thank_you .sccc-thank-you__orbit-ping {
+    border-color: color-mix(in srgb, var(--color-primary-500) 35%, transparent);
+    opacity: 0.28;
+  }
+
+  body.single-thank_you .sccc-thank-you__orbit-pulse {
+    border-color: color-mix(in srgb, var(--color-primary-500) 18%, transparent);
+    opacity: 0.5;
+  }
+
+  body.single-thank_you .sccc-thank-you--nebula .sccc-thank-you__orbit-ping {
+    opacity: 0.38;
+    border-color: color-mix(in srgb, var(--color-primary-500) 58%, transparent);
+  }
+
+  body.single-thank_you .sccc-thank-you--nebula .sccc-thank-you__orbit-pulse {
+    opacity: 0.62;
+    border-color: color-mix(in srgb, var(--color-primary-500) 32%, transparent);
+  }
+
+  body.single-thank_you .sccc-thank-you__orbit-icon {
+    color: var(--color-primary-500);
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__orbit {
+    border-color: color-mix(in srgb, #34d399 35%, rgb(167 139 250 / 0.45));
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__orbit-ping {
+    opacity: 0.36;
+    border-color: color-mix(in srgb, #34d399 55%, rgb(167 139 250 / 0.5));
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__orbit-pulse {
+    border-color: color-mix(in srgb, #34d399 28%, transparent);
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__orbit-icon {
+    color: #2dd4bf;
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__orbit {
+    border-color: color-mix(in srgb, #f43f5e 40%, rgb(19 91 236 / 0.35));
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__orbit-ping {
+    opacity: 0.36;
+    border-color: color-mix(in srgb, #f43f5e 55%, rgb(19 91 236 / 0.45));
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__orbit-pulse {
+    border-color: color-mix(in srgb, #f43f5e 22%, transparent);
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__orbit-icon {
+    color: #fb7185;
+  }
+
+  body.single-thank_you .sccc-thank-you__chip-icon {
+    color: color-mix(in srgb, var(--color-primary-500) 72%, transparent);
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__chip-icon {
+    color: #a78bfa;
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__chip-icon {
+    color: #60a5fa;
+  }
+
+  /* ── Layout & motif by variation (Nebula stays the calm default) ───────── */
+
+  @media (min-width: 768px) {
+    body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__shell {
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__grid {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      gap: 3.25rem;
+    }
+
+    body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__grid > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
+  body.single-thank_you .sccc-thank-you__media-col {
+    position: relative;
+  }
+
+  body.single-thank_you .sccc-thank-you__media-col > div {
+    position: relative;
+    z-index: 1;
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__media-col::before,
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__media-col::after {
+    content: "";
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+    filter: blur(42px);
+    opacity: 0.52;
+    z-index: 0;
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__media-col::before {
+    width: 11rem;
+    height: 11rem;
+    top: -5%;
+    right: -8%;
+    background: radial-gradient(circle, rgb(45 212 191 / 0.55) 0%, transparent 68%);
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__media-col::after {
+    width: 9rem;
+    height: 9rem;
+    bottom: 4%;
+    left: -10%;
+    background: radial-gradient(circle, rgb(167 139 250 / 0.52) 0%, transparent 70%);
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__media-col::before {
+    content: "";
+    position: absolute;
+    inset: -14% -10% auto -10%;
+    height: 48%;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(ellipse 80% 100% at 50% 0%, rgb(251 113 133 / 0.38) 0%, transparent 65%);
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__badge {
+    border-radius: 1rem;
+    border-color: color-mix(in srgb, #34d399 42%, var(--color-line) 58%);
+    box-shadow:
+      0 0 0 1px rgb(45 212 191 / 0.14),
+      0 0 26px rgb(167 139 250 / 0.14);
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__badge {
+    border-radius: 0.35rem;
+    letter-spacing: 0.22em;
+    border-color: color-mix(in srgb, #f43f5e 38%, var(--color-line) 62%);
+    box-shadow:
+      0 0 0 1px rgb(244 63 94 / 0.16),
+      0 0 22px rgb(251 146 60 / 0.12);
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__heading {
+    letter-spacing: -0.02em;
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__heading {
+    letter-spacing: -0.03em;
+  }
+
+  body.single-thank_you .sccc-thank-you--aurora .sccc-thank-you__glass-callout {
+    border-left: none;
+    border: 1px solid color-mix(in srgb, #34d399 45%, var(--color-line) 55%);
+    border-radius: 1.25rem;
+    box-shadow:
+      0 0 0 1px rgb(45 212 191 / 0.12),
+      0 18px 44px rgb(167 139 250 / 0.1),
+      inset 0 1px 0 rgb(255 255 255 / 0.08);
+  }
+
+  body.single-thank_you .sccc-thank-you--signal .sccc-thank-you__glass-callout {
+    border-left: 6px solid #f43f5e;
+    border-radius: 0.45rem;
+    box-shadow:
+      0 0 0 1px rgb(244 63 94 / 0.14),
+      0 16px 38px rgb(251 146 60 / 0.09),
+      inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+
+  /**
+   * Hero CTAs — reference: pill, cyan→magenta neon border, dark frosted glass,
+   * uppercase label, circular arrow chip with matching gradient ring.
+   */
+  body.single-thank_you .sccc-thank-you__btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 3.125rem;
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    isolation: isolate;
+    overflow: visible;
+
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.6875rem;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    background:
+      linear-gradient(
+        165deg,
+        rgb(8 12 26 / 0.78) 0%,
+        rgb(12 18 36 / 0.82) 45%,
+        rgb(6 10 22 / 0.88) 100%
+      ) padding-box,
+      linear-gradient(
+        90deg,
+        #22d3ee 0%,
+        #38bdf8 18%,
+        #a855f7 62%,
+        #e879f9 100%
+      ) border-box;
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    box-shadow:
+      0 0 0 1px rgb(34 211 238 / 0.22),
+      0 0 20px rgb(34 211 238 / 0.18),
+      0 0 32px rgb(232 121 249 / 0.14),
+      inset 0 1px 0 rgb(255 255 255 / 0.12);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      filter 0.2s ease;
+  }
+
+  html[data-theme="light"] body.single-thank_you .sccc-thank-you__btn {
+    color: #f8fafc;
+    background:
+      linear-gradient(
+        165deg,
+        rgb(15 23 42 / 0.82) 0%,
+        rgb(15 23 42 / 0.88) 50%,
+        rgb(2 6 23 / 0.9) 100%
+      ) padding-box,
+      linear-gradient(
+        90deg,
+        #06b6d4 0%,
+        #3b82f6 22%,
+        #a855f7 58%,
+        #d946ef 100%
+      ) border-box;
+    box-shadow:
+      0 0 0 1px rgb(6 182 212 / 0.28),
+      0 0 22px rgb(6 182 212 / 0.2),
+      0 0 36px rgb(217 70 239 / 0.16),
+      inset 0 1px 0 rgb(255 255 255 / 0.14);
+  }
+
+  body.single-thank_you .sccc-thank-you__btn:hover,
+  body.single-thank_you .sccc-thank-you__btn:focus-visible {
+    transform: translateY(-2px);
+    filter: brightness(1.05) saturate(1.08);
+    box-shadow:
+      0 0 0 1px rgb(34 211 238 / 0.35),
+      0 0 28px rgb(34 211 238 / 0.32),
+      0 0 48px rgb(232 121 249 / 0.22),
+      inset 0 1px 0 rgb(255 255 255 / 0.16);
+    outline: none;
+  }
+
+  body.single-thank_you .sccc-thank-you__btn:active {
+    transform: translateY(0);
+  }
+
+  body.single-thank_you .sccc-thank-you__btn-label {
+    flex: 1 1 auto;
+    text-align: left;
+    padding-right: 0.25rem;
+  }
+
+  body.single-thank_you .sccc-thank-you__btn-fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2.375rem;
+    height: 2.375rem;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background:
+      linear-gradient(
+        165deg,
+        rgb(6 10 22 / 0.92) 0%,
+        rgb(10 16 32 / 0.94) 100%
+      ) padding-box,
+      linear-gradient(
+        90deg,
+        #22d3ee 0%,
+        #60a5fa 35%,
+        #c026d3 78%,
+        #f472b6 100%
+      ) border-box;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.06),
+      0 0 14px rgb(34 211 238 / 0.28),
+      0 0 22px rgb(192 38 211 / 0.2);
+  }
+
+  body.single-thank_you .sccc-thank-you__btn-fab .material-symbols-outlined {
+    font-size: 1.125rem;
+    line-height: 1;
+    color: #fff;
+  }
+
+  body.single-thank_you .sccc-thank-you__btn-fab--secondary {
+    background:
+      linear-gradient(
+        165deg,
+        rgb(8 12 24 / 0.9) 0%,
+        rgb(14 20 36 / 0.92) 100%
+      ) padding-box,
+      linear-gradient(
+        90deg,
+        rgb(148 163 184 / 0.78) 0%,
+        rgb(96 165 250 / 0.88) 38%,
+        rgb(167 139 250 / 0.92) 72%,
+        rgb(244 114 182 / 0.8) 100%
+      ) border-box;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.05),
+      0 0 12px rgb(96 165 250 / 0.2),
+      0 0 20px rgb(167 139 250 / 0.16);
+  }
+
+  body.single-thank_you .sccc-thank-you__btn--secondary {
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 3.125rem;
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    letter-spacing: 0.14em;
+    font-size: 0.6875rem;
+    background:
+      linear-gradient(
+        165deg,
+        rgb(10 14 28 / 0.72) 0%,
+        rgb(14 20 38 / 0.78) 100%
+      ) padding-box,
+      linear-gradient(
+        90deg,
+        rgb(148 163 184 / 0.55) 0%,
+        rgb(96 165 250 / 0.65) 40%,
+        rgb(167 139 250 / 0.7) 72%,
+        rgb(244 114 182 / 0.55) 100%
+      ) border-box;
+    box-shadow:
+      0 0 0 1px rgb(148 163 184 / 0.18),
+      0 0 18px rgb(96 165 250 / 0.12),
+      0 0 28px rgb(167 139 250 / 0.1),
+      inset 0 1px 0 rgb(255 255 255 / 0.08);
+  }
+
+  html[data-theme="light"] body.single-thank_you .sccc-thank-you__btn--secondary {
+    color: rgb(248 250 252);
+    background:
+      linear-gradient(
+        165deg,
+        rgb(15 23 42 / 0.78) 0%,
+        rgb(15 23 42 / 0.85) 100%
+      ) padding-box,
+      linear-gradient(
+        90deg,
+        rgb(100 116 139 / 0.5) 0%,
+        rgb(59 130 246 / 0.55) 45%,
+        rgb(168 85 247 / 0.6) 100%
+      ) border-box;
+  }
+
+  body.single-thank_you .sccc-thank-you__btn--secondary:hover,
+  body.single-thank_you .sccc-thank-you__btn--secondary:focus-visible {
+    filter: brightness(1.04) saturate(1.06);
+    box-shadow:
+      0 0 0 1px rgb(96 165 250 / 0.38),
+      0 0 28px rgb(96 165 250 / 0.24),
+      0 0 44px rgb(192 132 252 / 0.2),
+      inset 0 1px 0 rgb(255 255 255 / 0.12);
+  }
+
+  /* Block content: keep readable on glassy hero */
+  body.single-thank_you .sccc-thank-you__entry :where(p, li) {
+    color: var(--color-muted);
+  }
+
+  body.single-thank_you .sccc-thank-you__entry :where(h2, h3, h4) {
+    color: var(--color-text);
+  }
+}

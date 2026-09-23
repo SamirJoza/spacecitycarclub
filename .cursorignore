@@ -1,0 +1,58 @@
+
+---
+
+## `.cursorignore`
+
+```gitignore
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+public/build/
+dist/
+build/
+
+# Local environment files
+.env
+.env.*
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archives and database dumps
+*.sql
+*.sqlite
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+
+# WordPress sensitive files
+wp-config.php
+wp-config-local.php
+
+# WordPress uploads and generated content
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backup*/
+
+# Local app and OS noise
+.DS_Store
+Thumbs.db
+
+# IDE noise
+.idea/
+.vscode/
+
+# Temporary files
+tmp/
+temp/
+.cache/

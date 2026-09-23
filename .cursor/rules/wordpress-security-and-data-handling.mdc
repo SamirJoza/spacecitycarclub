@@ -1,0 +1,55 @@
+---
+description: WordPress security, escaping, sanitization, permissions, and data handling standards.
+alwaysApply: true
+---
+
+# WordPress Security and Data Handling Rules
+
+These rules apply to all WordPress Sage 11 theme work.
+
+Security must be considered for every PHP, Blade, form, AJAX, REST, admin, and user-facing change.
+
+## Core Principle
+
+Never trust user input.
+
+Always sanitize data before saving or processing it.
+
+Always escape data before outputting it.
+
+Use WordPress APIs whenever possible.
+
+Do not bypass WordPress capability, nonce, escaping, or sanitization patterns.
+
+## Escaping Output
+
+Escape all dynamic output.
+
+Use the correct escaping function for the context.
+
+Common examples:
+
+- `esc_html()` for plain text.
+- `esc_attr()` for HTML attributes.
+- `esc_url()` for URLs.
+- `wp_kses_post()` for trusted post-like HTML.
+- `wp_json_encode()` when outputting JSON safely.
+
+Do not echo raw user input.
+
+Do not output raw post meta, user meta, option values, query vars, request values, or ACF fields unless they are escaped for the output context.
+
+## Blade Output
+
+In Blade templates:
+
+- Use escaped Blade output whenever possible.
+- Avoid raw output unless HTML is intentionally allowed.
+- If raw HTML is required, sanitize it first using an appropriate WordPress function.
+
+Prefer:
+
+```blade
+{{ $value }}---
+alwaysApply: true
+---
