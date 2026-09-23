@@ -257,39 +257,119 @@ Take a SiteGround backup (Site Tools → Security → Backups) before the first 
 
 ## Project structure
 
+Generated from the repository (excluding the contents of `vendor/`, `node_modules/` and `public/build/`).
+
 ```
 spacecitycarclub/
-├── .github/workflows/     GitHub Actions (production deploy)
-├── .cursor/               Cursor rules, project settings and AI skills
+├── .cursor/                         AI assistant rules, settings and skills (not deployed)
+│   ├── project-commands.md
+│   ├── project-settings.md
+│   ├── rules/                       Coding, security, versioning and output rules (*.mdc)
+│   └── skills/
+│       ├── complete-theme-change/
+│       ├── create-sage-gutenberg-block/
+│       ├── debug-theme-issue/
+│       ├── initialize-sage-theme/
+│       ├── run-theme-quality-check/
+│       └── update-existing-theme-file/
+├── .github/
+│   └── workflows/
+│       └── deploy-production.yml    SiteGround deploy on push to `production`
 ├── app/
-│   ├── Blocks/            ACF Composer Gutenberg blocks (PHP)
-│   │   └── Memberships/   Membership-specific blocks
-│   ├── Fields/            ACF field groups (CPTs, users, templates, settings)
-│   ├── Options/           ACF options pages under "Theme Settings"
-│   ├── Providers/         ThemeServiceProvider (Acorn)
-│   ├── Support/           Feature modules, loaded by setup.php (see Architecture)
-│   ├── View/Composers/    Blade view composers
-│   ├── woocommerce/       Woo checkout glue
-│   ├── setup.php          Theme boot file: supports, menus, assets, module loader
-│   └── filters.php        Small global filters
-├── mage-event/themes/     Template overrides for the MagePeople event plugin
-├── public/build/          Compiled assets + manifest (committed)
+│   ├── Blocks/                      ACF Composer Gutenberg blocks
+│   │   └── Memberships/             Founding Hero, Tiers Grid
+│   ├── Fields/                      ACF field groups (CPTs, users, templates, Event Signup settings)
+│   ├── Options/                     "Theme Settings" options pages
+│   ├── Providers/                   ThemeServiceProvider (Acorn)
+│   ├── Support/                     Self-booting feature modules, loaded by setup.php
+│   │   ├── Access/                  Protected frontend paths
+│   │   ├── Admin/                   WordPress branding, admin config
+│   │   │   ├── Dashboard/           "Cockpit" rename, widgets, cleanup
+│   │   │   │   └── Reports/         Birthdays, Anniversaries, Cars, Veterans, Car Park, Trends
+│   │   │   ├── UserRoles/           Operational roles, capabilities, admin access, admin bar
+│   │   │   └── Users/               Users list columns, bulk password reset, referral source
+│   │   ├── Auth/                    /logout/ route
+│   │   ├── Blog/                    Content Type taxonomy
+│   │   ├── CPT/                     Sponsors, Minutes, Leadership, FAQ, Testimonials, Thank You
+│   │   ├── Dev/                     Local-only SSL / notice workarounds
+│   │   ├── FeaturedVehicles/        Monthly featured vehicle resolver, archive CPT, repository
+│   │   ├── GravityForms/            KLogger fix, Sponsor APC sync
+│   │   ├── Integrations/            PMPro ↔ WooCommerce glue, member lifecycle status
+│   │   ├── Marketing/               Referral tracking, Gravity Forms cookie population
+│   │   ├── Media/                   Force HTTPS media URLs
+│   │   ├── Members/                 Member context, directory, garage, bio, avatar, role sync
+│   │   ├── Memberships/             Founding cap, abandoned signup cleanup
+│   │   ├── Navigation/              Per-menu-item role visibility
+│   │   ├── PMPro/                   Event (kiosk) signup flow
+│   │   ├── Security/                Strong passwords (+ parked no-auto-login module)
+│   │   ├── Taxonomies/              Business directory categories / services
+│   │   └── Woo/                     Product access, markup, shop nav/filters, event access, account extras
+│   ├── View/
+│   │   └── Composers/               Blade view composers
+│   ├── woocommerce/
+│   │   └── membership-checkout-fields.php
+│   ├── setup.php                    Theme boot: supports, menus, sidebars, assets, module loader
+│   └── filters.php                  Small global filters
+├── mage-event/
+│   └── themes/                      MagePeople event template overrides (default-theme.php, smart.php)
+├── public/
+│   └── build/                       Compiled assets, manifest.json, generated theme.json (committed)
 ├── resources/
-│   ├── css/               Tailwind entry, tokens, components, layouts, utilities
-│   ├── js/                app.js, editor.js, components, block scripts
-│   ├── images/            Logo, admin dashboard background
+│   ├── css/
+│   │   ├── app.css                  Tailwind entry + imports
+│   │   ├── editor.css               Block editor styles
+│   │   ├── tailwind-safelist.css    Classes generated in PHP
+│   │   ├── blocks/                  Per-block CSS entries (auto-discovered)
+│   │   ├── components/              Buttons, cards, header/footer nav, comments, Woo account/shop
+│   │   ├── layouts/                 Blog, single, minutes, events, checkout, thank-you, PMPro login…
+│   │   ├── tokens/                  colors.css, typography.css
+│   │   └── utilities/               Gradients, text gradients
 │   ├── fonts/
-│   └── views/             Blade templates (layouts, sections, partials, blocks,
-│                          components, woocommerce, page templates)
-├── scripts/               Build helpers (prune-theme-json.mjs)
-├── vendor/                Composer dependencies (committed)
-├── functions.php          Composer autoload + Acorn boot + setup/filters loader
-├── header.php / footer.php  Shims for plugin templates that call get_header()
-├── style.css              Theme header (version source of truth)
-├── theme.json             Base theme.json (the generated build copy is used)
+│   ├── images/
+│   │   ├── logo.svg
+│   │   └── admin/                   Dashboard background
+│   ├── js/
+│   │   ├── app.js                   Front-end entry
+│   │   ├── editor.js                Block editor entry
+│   │   ├── blocks/                  Per-block JS entries (auto-discovered)
+│   │   └── components/              offcanvas.js, theme.js, sccc-event-grid-cleanup.js
+│   └── views/
+│       ├── blocks/                  Block templates
+│       ├── components/              main-nav, footer, legal, socials, alert
+│       ├── forms/                   Search form
+│       ├── layouts/                 app, blog, single, members, kiosk, video-background
+│       ├── partials/                Content partials, eyebrow, entry meta, cards…
+│       │   ├── directory/           Business directory pieces
+│       │   └── faq/                 FAQ index, help CTA
+│       ├── sections/                header, footer, newsletter, sidebar
+│       ├── woocommerce/             Shop, product, archive templates
+│       │   ├── checkout/
+│       │   ├── myaccount/           Dashboard, membership, event bookings, addresses
+│       │   └── partials/            Shop category nav, shop filters
+│       └── *.blade.php              Page templates and WordPress hierarchy templates
+├── scripts/
+│   └── prune-theme-json.mjs         Postbuild: locks down theme.json color controls
+├── vendor/                          Composer dependencies (committed in full)
+├── CHANGELOG.md                     Release notes
+├── LICENSE.md                       MIT (Sage / Roots)
+├── README.md
+├── TAILWIND_OPTIMIZATION.md         Notes on dynamic Tailwind classes
+├── TAILWIND_QUICK_FIX.md
+├── TODO.md                          Roadmap and backlog
+├── composer.json / composer.lock
+├── package.json / package-lock.json
+├── functions.php                    Autoloader + Acorn boot + setup/filters loader
+├── header.php / footer.php          Shims for plugin templates that call get_header()/get_footer()
+├── index.php                        Sage view entry
+├── sidebar.php                      Empty placeholder
+├── screenshot.png                   Theme screenshot
+├── seed-members.php                 WP-CLI test member seeder (local only, not deployed)
+├── style.css                        Theme header (version source of truth)
+├── theme.json                       Base theme.json (the generated build copy is used)
 ├── vite.config.js
-├── CHANGELOG.md           Release notes
-└── TODO.md                Roadmap and backlog
+├── .editorconfig
+├── .gitignore
+└── .cursorignore
 ```
 
 ---
