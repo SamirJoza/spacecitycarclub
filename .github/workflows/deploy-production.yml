@@ -101,7 +101,12 @@ jobs:
       - name: Rsync theme
         if: steps.guard.outputs.ready == 'true'
         run: |
-          FLAGS="-az --delete --itemize-changes"
+          # --delete-after + --delay-updates: new/changed files (including the
+          # Vite manifest and its hashed assets) are staged, then swapped into
+          # place together at the end; files removed from git (e.g. old hashed
+          # build assets) are deleted only after that. The live site never sees
+          # a manifest pointing at assets that are missing.
+          FLAGS="-az --delete-after --delay-updates --itemize-changes"
           [ "$DRY_RUN" = "true" ] && FLAGS="$FLAGS --dry-run" && echo "DRY RUN — nothing will be copied"
           rsync $FLAGS \
             --exclude='.git/' \
