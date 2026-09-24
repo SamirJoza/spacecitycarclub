@@ -139,7 +139,7 @@ final class OperationalRoles
     ];
 
     /**
-     * Operational roles that may edit Minutes, Sponsors, Testimonials, and Leadership.
+     * Operational roles that may edit Minutes, Sponsors, Testimonials, Leadership and Vendors.
      *
      * @return list<string>
      */
@@ -173,7 +173,7 @@ final class OperationalRoles
      */
     public static function filterRegisterPostTypeArgs(array $args, string $postType): array
     {
-        $shared = ['minutes', 'sponsor', 'testimonial', 'leadership', 'thank_you'];
+        $shared = ['minutes', 'sponsor', 'testimonial', 'leadership', 'thank_you', 'vendor'];
         if (in_array($postType, $shared, true)) {
             $args['capabilities'] = array_merge(
                 self::mapPrimitiveCapsTo(self::CAP_EDIT_SHARED_CLUB_CONTENT),
@@ -251,7 +251,7 @@ final class OperationalRoles
             return $args;
         }
 
-        $sharedTaxonomies = ['meeting_type', 'sponsor_tier', 'leadership_group'];
+        $sharedTaxonomies = ['meeting_type', 'sponsor_tier', 'leadership_group', 'vendor_type'];
         if (!in_array($taxonomy, $sharedTaxonomies, true)) {
             return $args;
         }

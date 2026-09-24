@@ -128,6 +128,11 @@ if (! function_exists(__NAMESPACE__ . '\\themeSettingsPages')) {
                 'icon'  => 'dashicons-cart',
             ],
             [
+                'slug'  => 'theme-settings-vendor-settings',
+                'label' => 'Vendor Settings',
+                'icon'  => 'dashicons-store',
+            ],
+            [
                 'slug'  => 'theme-settings-sponsor-single-cta',
                 'label' => 'Sponsor Single CTA',
                 'icon'  => 'dashicons-awards',

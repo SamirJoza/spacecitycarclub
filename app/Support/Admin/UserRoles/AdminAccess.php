@@ -20,6 +20,10 @@ final class AdminAccess
 
     private const CPT_SPONSOR = 'sponsor';
 
+    private const CPT_VENDOR = 'vendor';
+
+    private const TAX_VENDOR_TYPE = 'vendor_type';
+
     private const CPT_FAQ = 'faq';
 
     private const TAX_FAQ_CATEGORY = 'faq_category';
@@ -400,6 +404,7 @@ final class AdminAccess
 
         if ($postType === self::CPT_MINUTES
             || $postType === self::CPT_SPONSOR
+            || $postType === self::CPT_VENDOR
             || $postType === self::CPT_TESTIMONIAL
             || $postType === self::CPT_LEADERSHIP) {
             return self::userHasAnyRole($user, OperationalRoles::sharedClubContentOperationalRoles());
@@ -438,6 +443,10 @@ final class AdminAccess
         }
 
         if ($taxonomy === self::TAX_SPONSOR_TIER && $postType === self::CPT_SPONSOR) {
+            return self::userHasAnyRole($user, OperationalRoles::sharedClubContentOperationalRoles());
+        }
+
+        if ($taxonomy === self::TAX_VENDOR_TYPE && $postType === self::CPT_VENDOR) {
             return self::userHasAnyRole($user, OperationalRoles::sharedClubContentOperationalRoles());
         }
 
