@@ -513,6 +513,7 @@ require_once get_theme_file_path('app/Support/CPT/TestimonialPostType.php');
  * -------------------------------------------------------------------------- */
 
 require_once get_theme_file_path('app/Support/Vendors/bootstrap.php');
+require_once get_theme_file_path('app/Support/CarShows/bootstrap.php');
 
 /* -----------------------------------------------------------------------------
  * Admin dashboard reports and admin-user tooling
@@ -616,6 +617,7 @@ require_once get_theme_file_path('app/Support/GravityForms/SponsorApcSync.php');
 
 require_once get_theme_file_path('app/Support/Woo/ShopNavigation.php');
 require_once get_theme_file_path('app/Support/Woo/ProductMarkup.php');
+require_once get_theme_file_path('app/Support/Woo/ProductSwatches.php');
 require_once get_theme_file_path('app/Support/Woo/ShopVariationAttributeFilters.php');
 require_once get_theme_file_path('app/Support/Woo/ProductAccess.php');
 require_once get_theme_file_path('app/Support/Woo/EventProductAccess.php');

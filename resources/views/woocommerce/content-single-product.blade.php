@@ -242,6 +242,109 @@
   }
 
   /*
+   * Gallery groups per colour, keyed by the colour's attribute value.
+   *
+   * Why:
+   * Printify attaches the images colour by colour (front, back, neck label…),
+   * in the order of the colour attribute. File names carry no colour, so:
+   *   1. If the variation images are the same attachments as gallery images,
+   *      each one starts its colour's group.
+   *   2. Otherwise split the images evenly by position, when the count divides
+   *      evenly by the number of colours.
+   * Products that fit neither keep the static thumbnails.
+   */
+  $scccGalleryGroups = [];
+
+  if ($isValidProduct && $scccVariationMatrix && $product->is_type('variable')) {
+      $colorKey = '';
+      $colorValues = [];
+
+      foreach ((array) $product->get_variation_attributes() as $attributeName => $attributeValues) {
+          if (preg_match('/colou?r/i', $attributeName.' '.wc_attribute_label($attributeName, $product))) {
+              $colorKey = 'attribute_'.sanitize_title($attributeName);
+              $colorValues = array_values(array_filter(array_map('strval', (array) $attributeValues), 'strlen'));
+              break;
+          }
+      }
+
+      $colorOfImage = [];
+
+      foreach ($scccVariationMatrix as $matrixRow) {
+          $rowColor = (string) ($matrixRow['attributes'][$colorKey] ?? '');
+
+          if ($rowColor !== '' && ! empty($matrixRow['image']['id'])) {
+              $colorOfImage[(int) $matrixRow['image']['id']] ??= $rowColor;
+          }
+      }
+
+      $galleryOnlyIds = array_values(array_unique(array_filter(array_map('intval', (array) $product->get_gallery_image_ids()))));
+      $orderedImageIds = array_values(array_unique(array_filter(array_merge([$featuredImageId], $galleryOnlyIds))));
+
+      // 1. Variation images found in the gallery.
+      $currentColor = '';
+      $byId = [];
+
+      foreach ($orderedImageIds as $orderedImageId) {
+          if (isset($colorOfImage[$orderedImageId])) {
+              $currentColor = $colorOfImage[$orderedImageId];
+          }
+
+          if ($currentColor !== '') {
+              $byId[$currentColor][] = $orderedImageId;
+          }
+      }
+
+      $byId = array_filter($byId, static fn (array $ids): bool => count($ids) > 1);
+      $groupIds = count($byId) >= 2 ? $byId : [];
+
+      // 2. Even split by position.
+      if (! $groupIds) {
+          $colorCount = count($colorValues);
+
+          foreach ([$orderedImageIds, $galleryOnlyIds] as $candidateIds) {
+              $perColor = $colorCount > 1 ? intdiv(count($candidateIds), $colorCount) : 0;
+
+              if ($perColor < 2 || $perColor * $colorCount !== count($candidateIds)) {
+                  continue;
+              }
+
+              foreach ($colorValues as $colorIndex => $colorValue) {
+                  $groupIds[$colorValue] = array_slice($candidateIds, $colorIndex * $perColor, $perColor);
+              }
+
+              break;
+          }
+      }
+
+      foreach ($groupIds as $colorValue => $ids) {
+          foreach ($ids as $groupImageId) {
+              $payload = $imagePayload((int) $groupImageId, $productTitle);
+
+              if ($payload !== null) {
+                  $scccGalleryGroups[(string) $colorValue][] = $payload;
+              }
+          }
+      }
+  }
+
+  $scccGalleryGroupsJson = wp_json_encode((object) $scccGalleryGroups);
+
+  if (! is_string($scccGalleryGroupsJson)) {
+      $scccGalleryGroupsJson = '{}';
+  }
+
+  /*
+   * Colour dots for this product's own colours (see app/Support/Woo/ProductSwatches.php).
+   */
+  $scccSwatchesJson = $isValidProduct && class_exists(\App\Support\Woo\ProductSwatches::class)
+      ? wp_json_encode((object) \App\Support\Woo\ProductSwatches::forProduct($product))
+      : '{}';
+
+  if (! is_string($scccSwatchesJson)) {
+      $scccSwatchesJson = '{}';
+  }
+
+  /*
    * Product category links.
    */
   $categoryLinks = [];
@@ -329,6 +432,8 @@
       {!! $productClassAttribute !!}
       data-sccc-product-single
       data-sccc-variation-matrix="{{ esc_attr($scccVariationMatrixJson) }}"
+      data-sccc-swatches="{{ esc_attr($scccSwatchesJson) }}"
+      data-sccc-gallery-groups="{{ esc_attr($scccGalleryGroupsJson) }}"
     >
       <div class="sccc-product-single__shell">
         <div class="sccc-product-single__grid">
@@ -343,6 +448,7 @@
                   href="{{ esc_url($mainImage['full']) }}"
                   class="sccc-product-single__main-link"
                   data-sccc-main-link
+                  aria-label="{{ esc_attr__('Open image larger', 'sage') }}"
                 >
                   <img
                     src="{{ esc_url($mainImage['src']) }}"
@@ -624,6 +730,75 @@
 
     .sccc-product-single__main-link {
       display: block;
+      cursor: zoom-in;
+    }
+
+    /* Lightbox */
+    .sccc-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3.5rem 1rem 4rem;
+      background: rgb(4 8 20 / 0.92);
+      backdrop-filter: blur(6px);
+    }
+
+    .sccc-lightbox[hidden] {
+      display: none;
+    }
+
+    .sccc-lightbox__image {
+      max-width: min(100%, 1100px);
+      max-height: 100%;
+      border-radius: 0.9rem;
+      background: #fff;
+      object-fit: contain;
+      box-shadow: 0 30px 80px rgb(0 0 0 / 0.55);
+    }
+
+    .sccc-lightbox__button {
+      position: absolute;
+      width: 2.9rem;
+      height: 2.9rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      background:
+        linear-gradient(rgb(15 23 42 / 0.85), rgb(15 23 42 / 0.85)) padding-box,
+        linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500)) border-box;
+    }
+
+    .sccc-lightbox__button:hover,
+    .sccc-lightbox__button:focus-visible {
+      outline: none;
+      box-shadow: 0 0 22px color-mix(in oklab, var(--color-accent-500) 45%, transparent);
+    }
+
+    .sccc-lightbox__button[hidden] {
+      display: none;
+    }
+
+    .sccc-lightbox__close { top: 0.75rem; right: 0.75rem; }
+    .sccc-lightbox__prev { left: 0.75rem; top: 50%; transform: translateY(-50%); }
+    .sccc-lightbox__next { right: 0.75rem; top: 50%; transform: translateY(-50%); }
+
+    .sccc-lightbox__count {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgb(255 255 255 / 0.85);
+      font-size: 0.85rem;
+      font-weight: 700;
     }
 
     .sccc-product-single__main-image {
@@ -1276,12 +1451,26 @@
     }
 
     .sccc-variation-option__swatch {
-      width: 1rem;
-      height: 1rem;
+      flex: 0 0 auto;
+      width: 1.65rem;
+      height: 1.65rem;
       border-radius: 999px;
-      border: 1px solid rgb(255 255 255 / 0.45);
-      background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
-      box-shadow: 0 0 0 1px rgb(0 0 0 / 0.1);
+      border: 2px solid rgb(255 255 255 / 0.85);
+      background: transparent;
+      box-shadow:
+        0 0 0 1px rgb(15 23 42 / 0.45),
+        inset 0 0 0 1px rgb(15 23 42 / 0.12);
+    }
+
+    /* Colour name we have no colour for: plain neutral dot, never a wrong colour. */
+    .sccc-variation-option__swatch.is-unknown {
+      background: #9ca3af;
+    }
+
+    .sccc-variation-option:has(.sccc-variation-option__swatch) {
+      min-height: 2.75rem;
+      padding: 0.4rem 0.95rem 0.4rem 0.45rem;
+      gap: 0.6rem;
     }
 
     .sccc-product-single__meta {
@@ -2172,6 +2361,23 @@
         }
       };
 
+      /*
+       * The JSON data attributes are escaped twice (esc_attr() inside Blade's
+       * echo), so the browser hands back &quot; instead of quotes. Decode
+       * the entities and try again when the first parse fails.
+       */
+      const parseJsonAttribute = (raw) => {
+        try {
+          return JSON.parse(raw);
+        } catch (error) {
+          try {
+            return JSON.parse(decodeEntities(raw));
+          } catch (secondError) {
+            return null;
+          }
+        }
+      };
+
       const getScccVariationMatrix = (root) => {
         const raw = root.getAttribute('data-sccc-variation-matrix');
 
@@ -2179,12 +2385,14 @@
           return [];
         }
 
-        try {
-          const parsed = JSON.parse(raw);
-          return Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-          return [];
-        }
+        const parsed = parseJsonAttribute(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      };
+
+      // Colours of this product's own colour options, resolved on the server.
+      const getProductSwatches = (root) => {
+        const parsed = parseJsonAttribute(root.getAttribute('data-sccc-swatches') || '{}');
+        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
       };
 
       const isColorSelect = (select) => {
@@ -2417,7 +2625,11 @@
           const mainLink = root.querySelector('[data-sccc-main-link]');
           const variationThumb = root.querySelector('[data-sccc-variation-thumb]');
           const variationThumbImage = root.querySelector('[data-sccc-variation-thumb-image]');
-          const thumbs = Array.from(root.querySelectorAll('[data-sccc-gallery-thumb]'));
+          let thumbs = Array.from(root.querySelectorAll('[data-sccc-gallery-thumb]'));
+          const thumbsContainer = root.querySelector('[data-sccc-gallery-thumbs]');
+          const originalStaticThumbs = thumbs.filter((thumb) => thumb !== variationThumb);
+          const galleryGroups = parseJsonAttribute(root.getAttribute('data-sccc-gallery-groups') || '{}') || {};
+          let currentGroupId = null;
           const form = root.querySelector('form.variations_form');
 
           const setMainImage = (src, full, alt, imageId) => {
@@ -2473,7 +2685,212 @@
             variationThumb.setAttribute('data-image-id', String(imageId));
 
             variationThumbImage.src = thumb;
+            showGroupThumbs();
           };
+
+          const bindThumb = (thumb) => {
+            thumb.addEventListener('click', () => {
+              setMainImage(
+                thumb.getAttribute('data-src'),
+                thumb.getAttribute('data-full'),
+                thumb.getAttribute('data-alt'),
+                thumb.getAttribute('data-image-id')
+              );
+            });
+          };
+
+          /*
+           * Show the other images of the selected colour (back, neck label…)
+           * next to the first thumbnail. Colours without their own group get
+           * the original static thumbnails back.
+           */
+          const showGroupThumbs = () => {
+            if (!thumbsContainer || !variationThumb) {
+              return;
+            }
+
+            // Groups are keyed by the selected colour, not by image.
+            const colorSelect = form
+              ? Array.from(form.querySelectorAll('select[name^="attribute_"]')).find(isColorSelect)
+              : null;
+            const color = colorSelect ? String(colorSelect.value || '') : '';
+            const groupKey = color === ''
+              ? ''
+              : Object.keys(galleryGroups).find((key) => key === color || key.toLowerCase() === color.toLowerCase()) || '';
+            const group = groupKey ? galleryGroups[groupKey] : null;
+            const groupId = groupKey;
+
+            if (groupId === currentGroupId) {
+              return;
+            }
+
+            currentGroupId = groupId;
+
+            thumbs.forEach((thumb) => {
+              if (thumb !== variationThumb) {
+                thumb.remove();
+              }
+            });
+
+            let extras = originalStaticThumbs;
+
+            if (group) {
+              // The first thumbnail already shows this colour's main image.
+              const firstId = variationThumb.getAttribute('data-image-id') || '';
+              const others = group.some((item) => String(item.id) === firstId)
+                ? group.filter((item) => String(item.id) !== firstId)
+                : group.slice(1);
+
+              extras = others.map((item, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'sccc-product-single__thumb';
+                button.setAttribute('data-sccc-gallery-thumb', '');
+                button.setAttribute('data-image-id', String(item.id));
+                button.setAttribute('data-src', item.src);
+                button.setAttribute('data-full', item.full);
+                button.setAttribute('data-thumb', item.thumb);
+                button.setAttribute('data-alt', item.alt || '');
+                button.setAttribute('aria-label', 'View product image ' + (index + 2));
+
+                const img = document.createElement('img');
+                img.src = item.thumb;
+                img.alt = '';
+                img.className = 'sccc-product-single__thumb-image';
+                img.loading = 'lazy';
+                button.appendChild(img);
+                bindThumb(button);
+
+                return button;
+              });
+            }
+
+            extras.forEach((thumb) => thumbsContainer.appendChild(thumb));
+            thumbs = [variationThumb].concat(extras);
+          };
+
+          /*
+           * Lightbox: opens the large image, steps through the thumbnails
+           * currently shown (so only the selected colour's images).
+           */
+          let lightbox = null;
+          let lightboxIndex = 0;
+          let lightboxItems = [];
+          let lightboxReturnFocus = null;
+
+          const lightboxShow = (index) => {
+            const count = lightboxItems.length;
+            lightboxIndex = (index + count) % count;
+            const item = lightboxItems[lightboxIndex];
+
+            lightbox.image.src = item.full;
+            lightbox.image.alt = item.alt;
+            lightbox.count.textContent = count > 1 ? (lightboxIndex + 1) + ' / ' + count : '';
+            lightbox.prev.hidden = count < 2;
+            lightbox.next.hidden = count < 2;
+          };
+
+          const lightboxClose = () => {
+            if (!lightbox || lightbox.el.hidden) {
+              return;
+            }
+
+            lightbox.el.hidden = true;
+            lightbox.image.removeAttribute('src');
+            document.documentElement.style.overflow = '';
+
+            if (lightboxReturnFocus) {
+              lightboxReturnFocus.focus();
+            }
+          };
+
+          const lightboxBuild = () => {
+            const el = document.createElement('div');
+            el.className = 'sccc-lightbox';
+            el.hidden = true;
+            el.setAttribute('role', 'dialog');
+            el.setAttribute('aria-modal', 'true');
+            el.setAttribute('aria-label', 'Product image');
+
+            const makeButton = (className, label, text) => {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'sccc-lightbox__button ' + className;
+              button.setAttribute('aria-label', label);
+              button.textContent = text;
+              el.appendChild(button);
+
+              return button;
+            };
+
+            const image = document.createElement('img');
+            image.className = 'sccc-lightbox__image';
+            el.appendChild(image);
+
+            const close = makeButton('sccc-lightbox__close', 'Close', '\u00d7');
+            const prev = makeButton('sccc-lightbox__prev', 'Previous image', '\u2039');
+            const next = makeButton('sccc-lightbox__next', 'Next image', '\u203a');
+
+            const count = document.createElement('span');
+            count.className = 'sccc-lightbox__count';
+            count.setAttribute('aria-live', 'polite');
+            el.appendChild(count);
+
+            close.addEventListener('click', lightboxClose);
+            prev.addEventListener('click', () => lightboxShow(lightboxIndex - 1));
+            next.addEventListener('click', () => lightboxShow(lightboxIndex + 1));
+
+            el.addEventListener('click', (event) => {
+              if (event.target === el) {
+                lightboxClose();
+              }
+            });
+
+            el.addEventListener('keydown', (event) => {
+              if (event.key === 'Escape') {
+                lightboxClose();
+              } else if (event.key === 'ArrowLeft') {
+                lightboxShow(lightboxIndex - 1);
+              } else if (event.key === 'ArrowRight') {
+                lightboxShow(lightboxIndex + 1);
+              } else if (event.key === 'Tab') {
+                // Keep focus inside the lightbox.
+                const buttons = [close, prev, next].filter((button) => !button.hidden);
+                const position = buttons.indexOf(document.activeElement);
+                event.preventDefault();
+                buttons[(position + (event.shiftKey ? -1 : 1) + buttons.length) % buttons.length].focus();
+              }
+            });
+
+            document.body.appendChild(el);
+
+            return { el, image, close, prev, next, count };
+          };
+
+          if (mainLink && mainImage) {
+            mainLink.addEventListener('click', (event) => {
+              event.preventDefault();
+
+              lightboxItems = thumbs.map((thumb) => ({
+                full: thumb.getAttribute('data-full') || thumb.getAttribute('data-src') || '',
+                alt: thumb.getAttribute('data-alt') || '',
+              })).filter((item) => item.full);
+
+              let start = lightboxItems.findIndex((item) => item.full === mainLink.href);
+
+              if (start < 0) {
+                lightboxItems.unshift({ full: mainLink.href, alt: mainImage.alt || '' });
+                start = 0;
+              }
+
+              lightbox = lightbox || lightboxBuild();
+              lightboxReturnFocus = mainLink;
+              lightbox.el.hidden = false;
+              document.documentElement.style.overflow = 'hidden';
+              lightboxShow(start);
+              lightbox.close.focus();
+            });
+          }
 
           const resetDynamicImage = () => {
             if (!mainImage) {
@@ -2504,19 +2921,11 @@
               variationThumb.setAttribute('data-image-id', defaultImageId);
 
               variationThumbImage.src = defaultThumb;
+              showGroupThumbs();
             }
           };
 
-          thumbs.forEach((thumb) => {
-            thumb.addEventListener('click', () => {
-              setMainImage(
-                thumb.getAttribute('data-src'),
-                thumb.getAttribute('data-full'),
-                thumb.getAttribute('data-alt'),
-                thumb.getAttribute('data-image-id')
-              );
-            });
-          });
+          thumbs.forEach(bindThumb);
 
           if (!form) {
             return;
@@ -2530,6 +2939,7 @@
 
           const wooVariationData = getVariationData(form);
           const scccVariationMatrix = getScccVariationMatrix(root);
+          const productSwatches = getProductSwatches(root);
           const variations = scccVariationMatrix.length ? scccVariationMatrix : wooVariationData;
 
           const groups = selects.map((select) => {
@@ -2674,7 +3084,14 @@
                 const swatch = document.createElement('span');
                 swatch.className = 'sccc-variation-option__swatch';
                 swatch.setAttribute('aria-hidden', 'true');
-                swatch.style.background = colorMap[valueSlug] || colorMap[slugify(optionLabel(option))] || '';
+                const labelSlug = slugify(optionLabel(option));
+                const swatchColor = productSwatches[valueSlug] || productSwatches[labelSlug] || colorMap[valueSlug] || colorMap[labelSlug] || '';
+
+                if (swatchColor) {
+                  swatch.style.background = swatchColor;
+                } else {
+                  swatch.classList.add('is-unknown');
+                }
                 button.appendChild(swatch);
               }
 
