@@ -509,6 +509,13 @@ require_once get_theme_file_path('app/Support/CPT/Faq.php');
 require_once get_theme_file_path('app/Support/CPT/TestimonialPostType.php');
 
 /* -----------------------------------------------------------------------------
+ * Vendor applications (CPT, Gravity Forms intake, approval, Stripe payment)
+ * -------------------------------------------------------------------------- */
+
+require_once get_theme_file_path('app/Support/Vendors/bootstrap.php');
+require_once get_theme_file_path('app/Support/CarShows/bootstrap.php');
+
+/* -----------------------------------------------------------------------------
  * Admin dashboard reports and admin-user tooling
  * -------------------------------------------------------------------------- */
 
