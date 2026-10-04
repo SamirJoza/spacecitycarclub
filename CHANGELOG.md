@@ -14,6 +14,37 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 
 ---
 
+## [1.36] - 2026-10-04
+
+### Added
+
+- **Vendors:** `vendor` post type with one record per business (`app/Support/Vendors/`, `app/Fields/Vendor.php`). Application → manual approval → Stripe payment, returning-vendor magic link, food-vendor rule, CSV exports. Gravity Forms are built in code (`VendorForms.php`); see `resources/gravity-forms/README-vendors.md`.
+- **Vendor blocks:** **Vendor Sign-up** (`app/Blocks/VendorSignup.php`) and **Featured Vendors** (`app/Blocks/FeaturedVendors.php`) with their Blade views.
+- **Club Show settings on events:** ACF box in the Classic editor (`app/Fields/EventVendorSettings.php`) and a **Club Show** step in MagePeople's Modern event editor (`EventVendorModernEditor.php`).
+- **Car show registration:** own Gravity Forms + Stripe form for club car shows (Category "Car Show" + Organizer "Space City Car Club") in `app/Support/CarShows/`. Owner details once, one block per car, price taken from the event's MagePeople tickets (early bird supported), price and quantity enforced on the server. See `resources/gravity-forms/README-car-shows.md`.
+- **Registered Cars:** `registered_car` post type with per-show car numbers, show filter and CSV export; shared club edit capability (`AdminAccess`, `OperationalRoles`).
+- **MagePeople template overrides:** `mage-event/layout/registration.php` and `seat_status.php` — car shows get the registration form, a "Cars registered" count and a "Vendors wanted" card; other events keep the plugin templates.
+- **Theme Settings:** **Car Show Settings** page (`app/Options/CarShowSettings.php`); Vendor Settings extended.
+- **Shared form styling:** `app/Support/Forms/GlassForms.php` — neon-glass fields and buttons for the vendor and car forms.
+- **Product color dots:** `app/Support/Woo/ProductSwatches.php` resolves a color for each of a product's color options from its name (built-in garment palette, word-based guessing, highlighter shades for "Safety …"), with a **Color dots** box on the product edit screen for manual picks (saved site-wide by color name). Filters `sccc_product_swatches`, `sccc_swatch_palette`.
+- **Product gallery:** thumbnails follow the selected color (front, back, neck label), grouped from the gallery order; lightbox on the main image with keyboard and arrow navigation.
+
+### Changed
+
+- **Single product:** larger color dots with a visible ring; unknown color names show a neutral dot instead of the theme gradient.
+
+### Fixed
+
+- **Single product:** the JSON data attributes (variation matrix, color dots) were double-escaped and could not be read by the page script; the script now decodes them, so impossible color/size combinations are disabled as intended.
+
+### Removed
+
+- `resources/gravity-forms/vendor-application.json`, `vendor-payment.json` (forms are now created from code).
+
+- `style.css`: `Version` `1.35` → `1.36`.
+
+---
+
 ## [1.35] - 2026-05-15
 
 ### Added
