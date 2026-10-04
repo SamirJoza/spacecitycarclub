@@ -4,25 +4,19 @@
  * File path + filename: app/Support/Vendors/VendorPayment.php
  *
  * Purpose:
- * - Wire the Gravity Forms "Vendor Payment" form (Stripe) to Vendor applications.
- *   1) Only render the form for a valid private link
- *      (?vendor_application=ID&vendor_token=TOKEN) on an APPROVED, unpaid
- *      application. Otherwise show a friendly message instead of the form.
- *   2) Pre-fill the hidden application/token fields, the payer email and a
- *      summary, and force the product price to the approved fee.
- *   3) Re-check everything server-side on submit (token, status, amount).
- *   4) When Stripe reports the payment as completed, mark the application Paid,
- *      store the amount / transaction / entry, kill the link and send the
- *      vendor confirmation + staff notice.
+ * - Wire the Gravity Forms "Vendor Sign-up & Payment" form (Stripe) to Vendors.
+ *   The form only works through a personal link
+ *   (?vendor=ID&vendor_token=TOKEN) emailed after approval or to a returning
+ *   vendor. It shows the vendor's business and the shows they may pay for:
+ *     • shows they were approved for (fee locked at approval), and
+ *     • for approved vendors, every open club show they aren't in yet —
+ *       filtered by the food rule.
+ * - The price is always set server-side from Vendors::payableShows().
+ * - When Stripe completes the payment, the show row becomes "Active", paid
+ *   details are stored, and the vendor + staff get confirmation emails.
  *
- * Why this file exists:
- * - The fee is decided by staff at approval time. The browser must never be
- *   able to change what gets charged, so the price is set from the Vendor
- *   record on every Gravity Forms pass and verified again after payment.
- *
- * How the form is recognised (no hard-coded form IDs):
- * - Form Settings → CSS Class Name contains `sccc-vendor-payment`.
- * - Fields are matched by Admin Field Label (see resources/gravity-forms/).
+ * How the form is recognised:
+ * - CSS class `sccc-vendor-payment`; fields by Admin Field Label (F_* below).
  */
 
 namespace App\Support\Vendors;
@@ -31,12 +25,11 @@ defined('ABSPATH') || exit;
 
 final class VendorPayment
 {
-    /** Admin Field Labels used by the payment form. */
-    public const F_APPLICATION = 'vendor_application_id';
+    public const F_SUMMARY = 'vendor_payment_summary';
+
+    public const F_VENDOR = 'vendor_id';
 
     public const F_TOKEN = 'vendor_token';
-
-    public const F_SUMMARY = 'vendor_payment_summary';
 
     public const F_PRODUCT = 'vendor_fee_product';
 
@@ -57,61 +50,60 @@ final class VendorPayment
     }
 
     /* -------------------------------------------------------------------------
-     * Request context
+     * Context
      * ---------------------------------------------------------------------- */
 
     /**
-     * Vendor ID + token from the private link (GET) or the posted hidden fields.
+     * Vendor ID + token from the link (GET) or the posted hidden fields.
      *
-     * @param  array<string, mixed>|null  $form
      * @return array{0:int,1:string}
      */
-    private static function requestContext(?array $form = null): array
+    private static function context(?array $form = null): array
     {
-        $id = isset($_GET[Vendors::QUERY_APPLICATION]) ? absint($_GET[Vendors::QUERY_APPLICATION]) : 0; // phpcs:ignore WordPress.Security.NonceVerification
+        $id = isset($_GET[Vendors::QUERY_VENDOR]) ? absint($_GET[Vendors::QUERY_VENDOR]) : 0; // phpcs:ignore WordPress.Security.NonceVerification
         $token = isset($_GET[Vendors::QUERY_TOKEN]) ? sanitize_text_field(wp_unslash($_GET[Vendors::QUERY_TOKEN])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 
         if ($form) {
-            $idField = Vendors::field($form, self::F_APPLICATION);
-            $tokenField = Vendors::field($form, self::F_TOKEN);
-
-            if ($idField && isset($_POST['input_'.$idField->id])) { // phpcs:ignore WordPress.Security.NonceVerification
-                $id = absint(wp_unslash($_POST['input_'.$idField->id]));
-            }
-            if ($tokenField && isset($_POST['input_'.$tokenField->id])) { // phpcs:ignore WordPress.Security.NonceVerification
-                $token = sanitize_text_field(wp_unslash($_POST['input_'.$tokenField->id]));
-            }
+            $posted = absint(Vendors::postedValue($form, self::F_VENDOR));
+            $postedToken = sanitize_text_field(Vendors::postedValue($form, self::F_TOKEN));
+            $id = $posted ?: $id;
+            $token = $postedToken !== '' ? $postedToken : $token;
         }
 
         return [$id, $token];
     }
 
-    /**
-     * Why a link cannot be used, or '' when it can.
-     */
+    /** Why the link can't be used right now ('' when it can). */
     private static function problemFor(int $id, string $token): string
     {
         if (! $id || ! Vendors::isVendor($id) || ! Vendors::tokenIsValid($id, $token)) {
-            return Vendors::isVendor($id) && Vendors::status($id) === Vendors::STATUS_PAID
-                ? __('This vendor fee has already been paid — you\'re all set. Check your email for the confirmation.', 'sccc')
-                : __('This payment link is not valid or has expired. Please use the link from your approval email, or contact us.', 'sccc');
+            return __('This link is not valid or has expired. Use "I\'ve been a vendor with you before" on our vendor page to get a new one.', 'sccc');
         }
 
-        $status = Vendors::status($id);
-
-        if ($status === Vendors::STATUS_PAID) {
-            return __('This vendor fee has already been paid — you\'re all set.', 'sccc');
+        if (in_array(Vendors::status($id), [Vendors::STATUS_REJECTED, Vendors::STATUS_BLOCKED], true)) {
+            return __('This vendor account can\'t sign up online. Please contact us.', 'sccc');
         }
 
-        if ($status !== Vendors::STATUS_APPROVED) {
-            return __('This application is not awaiting payment. Please contact us if you think this is a mistake.', 'sccc');
+        if (Vendors::payableShows($id)) {
+            return '';
         }
 
-        if (Vendors::feeDue($id) <= 0) {
-            return __('There is no fee due for this application. Please contact us.', 'sccc');
+        if (Vendors::status($id) === Vendors::STATUS_PENDING) {
+            return __('Your application is still being reviewed. We\'ll email you once it\'s approved.', 'sccc');
         }
 
-        return '';
+        $foodBlocked = Vendors::foodBlockedShows($id);
+        if ($foodBlocked) {
+            return Vendors::foodMessage((int) $foodBlocked[0]);
+        }
+
+        foreach (Vendors::openShows() as $eventId) {
+            if (Vendors::showRowStatus($id, $eventId) === Vendors::SHOW_ACTIVE) {
+                return __('You\'re all set — you\'re already confirmed for our upcoming show. See you there!', 'sccc');
+            }
+        }
+
+        return Vendors::closedMessage();
     }
 
     /* -------------------------------------------------------------------------
@@ -128,29 +120,45 @@ final class VendorPayment
             return $form;
         }
 
-        [$id, $token] = self::requestContext($form);
+        [$id, $token] = self::context($form);
 
         if (self::problemFor($id, $token) !== '') {
             return $form;
         }
 
-        $fee = Vendors::feeDue($id);
+        $payable = Vendors::payableShows($id);
 
         foreach ((array) $form['fields'] as $field) {
-            $label = (string) ($field->adminLabel ?? '');
+            switch ((string) ($field->adminLabel ?? '')) {
+                case self::F_VENDOR:
+                    $field->defaultValue = (string) $id;
+                    break;
 
-            if ($label === self::F_APPLICATION) {
-                $field->defaultValue = (string) $id;
-            } elseif ($label === self::F_TOKEN) {
-                $field->defaultValue = $token;
-            } elseif ($label === self::F_EMAIL) {
-                $field->defaultValue = Vendors::contactEmail($id);
-            } elseif ($label === self::F_PRODUCT) {
-                $field->basePrice = self::gfMoney($fee);
-                $field->disableQuantity = true;
-                $field->label = sprintf(__('Vendor fee — %s', 'sccc'), html_entity_decode(get_the_title(Vendors::eventId($id)), ENT_QUOTES, 'UTF-8'));
-            } elseif ($label === self::F_SUMMARY) {
-                $field->content = self::summaryHtml($id);
+                case self::F_TOKEN:
+                    $field->defaultValue = $token;
+                    break;
+
+                case self::F_EMAIL:
+                    $field->defaultValue = Vendors::contactEmail($id);
+                    break;
+
+                case self::F_SUMMARY:
+                    $field->content = self::summaryHtml($id);
+                    break;
+
+                case self::F_PRODUCT:
+                    $choices = [];
+                    foreach ($payable as $eventId => $fee) {
+                        $choices[] = [
+                            'text' => Vendors::eventLabel((int) $eventId),
+                            'value' => (string) $eventId,
+                            'price' => self::gfMoney($fee),
+                            'isSelected' => count($payable) === 1,
+                        ];
+                    }
+                    $field->choices = $choices;
+                    $field->enablePrice = true;
+                    break;
             }
         }
 
@@ -158,37 +166,30 @@ final class VendorPayment
     }
 
     /**
-     * Replace the form with a message when the link is not usable.
-     *
      * @param  array<string, mixed>|mixed  $form
      */
     public static function guardFormOutput(string $formString, $form): string
     {
-        if (is_admin() || ! Vendors::formHasClass($form, Vendors::PAYMENT_FORM_CLASS)) {
+        if (is_admin() || ! Vendors::formHasClass($form, Vendors::PAYMENT_FORM_CLASS) || ! empty($GLOBALS['sccc_vendor_payment_submitted'])) {
             return $formString;
         }
 
-        // After a successful submission Gravity Forms returns the confirmation; leave it alone.
-        if (! empty($GLOBALS['sccc_vendor_payment_submitted'])) {
-            return $formString;
-        }
-
-        [$id, $token] = self::requestContext(is_array($form) ? $form : null);
+        [$id, $token] = self::context(is_array($form) ? $form : null);
         $problem = self::problemFor($id, $token);
 
-        if ($problem === '') {
-            return $formString;
-        }
-
-        return '<div class="sccc-vendor-payment-message gform_confirmation_message">'.esc_html($problem).'</div>';
+        return $problem === ''
+            ? $formString
+            : '<div class="sccc-vendor-message gform_confirmation_message">'.esc_html($problem).'</div>';
     }
 
     private static function summaryHtml(int $id): string
     {
-        return '<div class="sccc-vendor-payment-summary">'
-            .'<p><strong>'.esc_html(Vendors::businessName($id)).'</strong></p>'
-            .'<p>'.esc_html(Vendors::eventLabel(Vendors::eventId($id))).'</p>'
-            .'<p>'.esc_html__('Amount due:', 'sccc').' <strong>'.esc_html(Vendors::money(Vendors::feeDue($id))).'</strong></p>'
+        $logo = Vendors::logoId($id);
+
+        return '<div class="sccc-vendor-summary">'
+            .($logo ? wp_get_attachment_image($logo, 'thumbnail', false, ['class' => 'sccc-vendor-summary__logo', 'alt' => '']) : '')
+            .'<div><p class="sccc-vendor-summary__name"><strong>'.esc_html(Vendors::businessName($id)).'</strong></p>'
+            .'<p class="sccc-vendor-summary__contact">'.esc_html(Vendors::contactName($id)).' · '.esc_html(Vendors::contactEmail($id)).'</p></div>'
             .'</div>';
     }
 
@@ -208,8 +209,15 @@ final class VendorPayment
             return $result;
         }
 
-        [$id, $token] = self::requestContext($form);
+        [$id, $token] = self::context($form);
         $problem = self::problemFor($id, $token);
+        $eventId = self::eventFromValue(Vendors::postedValue($form, self::F_PRODUCT));
+
+        if ($problem === '' && ! isset(Vendors::payableShows($id)[$eventId])) {
+            $problem = $eventId && ! Vendors::showAllowsType($eventId, Vendors::typeSlug($id))
+                ? Vendors::foodMessage($eventId)
+                : __('Please choose a show from the list.', 'sccc');
+        }
 
         if ($problem !== '') {
             $result['is_valid'] = false;
@@ -228,7 +236,7 @@ final class VendorPayment
     }
 
     /**
-     * Force the charged price to the approved fee, whatever the browser posted.
+     * Force the charged price to the vendor's fee for the chosen show.
      *
      * @param  array<string, mixed>  $productInfo
      * @param  array<string, mixed>  $form
@@ -237,26 +245,24 @@ final class VendorPayment
      */
     public static function enforcePrice($productInfo, $form, $entry)
     {
-        if (! is_array($productInfo) || ! Vendors::formHasClass($form, Vendors::PAYMENT_FORM_CLASS)) {
+        if (! is_array($productInfo) || ! is_array($form) || ! Vendors::formHasClass($form, Vendors::PAYMENT_FORM_CLASS)) {
             return $productInfo;
         }
 
-        $id = absint(Vendors::entryValue($form, (array) $entry, self::F_APPLICATION));
-        if (! $id) {
-            [$id] = self::requestContext($form);
-        }
+        $field = Vendors::field($form, self::F_PRODUCT);
+        $id = absint(Vendors::entryValue($form, (array) $entry, self::F_VENDOR)) ?: self::context($form)[0];
+        $eventId = self::eventFromValue(Vendors::entryValue($form, (array) $entry, self::F_PRODUCT) ?: Vendors::postedValue($form, self::F_PRODUCT));
 
-        $productField = Vendors::field($form, self::F_PRODUCT);
-
-        if (! $id || ! Vendors::isVendor($id) || ! $productField) {
+        if (! $field || ! $id || ! $eventId || ! isset($productInfo['products'][$field->id])) {
             return $productInfo;
         }
 
-        $fee = Vendors::feeDue($id);
+        $fee = Vendors::payableShows($id)[$eventId] ?? self::expectedFee($id, $eventId);
 
-        if ($fee > 0 && isset($productInfo['products'][$productField->id])) {
-            $productInfo['products'][$productField->id]['price'] = self::gfMoney($fee);
-            $productInfo['products'][$productField->id]['quantity'] = 1;
+        if ($fee > 0) {
+            $productInfo['products'][$field->id]['price'] = self::gfMoney($fee);
+            $productInfo['products'][$field->id]['quantity'] = 1;
+            $productInfo['products'][$field->id]['name'] = sprintf(__('Vendor fee — %s', 'sccc'), Vendors::eventTitle($eventId));
         }
 
         return $productInfo;
@@ -267,8 +273,6 @@ final class VendorPayment
      * ---------------------------------------------------------------------- */
 
     /**
-     * Fires when Gravity Forms Stripe marks the payment complete.
-     *
      * @param  array<string, mixed>  $entry
      * @param  array<string, mixed>  $action
      */
@@ -280,35 +284,26 @@ final class VendorPayment
 
         $form = \GFAPI::get_form((int) rgar($entry, 'form_id'));
 
-        if (! Vendors::formHasClass($form, Vendors::PAYMENT_FORM_CLASS)) {
-            return;
+        if (is_array($form) && Vendors::formHasClass($form, Vendors::PAYMENT_FORM_CLASS)) {
+            self::markPaid(
+                $form,
+                $entry,
+                (float) rgar((array) $action, 'amount', rgar($entry, 'payment_amount')),
+                (string) rgar((array) $action, 'transaction_id', rgar($entry, 'transaction_id'))
+            );
         }
-
-        self::markPaid(
-            $form,
-            $entry,
-            (float) rgar((array) $action, 'amount', rgar($entry, 'payment_amount')),
-            (string) rgar((array) $action, 'transaction_id', rgar($entry, 'transaction_id'))
-        );
     }
 
     /**
-     * Fallback for gateways that finish during submission (entry already "Paid").
-     *
      * @param  array<string, mixed>  $entry
      * @param  array<string, mixed>  $form
      */
     public static function onAfterSubmission($entry, $form): void
     {
-        if (! is_array($entry) || ! Vendors::formHasClass($form, Vendors::PAYMENT_FORM_CLASS)) {
-            return;
+        if (is_array($entry) && is_array($form) && Vendors::formHasClass($form, Vendors::PAYMENT_FORM_CLASS)
+            && strtolower((string) rgar($entry, 'payment_status')) === 'paid') {
+            self::markPaid($form, $entry, (float) rgar($entry, 'payment_amount'), (string) rgar($entry, 'transaction_id'));
         }
-
-        if (strtolower((string) rgar($entry, 'payment_status')) !== 'paid') {
-            return;
-        }
-
-        self::markPaid($form, $entry, (float) rgar($entry, 'payment_amount'), (string) rgar($entry, 'transaction_id'));
     }
 
     /**
@@ -317,62 +312,93 @@ final class VendorPayment
      */
     private static function markPaid(array $form, array $entry, float $amount, string $transactionId): void
     {
-        $id = absint(Vendors::entryValue($form, $entry, self::F_APPLICATION));
+        $id = absint(Vendors::entryValue($form, $entry, self::F_VENDOR));
+        $eventId = self::eventFromValue(Vendors::entryValue($form, $entry, self::F_PRODUCT));
         $entryId = (int) rgar($entry, 'id');
 
-        if (! $id || ! Vendors::isVendor($id)) {
-            self::entryNote($entryId, __('Payment received, but no matching vendor application was found. Please reconcile manually.', 'sccc'));
+        if (! $id || ! Vendors::isVendor($id) || ! $eventId) {
+            self::note($entryId, __('Payment received, but the vendor or show could not be matched. Please reconcile manually.', 'sccc'));
 
             return;
         }
 
-        // Idempotent: both hooks may fire for the same payment.
-        if (Vendors::status($id) === Vendors::STATUS_PAID) {
+        $rows = Vendors::history($id);
+        $index = Vendors::historyIndex($rows, $eventId);
+
+        // Idempotent: both payment hooks can fire for one payment.
+        if ($index >= 0 && ($rows[$index][Vendors::ROW_STATUS] ?? '') === Vendors::SHOW_ACTIVE) {
             return;
         }
 
-        $due = Vendors::feeDue($id);
+        $expected = self::expectedFee($id, $eventId);
 
-        if ($due > 0 && $amount + 0.001 < $due) {
+        if ($expected > 0 && $amount + 0.001 < $expected) {
             $message = sprintf(
-                __('Payment of %1$s is less than the %2$s due for vendor application #%3$d. The application was NOT marked paid.', 'sccc'),
-                Vendors::money($amount),
-                Vendors::money($due),
+                __('Payment of $%1$s is less than the $%2$s due for %3$s (vendor #%4$d). The show was NOT marked active.', 'sccc'),
+                number_format($amount, 2),
+                number_format($expected, 2),
+                Vendors::eventTitle($eventId),
                 $id
             );
-            self::entryNote($entryId, $message);
+            self::note($entryId, $message);
             Vendors::mail(Vendors::staffEmail(), __('Vendor payment needs review', 'sccc'), '<p>'.esc_html($message).'</p>', [
-                ['label' => __('Open application', 'sccc'), 'url' => admin_url('post.php?action=edit&post='.$id)],
+                ['label' => __('Open vendor', 'sccc'), 'url' => admin_url('post.php?action=edit&post='.$id)],
             ]);
 
             return;
         }
 
-        update_post_meta($id, Vendors::FIELD_STATUS, Vendors::STATUS_PAID);
-        update_post_meta($id, Vendors::META_PAID_AT, current_time('mysql'));
-        update_post_meta($id, Vendors::META_PAID_AMOUNT, round($amount, 2));
-        update_post_meta($id, Vendors::META_TRANSACTION_ID, sanitize_text_field($transactionId));
-        update_post_meta($id, Vendors::META_PAYMENT_ENTRY_ID, $entryId);
-        update_post_meta($id, Vendors::META_PAYMENT_FORM_ID, (int) rgar($form, 'id'));
-        delete_post_meta($id, Vendors::META_TOKEN);
+        $row = [
+            Vendors::ROW_EVENT => $eventId,
+            Vendors::ROW_STATUS => Vendors::SHOW_ACTIVE,
+            Vendors::ROW_FEE => $expected ?: $amount,
+            Vendors::ROW_PAID_AMOUNT => round($amount, 2),
+            Vendors::ROW_PAID_AT => current_time('Y-m-d H:i'),
+            Vendors::ROW_TRANSACTION => sanitize_text_field($transactionId),
+            Vendors::ROW_ENTRY => $entryId,
+        ];
 
-        self::entryNote($entryId, sprintf(__('Vendor application #%d marked as paid.', 'sccc'), $id));
-        self::sendConfirmations($id, $amount);
+        if ($index >= 0) {
+            $rows[$index] = array_merge($rows[$index], $row);
+        } else {
+            $rows[] = $row;
+        }
+
+        Vendors::saveHistory($id, $rows);
+
+        // Keep the link only while there is still something left to pay for.
+        if (! Vendors::payableShows($id)) {
+            Vendors::clearToken($id);
+        }
+
+        self::note($entryId, sprintf(__('Vendor #%1$d is now active for %2$s.', 'sccc'), $id, Vendors::eventTitle($eventId)));
+        self::sendConfirmations($id, $eventId, $amount);
     }
 
-    private static function sendConfirmations(int $id, float $amount): void
+    /** Fee locked on the history row, else the show's current fee. */
+    private static function expectedFee(int $id, int $eventId): float
     {
-        $first = (string) get_post_meta($id, Vendors::FIELD_FIRST_NAME, true);
-        $show = Vendors::eventLabel(Vendors::eventId($id));
-        $showTitle = html_entity_decode(get_the_title(Vendors::eventId($id)), ENT_QUOTES, 'UTF-8');
+        $rows = Vendors::history($id);
+        $index = Vendors::historyIndex($rows, $eventId);
+
+        if ($index >= 0 && is_numeric($rows[$index][Vendors::ROW_FEE] ?? null) && (float) $rows[$index][Vendors::ROW_FEE] > 0) {
+            return round((float) $rows[$index][Vendors::ROW_FEE], 2);
+        }
+
+        return Vendors::showFee($eventId, (string) get_post_meta($id, Vendors::FIELD_BOOTH_TYPE, true));
+    }
+
+    private static function sendConfirmations(int $id, int $eventId, float $amount): void
+    {
+        $show = Vendors::eventLabel($eventId);
 
         Vendors::mail(
             Vendors::contactEmail($id),
-            sprintf(__('You\'re confirmed as a vendor for %s', 'sccc'), $showTitle),
-            '<p>'.esc_html(sprintf(__('Hi %s,', 'sccc'), $first ?: Vendors::businessName($id))).'</p>'
+            sprintf(__('You\'re confirmed as a vendor for %s', 'sccc'), Vendors::eventTitle($eventId)),
+            Vendors::greeting($id)
             .'<p>'.sprintf(
                 esc_html__('We received your payment of %1$s. %2$s is confirmed as a vendor for %3$s.', 'sccc'),
-                '<strong>'.esc_html(Vendors::money($amount)).'</strong>',
+                '<strong>$'.esc_html(number_format($amount, 2)).'</strong>',
                 '<strong>'.esc_html(Vendors::businessName($id)).'</strong>',
                 '<strong>'.esc_html($show).'</strong>'
             ).'</p>'
@@ -381,14 +407,14 @@ final class VendorPayment
 
         Vendors::mail(
             Vendors::staffEmail(),
-            sprintf(__('Vendor paid: %1$s — %2$s', 'sccc'), Vendors::businessName($id), $showTitle),
+            sprintf(__('Vendor paid: %1$s — %2$s', 'sccc'), Vendors::businessName($id), Vendors::eventTitle($eventId)),
             '<p>'.sprintf(
-                esc_html__('%1$s paid %2$s for %3$s.', 'sccc'),
+                esc_html__('%1$s paid %2$s and is active for %3$s.', 'sccc'),
                 '<strong>'.esc_html(Vendors::businessName($id)).'</strong>',
-                '<strong>'.esc_html(Vendors::money($amount)).'</strong>',
+                '<strong>$'.esc_html(number_format($amount, 2)).'</strong>',
                 esc_html($show)
             ).'</p>',
-            [['label' => __('Open application', 'sccc'), 'url' => admin_url('post.php?action=edit&post='.$id)]],
+            [['label' => __('Open vendor', 'sccc'), 'url' => admin_url('post.php?action=edit&post='.$id)]],
             Vendors::contactEmail($id)
         );
     }
@@ -397,12 +423,18 @@ final class VendorPayment
      * Helpers
      * ---------------------------------------------------------------------- */
 
+    /** Product select values are stored as "eventId|price". */
+    private static function eventFromValue(string $value): int
+    {
+        return absint(explode('|', $value)[0] ?? '');
+    }
+
     private static function gfMoney(float $amount): string
     {
         return class_exists('GFCommon') ? (string) \GFCommon::to_money($amount) : '$'.number_format($amount, 2);
     }
 
-    private static function entryNote(int $entryId, string $note): void
+    private static function note(int $entryId, string $note): void
     {
         if ($entryId && class_exists('GFAPI')) {
             \GFAPI::add_note($entryId, 0, 'SCCC Vendors', $note);

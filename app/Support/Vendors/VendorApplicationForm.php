@@ -4,26 +4,19 @@
  * File path + filename: app/Support/Vendors/VendorApplicationForm.php
  *
  * Purpose:
- * - Wire the Gravity Forms "Vendor Application" form to the Vendor post type.
- *   1) Fill the "Which shows?" checkbox field with upcoming shows that accept
- *      vendors (see EventVendorSettings on each event).
- *   2) Replace the form with a "closed" message when no show is open.
- *   3) After submission, create one Vendor application (status: pending) per
- *      selected show and add a note to the entry listing what was created.
+ * - Wire the Gravity Forms "Vendor Application" (new vendors, 4 pages) to the
+ *   Vendor post type:
+ *   1) Fill the "Which show?" field with open club shows.
+ *   2) Validate: one vendor per email (returning vendors are pointed to the
+ *      returning-vendor option), the show must still be open, and the food
+ *      rule — food vendors cannot apply to a show that doesn't allow food.
+ *   3) After submission, create the Vendor (status: pending), copy every
+ *      answer into its fields, move the logo/photos into the Media Library,
+ *      and add a "pending" row for the chosen show to the show history.
  *
- * Why this file exists:
- * - Vendors can pick several shows at once, but each show is reviewed, approved
- *   (or declined) and paid separately — e.g. a food vendor may be approved for
- *   one venue and declined at a venue that does not allow food.
- *
- * How the form is recognised (no hard-coded form IDs):
- * - Form Settings → CSS Class Name contains `sccc-vendor-application`.
- * - Fields are matched by their Admin Field Label (see resources/gravity-forms/
- *   vendor-application.json and README-vendors.md in that folder).
- *
- * Not handled here:
- * - Emails on submit → Gravity Forms notifications (in the form JSON).
- * - EmailOctopus → the Gravity Forms EmailOctopus add-on feed.
+ * How the form is recognised:
+ * - CSS class `sccc-vendor-application`; fields by Admin Field Label (the F_*
+ *   constants below, used by VendorForms when it builds the form).
  */
 
 namespace App\Support\Vendors;
@@ -32,46 +25,92 @@ defined('ABSPATH') || exit;
 
 final class VendorApplicationForm
 {
-    /** Admin Field Labels used by the application form. */
     public const F_BUSINESS = 'vendor_business_name';
+
+    public const F_DISPLAY_NAME = 'vendor_display_name';
 
     public const F_TYPE = 'vendor_type';
 
-    public const F_DESCRIPTION = 'vendor_description';
+    public const F_BLURB = 'vendor_blurb';
+
+    public const F_OFFERINGS = 'vendor_offerings';
 
     public const F_WEBSITE = 'vendor_website';
 
-    public const F_SOCIAL = 'vendor_social';
+    public const F_INSTAGRAM = 'vendor_instagram';
+
+    public const F_FACEBOOK = 'vendor_facebook';
+
+    public const F_TIKTOK = 'vendor_tiktok';
+
+    public const F_LOGO = 'vendor_logo';
+
+    public const F_PHOTOS = 'vendor_photos';
 
     public const F_FIRST_NAME = 'vendor_first_name';
 
     public const F_LAST_NAME = 'vendor_last_name';
 
+    public const F_ROLE = 'vendor_role';
+
     public const F_EMAIL = 'vendor_email';
 
     public const F_PHONE = 'vendor_phone';
 
-    public const F_SHOWS = 'vendor_shows';
+    public const F_TEXT_OK = 'vendor_text_ok';
+
+    public const F_ADDRESS = 'vendor_address';
+
+    public const F_DAYOF_NAME = 'vendor_dayof_name';
+
+    public const F_DAYOF_PHONE = 'vendor_dayof_phone';
+
+    public const F_SHOW = 'vendor_show';
+
+    public const F_BOOTH = 'vendor_booth_type';
+
+    public const F_TRAILER = 'vendor_trailer_length';
+
+    public const F_EQUIPMENT = 'vendor_equipment';
 
     public const F_POWER = 'vendor_power';
 
+    public const F_GENERATOR = 'vendor_generator';
+
+    public const F_OPEN_FLAME = 'vendor_open_flame';
+
+    public const F_STAFF = 'vendor_staff_count';
+
     public const F_NOTES = 'vendor_notes';
 
+    public const F_FEATURE_OK = 'vendor_feature_ok';
+
+    public const F_OFFER = 'vendor_member_offer';
+
+    public const F_HEARD = 'vendor_heard_about';
+
     public const F_MARKETING = 'vendor_marketing_optin';
+
+    public const F_AGREEMENT = 'vendor_agreement';
+
+    public const F_SIGNATURE = 'vendor_signature';
 
     public const F_REFERRAL = 'vendor_referral_source';
 
     public static function register(): void
     {
-        // Populate the shows checkbox everywhere Gravity Forms builds the form.
         foreach (['gform_pre_render', 'gform_pre_validation', 'gform_pre_submission_filter', 'gform_admin_pre_render'] as $hook) {
             add_filter($hook, [self::class, 'populateShows']);
         }
 
         add_filter('gform_get_form_filter', [self::class, 'maybeShowClosedMessage'], 10, 2);
-        add_filter('gform_validation', [self::class, 'validateShows']);
-        add_action('gform_after_submission', [self::class, 'createApplications'], 10, 2);
+        add_filter('gform_validation', [self::class, 'validate']);
+        add_action('gform_after_submission', [self::class, 'createVendor'], 10, 2);
     }
+
+    /* -------------------------------------------------------------------------
+     * Rendering
+     * ---------------------------------------------------------------------- */
 
     /**
      * @param  array<string, mixed>|mixed  $form
@@ -83,62 +122,61 @@ final class VendorApplicationForm
             return $form;
         }
 
-        $field = Vendors::field($form, self::F_SHOWS);
+        $field = Vendors::field($form, self::F_SHOW);
         if (! $field) {
             return $form;
         }
 
-        $choices = [];
-        $inputs = [];
-        $index = 0;
+        // Links from a car-show event page pre-select that show (?vendor_show=ID).
+        $preselect = isset($_GET['vendor_show']) ? absint($_GET['vendor_show']) : 0; // phpcs:ignore WordPress.Security.NonceVerification
 
-        foreach (Vendors::openShows() as $eventId => $post) {
-            $index++;
-            if ($index % 10 === 0) {
-                $index++; // Gravity Forms skips input IDs ending in 0 (e.g. 8.10).
+        $choices = [];
+        foreach (Vendors::openShows() as $eventId) {
+            $label = Vendors::eventLabel($eventId);
+            $fee = Vendors::showFee($eventId);
+
+            if ((string) get_post_meta($eventId, Vendors::EVENT_PRICING_MODE, true) !== 'booth' && $fee > 0) {
+                $label .= ' — '.sprintf(__('vendor fee $%s', 'sccc'), number_format($fee, 2));
             }
 
-            $label = Vendors::eventLabel((int) $eventId);
-            $choices[] = ['text' => $label, 'value' => (string) $eventId, 'isSelected' => false, 'price' => ''];
-            $inputs[] = ['id' => $field->id.'.'.$index, 'label' => $label, 'name' => ''];
+            if (! Vendors::showAllowsFood($eventId)) {
+                $label .= ' '.__('(no food vendors)', 'sccc');
+            }
+
+            $choices[] = ['text' => $label, 'value' => (string) $eventId, 'isSelected' => $preselect === $eventId, 'price' => ''];
         }
 
         if ($choices) {
+            if (count($choices) === 1) {
+                $choices[0]['isSelected'] = true;
+            }
             $field->choices = $choices;
-            $field->inputs = $inputs;
         }
 
         return $form;
     }
 
     /**
-     * Show a friendly message instead of the form when no show is open.
-     *
      * @param  array<string, mixed>|mixed  $form
      */
     public static function maybeShowClosedMessage(string $formString, $form): string
     {
-        if (! Vendors::formHasClass($form, Vendors::APPLICATION_FORM_CLASS) || is_admin()) {
+        if (is_admin() || ! Vendors::formHasClass($form, Vendors::APPLICATION_FORM_CLASS) || Vendors::openShows()) {
             return $formString;
         }
 
-        if (Vendors::openShows()) {
-            return $formString;
-        }
-
-        $message = function_exists('get_field') ? (string) get_field('vendor_applications_closed_message', 'option') : '';
-        $message = $message !== '' ? $message : __('Vendor applications are currently closed. Check back soon for upcoming shows.', 'sccc');
-
-        return '<div class="sccc-vendor-closed gform_confirmation_message">'.esc_html($message).'</div>';
+        return '<div class="sccc-vendor-message gform_confirmation_message">'.esc_html(Vendors::closedMessage()).'</div>';
     }
 
+    /* -------------------------------------------------------------------------
+     * Validation (runs per page on multi-page forms)
+     * ---------------------------------------------------------------------- */
+
     /**
-     * Server-side check: every selected show must still be open to vendors.
-     *
      * @param  array<string, mixed>  $result
      * @return array<string, mixed>
      */
-    public static function validateShows(array $result): array
+    public static function validate(array $result): array
     {
         $form = $result['form'] ?? null;
 
@@ -146,20 +184,38 @@ final class VendorApplicationForm
             return $result;
         }
 
-        $field = Vendors::field($form, self::F_SHOWS);
-        if (! $field) {
-            return $result;
+        $type = sanitize_title(Vendors::postedValue($form, self::F_TYPE));
+
+        // Page 1: a food vendor when no open show allows food → stop right away.
+        $typeField = Vendors::field($form, self::F_TYPE);
+        if ($typeField && self::isOnCurrentPage($form, $typeField) && $type === Vendors::FOOD_TYPE_SLUG) {
+            $open = Vendors::openShows();
+            $foodShows = array_filter($open, [Vendors::class, 'showAllowsFood']);
+
+            if ($open && ! $foodShows) {
+                self::fail($result, $typeField, Vendors::foodMessage((int) $open[0]));
+            }
         }
 
-        $selected = self::postedShowIds($field);
-        $invalid = array_filter($selected, static fn (int $id): bool => ! Vendors::eventAcceptsVendors($id));
+        // Page 2: one vendor record per email address.
+        $emailField = Vendors::field($form, self::F_EMAIL);
+        if ($emailField && self::isOnCurrentPage($form, $emailField)) {
+            $email = Vendors::postedValue($form, self::F_EMAIL);
+            if ($email !== '' && Vendors::findByEmail($email)) {
+                self::fail($result, $emailField, __('We already have a vendor record for this email address. Please go back and choose "I\'ve been a vendor with you before" — no need to fill out the full application again.', 'sccc'));
+            }
+        }
 
-        if (! $selected || $invalid) {
-            $field->failed_validation = true;
-            $field->validation_message = $selected
-                ? __('One of the selected shows is no longer accepting vendors. Please review your selection.', 'sccc')
-                : __('Please choose at least one show.', 'sccc');
-            $result['is_valid'] = false;
+        // Page 3: the show must be open, and the food rule must pass.
+        $showField = Vendors::field($form, self::F_SHOW);
+        if ($showField && self::isOnCurrentPage($form, $showField)) {
+            $eventId = absint(Vendors::postedValue($form, self::F_SHOW));
+
+            if (! $eventId || ! Vendors::showIsOpen($eventId)) {
+                self::fail($result, $showField, __('Please choose a show that is open for vendors.', 'sccc'));
+            } elseif (! Vendors::showAllowsType($eventId, $type)) {
+                self::fail($result, $showField, Vendors::foodMessage($eventId));
+            }
         }
 
         $result['form'] = $form;
@@ -168,148 +224,235 @@ final class VendorApplicationForm
     }
 
     /**
-     * Create one pending Vendor application per selected show.
-     *
+     * @param  array<string, mixed>  $result
+     */
+    private static function fail(array &$result, object $field, string $message): void
+    {
+        $field->failed_validation = true;
+        $field->validation_message = $message;
+        $result['is_valid'] = false;
+    }
+
+    /**
+     * @param  array<string, mixed>  $form
+     */
+    private static function isOnCurrentPage(array $form, object $field): bool
+    {
+        $page = class_exists('GFFormDisplay') ? (int) \GFFormDisplay::get_source_page((int) $form['id']) : 0;
+
+        // 0 = final submission (all pages validated together).
+        return $page === 0 || (int) ($field->pageNumber ?? 1) === $page;
+    }
+
+    /* -------------------------------------------------------------------------
+     * Create the vendor
+     * ---------------------------------------------------------------------- */
+
+    /**
      * @param  array<string, mixed>  $entry
      * @param  array<string, mixed>  $form
      */
-    public static function createApplications($entry, $form): void
+    public static function createVendor($entry, $form): void
     {
-        if (! is_array($entry) || ! Vendors::formHasClass($form, Vendors::APPLICATION_FORM_CLASS)) {
+        if (! is_array($entry) || ! is_array($form) || ! Vendors::formHasClass($form, Vendors::APPLICATION_FORM_CLASS)) {
             return;
         }
 
-        $business = sanitize_text_field(Vendors::entryValue($form, $entry, self::F_BUSINESS));
-        $email = sanitize_email(Vendors::entryValue($form, $entry, self::F_EMAIL));
-        $showIds = array_filter(array_map('intval', explode(',', Vendors::entryValue($form, $entry, self::F_SHOWS))));
+        $v = static fn (string $label, string $input = ''): string => Vendors::entryValue($form, $entry, $label, $input);
 
-        if ($business === '' || ! is_email($email) || ! $showIds) {
+        $email = sanitize_email($v(self::F_EMAIL));
+        $business = sanitize_text_field($v(self::F_BUSINESS));
+        $eventId = absint($v(self::F_SHOW));
+
+        if (! is_email($email) || $business === '') {
             return;
         }
 
-        $typeSlug = sanitize_title(Vendors::entryValue($form, $entry, self::F_TYPE));
-        $term = $typeSlug !== '' ? get_term_by('slug', $typeSlug, Vendors::TAXONOMY_TYPE) : false;
-        $marketing = Vendors::entryValue($form, $entry, self::F_MARKETING) !== '' ? '1' : '0';
-        $power = strtolower(Vendors::entryValue($form, $entry, self::F_POWER)) === 'yes' ? 'yes' : 'no';
+        $vendorId = Vendors::findByEmail($email);
+        $isNew = ! $vendorId;
 
-        $created = [];
-        $skipped = [];
-
-        foreach (array_unique($showIds) as $eventId) {
-            if (! Vendors::eventAcceptsVendors($eventId)) {
-                $skipped[] = Vendors::eventLabel($eventId, false).' ('.__('not open', 'sccc').')';
-                continue;
-            }
-
-            if (self::hasActiveApplication($email, $eventId)) {
-                $skipped[] = Vendors::eventLabel($eventId, false).' ('.__('already applied', 'sccc').')';
-                continue;
-            }
-
-            $postId = wp_insert_post([
+        if ($isNew) {
+            $vendorId = (int) wp_insert_post([
                 'post_type' => Vendors::POST_TYPE,
                 'post_status' => 'publish',
                 'post_title' => $business,
-            ], true);
+            ]);
 
-            if (is_wp_error($postId) || ! $postId) {
-                continue;
+            if (! $vendorId) {
+                return;
             }
+        }
 
-            $postId = (int) $postId;
-
-            if ($term && ! is_wp_error($term)) {
-                wp_set_object_terms($postId, (int) $term->term_id, Vendors::TAXONOMY_TYPE);
-                self::update('field_vendor_type_term', (int) $term->term_id, $postId);
+        $set = static function (string $name, $value) use ($vendorId): void {
+            if (function_exists('update_field')) {
+                update_field('field_'.$name, $value, $vendorId);
+            } else {
+                update_post_meta($vendorId, $name, $value);
             }
+        };
 
-            self::update('field_vendor_description', sanitize_textarea_field(Vendors::entryValue($form, $entry, self::F_DESCRIPTION)), $postId);
-            self::update('field_vendor_website', esc_url_raw(Vendors::entryValue($form, $entry, self::F_WEBSITE)), $postId);
-            self::update('field_vendor_social', sanitize_text_field(Vendors::entryValue($form, $entry, self::F_SOCIAL)), $postId);
-            self::update('field_vendor_contact_first_name', sanitize_text_field(Vendors::entryValue($form, $entry, self::F_FIRST_NAME)), $postId);
-            self::update('field_vendor_contact_last_name', sanitize_text_field(Vendors::entryValue($form, $entry, self::F_LAST_NAME)), $postId);
-            self::update('field_vendor_contact_email', $email, $postId);
-            self::update('field_vendor_contact_phone', sanitize_text_field(Vendors::entryValue($form, $entry, self::F_PHONE)), $postId);
-            self::update('field_vendor_event', $eventId, $postId);
-            self::update('field_vendor_needs_power', $power, $postId);
-            self::update('field_vendor_notes', sanitize_textarea_field(Vendors::entryValue($form, $entry, self::F_NOTES)), $postId);
-            self::update('field_vendor_status', Vendors::STATUS_PENDING, $postId);
-            self::update('field_vendor_send_status_email', 1, $postId);
+        $type = get_term_by('slug', sanitize_title($v(self::F_TYPE)), Vendors::TAXONOMY_TYPE);
+        if ($type && ! is_wp_error($type)) {
+            wp_set_object_terms($vendorId, (int) $type->term_id, Vendors::TAXONOMY_TYPE);
+            $set(Vendors::FIELD_TYPE, (int) $type->term_id);
+        }
 
-            update_post_meta($postId, Vendors::META_ENTRY_ID, (int) rgar($entry, 'id'));
-            update_post_meta($postId, Vendors::META_FORM_ID, (int) rgar($form, 'id'));
-            update_post_meta($postId, Vendors::META_MARKETING_OPTIN, $marketing);
-            update_post_meta($postId, Vendors::META_REFERRAL_SOURCE, sanitize_text_field(Vendors::entryValue($form, $entry, self::F_REFERRAL)) ?: 'Direct');
+        $set(Vendors::FIELD_DISPLAY_NAME, sanitize_text_field($v(self::F_DISPLAY_NAME)));
+        $set(Vendors::FIELD_BLURB, sanitize_textarea_field($v(self::F_BLURB)));
+        $set(Vendors::FIELD_OFFERINGS, sanitize_textarea_field($v(self::F_OFFERINGS)));
+        $set(Vendors::FIELD_WEBSITE, esc_url_raw($v(self::F_WEBSITE)));
+        $set(Vendors::FIELD_INSTAGRAM, sanitize_text_field($v(self::F_INSTAGRAM)));
+        $set(Vendors::FIELD_FACEBOOK, sanitize_text_field($v(self::F_FACEBOOK)));
+        $set(Vendors::FIELD_TIKTOK, sanitize_text_field($v(self::F_TIKTOK)));
 
-            $created[] = Vendors::eventLabel($eventId, false).' → #'.$postId;
+        $set(Vendors::FIELD_FIRST_NAME, sanitize_text_field($v(self::F_FIRST_NAME)));
+        $set(Vendors::FIELD_LAST_NAME, sanitize_text_field($v(self::F_LAST_NAME)));
+        $set(Vendors::FIELD_ROLE, sanitize_text_field($v(self::F_ROLE)));
+        $set(Vendors::FIELD_EMAIL, $email);
+        $set(Vendors::FIELD_PHONE, sanitize_text_field($v(self::F_PHONE)));
+        $set(Vendors::FIELD_TEXT_OK, $v(self::F_TEXT_OK) !== '' ? 1 : 0);
+        $set(Vendors::FIELD_ADDRESS, trim(sanitize_text_field($v(self::F_ADDRESS, '1')).' '.sanitize_text_field($v(self::F_ADDRESS, '2'))));
+        $set(Vendors::FIELD_CITY, sanitize_text_field($v(self::F_ADDRESS, '3')));
+        $set(Vendors::FIELD_STATE, sanitize_text_field($v(self::F_ADDRESS, '4')));
+        $set(Vendors::FIELD_ZIP, sanitize_text_field($v(self::F_ADDRESS, '5')));
+        $set(Vendors::FIELD_DAYOF_NAME, sanitize_text_field($v(self::F_DAYOF_NAME)));
+        $set(Vendors::FIELD_DAYOF_PHONE, sanitize_text_field($v(self::F_DAYOF_PHONE)));
+
+        $booth = sanitize_key($v(self::F_BOOTH));
+        $set(Vendors::FIELD_BOOTH_TYPE, array_key_exists($booth, Vendors::boothTypes()) ? $booth : '');
+        $set(Vendors::FIELD_TRAILER_LENGTH, sanitize_text_field($v(self::F_TRAILER)));
+        $set(Vendors::FIELD_EQUIPMENT, array_values(array_intersect(explode(',', $v(self::F_EQUIPMENT)), ['tent', 'tables', 'chairs'])));
+        $set(Vendors::FIELD_POWER, $v(self::F_POWER) === 'yes' ? 'yes' : 'no');
+        $set(Vendors::FIELD_GENERATOR, $v(self::F_GENERATOR) === 'yes' ? 'yes' : 'no');
+        $set(Vendors::FIELD_OPEN_FLAME, $v(self::F_OPEN_FLAME) === 'yes' ? 'yes' : 'no');
+        $set(Vendors::FIELD_STAFF_COUNT, absint($v(self::F_STAFF)));
+        $set(Vendors::FIELD_NOTES, sanitize_textarea_field($v(self::F_NOTES)));
+
+        $set(Vendors::FIELD_FEATURE_OK, $v(self::F_FEATURE_OK) === 'yes' ? 1 : 0);
+        $set(Vendors::FIELD_OFFER, sanitize_text_field($v(self::F_OFFER)));
+
+        if ($isNew) {
+            $set(Vendors::FIELD_STATUS, Vendors::STATUS_PENDING);
+            $set(Vendors::FIELD_SEND_EMAIL, 1);
+        }
+
+        // Logo + product photos → Media Library, attached to the vendor.
+        $logoId = self::sideload(self::uploadedUrls($v(self::F_LOGO))[0] ?? '', $vendorId, $business.' logo');
+        if ($logoId) {
+            $set(Vendors::FIELD_LOGO, $logoId);
+            set_post_thumbnail($vendorId, $logoId);
+        }
+
+        $photoIds = [];
+        foreach (array_slice(self::uploadedUrls($v(self::F_PHOTOS)), 0, 3) as $url) {
+            $photoId = self::sideload($url, $vendorId, $business.' photo');
+            if ($photoId) {
+                $photoIds[] = $photoId;
+            }
+        }
+        if ($photoIds) {
+            $set(Vendors::FIELD_PHOTOS, $photoIds);
+        }
+
+        update_post_meta($vendorId, Vendors::META_ENTRY_ID, (int) rgar($entry, 'id'));
+        update_post_meta($vendorId, Vendors::META_FORM_ID, (int) rgar($form, 'id'));
+        update_post_meta($vendorId, Vendors::META_MARKETING_OPTIN, $v(self::F_MARKETING) !== '' ? '1' : '0');
+        update_post_meta($vendorId, Vendors::META_REFERRAL_SOURCE, sanitize_text_field($v(self::F_REFERRAL)) ?: 'Direct');
+        update_post_meta($vendorId, Vendors::META_HEARD_ABOUT, sanitize_text_field($v(self::F_HEARD)));
+        update_post_meta($vendorId, Vendors::META_SIGNATURE, sanitize_text_field($v(self::F_SIGNATURE)).' — '.current_time('M j, Y g:i a'));
+
+        // Show history: pending row for the chosen show.
+        if ($eventId && Vendors::isClubShow($eventId)) {
+            $rows = Vendors::history($vendorId);
+            if (Vendors::historyIndex($rows, $eventId) < 0) {
+                $rows[] = [
+                    Vendors::ROW_EVENT => $eventId,
+                    Vendors::ROW_STATUS => Vendors::SHOW_PENDING,
+                    Vendors::ROW_FEE => Vendors::showFee($eventId, $booth),
+                ];
+            }
+            Vendors::saveHistory($vendorId, $rows);
+        } else {
+            Vendors::syncIndexes($vendorId);
         }
 
         if (class_exists('GFAPI')) {
-            $note = $created
-                ? __('Vendor applications created:', 'sccc')."\n".implode("\n", $created)
-                : __('No vendor applications were created.', 'sccc');
-
-            if ($skipped) {
-                $note .= "\n".__('Skipped:', 'sccc')."\n".implode("\n", $skipped);
-            }
-
-            \GFAPI::add_note((int) rgar($entry, 'id'), 0, 'SCCC Vendors', $note);
+            \GFAPI::add_note((int) rgar($entry, 'id'), 0, 'SCCC Vendors', sprintf(
+                $isNew ? __('Vendor #%1$d created (pending review) for %2$s.', 'sccc') : __('Existing vendor #%1$d updated for %2$s.', 'sccc'),
+                $vendorId,
+                $eventId ? Vendors::eventTitle($eventId) : '—'
+            ));
         }
     }
 
     /* -------------------------------------------------------------------------
-     * Helpers
+     * Uploads
      * ---------------------------------------------------------------------- */
 
     /**
-     * Event IDs checked in the posted form.
+     * Gravity Forms stores a single upload as a URL and multiple uploads as a
+     * JSON array of URLs.
      *
-     * @return array<int, int>
+     * @return array<int, string>
      */
-    private static function postedShowIds(object $field): array
+    private static function uploadedUrls(string $value): array
     {
-        $ids = [];
+        $value = trim($value);
 
-        foreach ((array) ($field->inputs ?? []) as $input) {
-            $key = 'input_'.str_replace('.', '_', (string) $input['id']);
-            $value = isset($_POST[$key]) ? absint(wp_unslash($_POST[$key])) : 0; // phpcs:ignore WordPress.Security.NonceVerification -- Gravity Forms handles the submission nonce.
-            if ($value > 0) {
-                $ids[] = $value;
-            }
+        if ($value === '') {
+            return [];
         }
 
-        return array_values(array_unique($ids));
+        $decoded = json_decode($value, true);
+
+        return array_values(array_filter(array_map('strval', is_array($decoded) ? $decoded : [$value])));
     }
 
-    /** Same email already has a pending/approved/paid application for this show. */
-    private static function hasActiveApplication(string $email, int $eventId): bool
+    /**
+     * Copy a Gravity Forms upload into the Media Library (image files only).
+     */
+    private static function sideload(string $url, int $postId, string $title): int
     {
-        $existing = get_posts([
-            'post_type' => Vendors::POST_TYPE,
-            'post_status' => 'any',
-            'posts_per_page' => 1,
-            'fields' => 'ids',
-            'no_found_rows' => true,
-            'meta_query' => [
-                ['key' => Vendors::FIELD_EMAIL, 'value' => $email],
-                ['key' => Vendors::FIELD_EVENT, 'value' => $eventId],
-                ['key' => Vendors::FIELD_STATUS, 'value' => [Vendors::STATUS_PENDING, Vendors::STATUS_APPROVED, Vendors::STATUS_PAID], 'compare' => 'IN'],
-            ],
-        ]);
-
-        return (bool) $existing;
-    }
-
-    /** Write through ACF when available so field reference keys are stored too. */
-    private static function update(string $fieldKey, $value, int $postId): void
-    {
-        if (function_exists('update_field')) {
-            update_field($fieldKey, $value, $postId);
-
-            return;
+        if ($url === '') {
+            return 0;
         }
 
-        $name = substr($fieldKey, strlen('field_'));
-        update_post_meta($postId, $name === 'vendor_type_term' ? 'vendor_type_term' : $name, $value);
+        $path = '';
+        if (class_exists('GFFormsModel') && method_exists('GFFormsModel', 'get_physical_file_path')) {
+            $path = (string) \GFFormsModel::get_physical_file_path($url);
+        }
+
+        if ($path === '' || ! file_exists($path)) {
+            $uploads = wp_get_upload_dir();
+            $path = str_replace($uploads['baseurl'], $uploads['basedir'], strtok($url, '?'));
+        }
+
+        if (! file_exists($path)) {
+            return 0;
+        }
+
+        $check = wp_check_filetype_and_ext($path, basename($path));
+        if (! in_array($check['type'] ?? '', ['image/jpeg', 'image/png', 'image/webp'], true)) {
+            return 0;
+        }
+
+        require_once ABSPATH.'wp-admin/includes/file.php';
+        require_once ABSPATH.'wp-admin/includes/media.php';
+        require_once ABSPATH.'wp-admin/includes/image.php';
+
+        $tmp = wp_tempnam(basename($path));
+        if (! $tmp || ! copy($path, $tmp)) {
+            return 0;
+        }
+
+        $id = media_handle_sideload(['name' => basename($path), 'tmp_name' => $tmp], $postId, $title);
+
+        if (is_wp_error($id)) {
+            @unlink($tmp); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+
+            return 0;
+        }
+
+        return (int) $id;
     }
 }

@@ -4,21 +4,20 @@
  * File path + filename: app/Support/Vendors/VendorApproval.php
  *
  * Purpose:
- * - Run the manual approval workflow when staff change "Application status" on
- *   a Vendor application and click Update:
- *     → Approved : lock in the fee, create the private payment link and email it
- *     → Declined : optionally email the vendor (with the reason, if given)
- *     → Paid     : manual override (e.g. paid cash at the gate) — records the date
- *     → Pending / Declined / Cancelled after Approved : the payment link stops working
- * - "Resend payment email" button (admin-post) from the Application record box.
+ * - Manual review workflow, triggered when staff change "Vendor status" and
+ *   click Update on a Vendor:
+ *     → Approved : pending show rows become "awaiting payment" with the fee
+ *                  locked in; the vendor is emailed a private sign-up/payment
+ *                  link. From now on they can sign up for future club shows
+ *                  themselves (returning vendor flow).
+ *     → Rejected : a reason is required; pending show rows are declined and
+ *                  the vendor is emailed WHY. The record can be deleted later.
+ *     → Do not re-invite : pending rows declined, link disabled, no email.
+ * - Show rows set to "Active" by hand (cash / check) get their paid fields
+ *   filled in.
+ * - "Email sign-up / payment link" button in the Vendor record box.
  *
- * Why this file exists:
- * - Payment must never be requested before a human approves the vendor
- *   (some venues do not allow food vendors, booth space is limited, etc.).
- *
- * Guard rails:
- * - Approval is refused (status reverts) when the fee would be $0 or no payment
- *   page is configured, with an admin notice explaining what to fix.
+ * Why: payment is never requested before a person approves the vendor.
  */
 
 namespace App\Support\Vendors;
@@ -27,18 +26,19 @@ defined('ABSPATH') || exit;
 
 final class VendorApproval
 {
-    public const RESEND_ACTION = 'sccc_vendor_resend_payment_email';
+    public const SEND_LINK_ACTION = 'sccc_vendor_send_link';
 
     private const NOTICE_TRANSIENT = 'sccc_vendor_notice_';
 
-    /** @var array<int, string> Status before ACF saved the post. */
+    /** @var array<int, string> */
     private static array $previous = [];
 
     public static function register(): void
     {
         add_action('acf/save_post', [self::class, 'rememberPreviousStatus'], 5);
-        add_action('acf/save_post', [self::class, 'handleStatusChange'], 20);
-        add_action('admin_post_'.self::RESEND_ACTION, [self::class, 'handleResend']);
+        add_action('acf/save_post', [self::class, 'handleSave'], 20);
+        add_filter('acf/validate_value/key=field_'.Vendors::FIELD_REJECT_REASON, [self::class, 'requireRejectReason'], 10, 4);
+        add_action('admin_post_'.self::SEND_LINK_ACTION, [self::class, 'handleSendLink']);
         add_action('admin_notices', [self::class, 'renderNotice']);
     }
 
@@ -50,8 +50,25 @@ final class VendorApproval
         }
     }
 
+    /**
+     * A rejection must say why — the reason is emailed to the vendor.
+     *
+     * @param  bool|string  $valid
+     * @return bool|string
+     */
+    public static function requireRejectReason($valid, $value, $field, $input)
+    {
+        $status = $_POST['acf']['field_'.Vendors::FIELD_STATUS] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification -- ACF verifies its own nonce.
+
+        if ($valid === true && $status === Vendors::STATUS_REJECTED && trim((string) $value) === '') {
+            return __('Please enter the reason for the rejection — it is included in the email to the vendor.', 'sccc');
+        }
+
+        return $valid;
+    }
+
     /** @param int|string $postId */
-    public static function handleStatusChange($postId): void
+    public static function handleSave($postId): void
     {
         if (! is_numeric($postId) || ! Vendors::isVendor((int) $postId) || wp_is_post_revision((int) $postId)) {
             return;
@@ -62,80 +79,121 @@ final class VendorApproval
         $old = self::$previous[$id] ?? $new;
         $sendEmail = (bool) get_post_meta($id, Vendors::FIELD_SEND_EMAIL, true);
 
-        if ($new === Vendors::STATUS_APPROVED) {
-            self::handleApproved($id, $old, $sendEmail);
+        self::fillManualPayments($id);
 
+        if ($new === $old) {
             return;
         }
 
-        // Leaving "approved" for anything but "paid" invalidates the payment link.
-        if ($old === Vendors::STATUS_APPROVED && $new !== Vendors::STATUS_PAID) {
-            delete_post_meta($id, Vendors::META_TOKEN);
-        }
-
-        if ($new === Vendors::STATUS_DECLINED && $old !== Vendors::STATUS_DECLINED && $sendEmail) {
-            self::notice(self::sendDeclineEmail($id)
-                ? __('Vendor declined. The vendor has been emailed.', 'sccc')
-                : __('Vendor declined, but the email could not be sent. Check the contact email address.', 'sccc'), 'success');
-        }
-
-        if ($new === Vendors::STATUS_PAID && $old !== Vendors::STATUS_PAID) {
-            // Manual "paid" (e.g. cash / check). Online payments are recorded by VendorPayment.
-            if ((string) get_post_meta($id, Vendors::META_PAID_AT, true) === '') {
-                update_post_meta($id, Vendors::META_PAID_AT, current_time('mysql'));
+        if ($new === Vendors::STATUS_APPROVED) {
+            self::approve($id, $old, $sendEmail);
+        } elseif ($new === Vendors::STATUS_REJECTED) {
+            self::closePendingRows($id);
+            Vendors::clearToken($id);
+            if ($sendEmail) {
+                self::notice(self::sendRejectionEmail($id)
+                    ? __('Vendor rejected. The vendor has been emailed the reason.', 'sccc')
+                    : __('Vendor rejected, but the email could not be sent. Check the contact email address.', 'sccc'), 'warning');
             }
-            if ((string) get_post_meta($id, Vendors::META_PAID_AMOUNT, true) === '') {
-                update_post_meta($id, Vendors::META_PAID_AMOUNT, Vendors::feeDue($id) ?: Vendors::resolveFee($id));
-            }
-            if ((string) get_post_meta($id, Vendors::META_TRANSACTION_ID, true) === '') {
-                update_post_meta($id, Vendors::META_TRANSACTION_ID, __('Marked paid manually', 'sccc'));
-            }
-            delete_post_meta($id, Vendors::META_TOKEN);
+        } elseif ($new === Vendors::STATUS_BLOCKED) {
+            self::closePendingRows($id);
+            Vendors::clearToken($id);
+            self::notice(__('Vendor marked "Do not re-invite". They can no longer sign up online.', 'sccc'), 'info');
         }
     }
 
-    private static function handleApproved(int $id, string $old, bool $sendEmail): void
+    private static function approve(int $id, string $old, bool $sendEmail): void
     {
-        $fee = Vendors::resolveFee($id);
-        $problem = '';
-
-        if ($fee <= 0) {
-            $problem = __('Approval not saved: the fee is $0. Set a vendor fee on the show, or enter a fee override, then approve again.', 'sccc');
-        } elseif (Vendors::paymentPageUrl() === '') {
-            $problem = __('Approval not saved: no vendor payment page is set. Choose one in Theme Settings → Vendor Settings, then approve again.', 'sccc');
-        } elseif (! is_email(Vendors::contactEmail($id))) {
-            $problem = __('Approval not saved: the vendor has no valid email address for the payment link.', 'sccc');
-        }
-
-        if ($problem !== '') {
-            update_post_meta($id, Vendors::FIELD_STATUS, $old === Vendors::STATUS_APPROVED ? Vendors::STATUS_PENDING : $old);
-            self::notice($problem, 'error');
+        if (Vendors::pageUrl('vendor_payment_page') === '') {
+            update_post_meta($id, Vendors::FIELD_STATUS, $old);
+            self::notice(__('Approval not saved: no vendor sign-up page is set. Choose it in Theme Settings → Vendor Settings, then approve again.', 'sccc'), 'error');
 
             return;
         }
 
-        $previousFee = Vendors::feeDue($id);
-        update_post_meta($id, Vendors::META_FEE_DUE, $fee);
-        Vendors::ensureToken($id);
+        $rows = Vendors::history($id);
+        $booth = (string) get_post_meta($id, Vendors::FIELD_BOOTH_TYPE, true);
+        $type = Vendors::typeSlug($id);
+        $warnings = [];
 
-        if ($old !== Vendors::STATUS_APPROVED) {
-            update_post_meta($id, Vendors::META_APPROVED_AT, current_time('mysql'));
-
-            if (! $sendEmail) {
-                self::notice(__('Vendor approved. No email was sent — copy the payment link from the Application record box.', 'sccc'), 'success');
-
-                return;
+        foreach ($rows as $index => $row) {
+            if (($row[Vendors::ROW_STATUS] ?? '') !== Vendors::SHOW_PENDING) {
+                continue;
             }
 
-            self::notice(self::sendPaymentEmail($id)
-                ? sprintf(__('Vendor approved and emailed a payment link for %s.', 'sccc'), Vendors::money($fee))
-                : __('Vendor approved, but the email could not be sent. Copy the payment link from the Application record box.', 'sccc'), 'success');
+            $eventId = (int) ($row[Vendors::ROW_EVENT] ?? 0);
 
-            return;
+            if (! Vendors::showAllowsType($eventId, $type)) {
+                $rows[$index][Vendors::ROW_STATUS] = Vendors::SHOW_DECLINED;
+                $rows[$index][Vendors::ROW_NOTES] = __('No food vendors at this show', 'sccc');
+                continue;
+            }
+
+            $fee = is_numeric($row[Vendors::ROW_FEE] ?? null) && (float) $row[Vendors::ROW_FEE] > 0
+                ? round((float) $row[Vendors::ROW_FEE], 2)
+                : Vendors::showFee($eventId, $booth);
+
+            if ($fee <= 0) {
+                $warnings[] = sprintf(__('%s has no vendor fee set — that show stays pending until a fee is set.', 'sccc'), Vendors::eventTitle($eventId));
+                continue;
+            }
+
+            $rows[$index][Vendors::ROW_STATUS] = Vendors::SHOW_AWAITING;
+            $rows[$index][Vendors::ROW_FEE] = $fee;
         }
 
-        if (abs($previousFee - $fee) > 0.001) {
-            self::notice(sprintf(__('Fee updated to %s. Use "Resend payment email" to let the vendor know.', 'sccc'), Vendors::money($fee)), 'warning');
+        Vendors::saveHistory($id, $rows);
+        update_post_meta($id, Vendors::META_APPROVED_AT, current_time('mysql'));
+
+        $payable = Vendors::payableShows($id);
+        $message = __('Vendor approved.', 'sccc');
+
+        if ($sendEmail) {
+            $sent = self::sendApprovalEmail($id, $payable);
+            $message .= ' '.($sent ? __('The vendor has been emailed.', 'sccc') : __('The email could not be sent — use "Email sign-up / payment link".', 'sccc'));
+        }
+
+        if ($warnings) {
+            $message .= ' '.implode(' ', $warnings);
+        }
+
+        self::notice($message, $warnings ? 'warning' : 'success');
+    }
+
+    private static function closePendingRows(int $id): void
+    {
+        $rows = Vendors::history($id);
+        $changed = false;
+
+        foreach ($rows as $index => $row) {
+            if (in_array($row[Vendors::ROW_STATUS] ?? '', [Vendors::SHOW_PENDING, Vendors::SHOW_AWAITING], true)) {
+                $rows[$index][Vendors::ROW_STATUS] = Vendors::SHOW_DECLINED;
+                $changed = true;
+            }
+        }
+
+        if ($changed) {
+            Vendors::saveHistory($id, $rows);
+        }
+    }
+
+    /** Rows switched to Active by staff (cash / check) get paid details filled in. */
+    private static function fillManualPayments(int $id): void
+    {
+        $rows = Vendors::history($id);
+        $changed = false;
+
+        foreach ($rows as $index => $row) {
+            if (($row[Vendors::ROW_STATUS] ?? '') === Vendors::SHOW_ACTIVE && trim((string) ($row[Vendors::ROW_PAID_AT] ?? '')) === '') {
+                $rows[$index][Vendors::ROW_PAID_AT] = current_time('Y-m-d H:i');
+                $rows[$index][Vendors::ROW_PAID_AMOUNT] = ($row[Vendors::ROW_PAID_AMOUNT] ?? '') ?: ($row[Vendors::ROW_FEE] ?? '');
+                $rows[$index][Vendors::ROW_TRANSACTION] = ($row[Vendors::ROW_TRANSACTION] ?? '') ?: __('Marked paid manually', 'sccc');
+                $changed = true;
+            }
+        }
+
+        if ($changed) {
+            Vendors::saveHistory($id, $rows);
         }
     }
 
@@ -143,85 +201,76 @@ final class VendorApproval
      * Emails
      * ---------------------------------------------------------------------- */
 
-    public static function sendPaymentEmail(int $id): bool
+    /**
+     * @param  array<int, float>  $payable
+     */
+    public static function sendApprovalEmail(int $id, array $payable): bool
     {
-        $url = Vendors::paymentUrl($id);
+        $extra = Vendors::option('vendor_approval_email_note');
+        $body = Vendors::greeting($id)
+            .'<p>'.sprintf(esc_html__('Great news — %s has been approved as a Space City Car Club vendor!', 'sccc'), '<strong>'.esc_html(Vendors::businessName($id)).'</strong>').'</p>';
+        $buttons = [];
 
-        if ($url === '') {
-            return false;
+        if ($payable) {
+            $url = Vendors::signupUrl($id);
+            $body .= '<p>'.esc_html__('To confirm your spot, please pay the vendor fee:', 'sccc').'</p><ul>';
+            foreach ($payable as $eventId => $fee) {
+                $body .= '<li>'.esc_html(Vendors::eventLabel((int) $eventId)).' — <strong>$'.esc_html(number_format($fee, 2)).'</strong></li>';
+            }
+            $body .= '</ul><p>'.esc_html__('Your spot is confirmed once payment is received.', 'sccc').'</p>';
+            $buttons[] = ['label' => __('Pay vendor fee', 'sccc'), 'url' => $url];
+            update_post_meta($id, Vendors::META_LINK_EMAILED_AT, current_time('mysql'));
+        } else {
+            $body .= '<p>'.esc_html__('We\'ll email you when vendor sign-up opens for our next show — signing up again only takes a minute.', 'sccc').'</p>';
         }
 
-        $first = (string) get_post_meta($id, Vendors::FIELD_FIRST_NAME, true);
-        $show = Vendors::eventLabel(Vendors::eventId($id));
-        $fee = Vendors::money(Vendors::feeDue($id));
-        $extra = function_exists('get_field') ? (string) get_field('vendor_approval_email_note', 'option') : '';
-
-        $body = '<p>'.esc_html(sprintf(__('Hi %s,', 'sccc'), $first ?: Vendors::businessName($id))).'</p>'
-            .'<p>'.sprintf(
-                /* translators: 1: business name, 2: show */
-                esc_html__('Great news — %1$s has been approved as a vendor for %2$s.', 'sccc'),
-                '<strong>'.esc_html(Vendors::businessName($id)).'</strong>',
-                '<strong>'.esc_html($show).'</strong>'
-            ).'</p>'
-            .'<p>'.sprintf(esc_html__('The vendor fee is %s. Your spot is confirmed once payment is received.', 'sccc'), '<strong>'.esc_html($fee).'</strong>').'</p>'
-            .($extra !== '' ? '<p>'.wp_kses($extra, ['br' => [], 'strong' => [], 'em' => [], 'a' => ['href' => []]]).'</p>' : '')
-            .'<p style="color:#64748b;font-size:14px;">'.esc_html__('This payment link is private to your application. Please don\'t share it.', 'sccc').'</p>';
-
-        $sent = Vendors::mail(
-            Vendors::contactEmail($id),
-            sprintf(__('You\'re approved: %s — complete your vendor payment', 'sccc'), html_entity_decode(get_the_title(Vendors::eventId($id)), ENT_QUOTES, 'UTF-8')),
-            $body,
-            [['label' => sprintf(__('Pay %s now', 'sccc'), $fee), 'url' => $url]]
-        );
-
-        if ($sent) {
-            update_post_meta($id, Vendors::META_PAYMENT_EMAILED_AT, current_time('mysql'));
+        if ($extra !== '') {
+            $body .= '<p>'.wp_kses($extra, ['br' => [], 'strong' => [], 'em' => [], 'a' => ['href' => []]]).'</p>';
         }
 
-        return $sent;
+        if ($buttons) {
+            $body .= '<p style="color:#64748b;font-size:14px;">'.esc_html__('This payment link is personal to your business and expires in 30 days. Please don\'t share it.', 'sccc').'</p>';
+        }
+
+        return Vendors::mail(Vendors::contactEmail($id), __('You\'re approved as a vendor!', 'sccc'), $body, $buttons);
     }
 
-    public static function sendDeclineEmail(int $id): bool
+    public static function sendRejectionEmail(int $id): bool
     {
-        $first = (string) get_post_meta($id, Vendors::FIELD_FIRST_NAME, true);
-        $reason = trim((string) get_post_meta($id, Vendors::FIELD_DECLINE_REASON, true));
-        $show = Vendors::eventLabel(Vendors::eventId($id));
-
-        $body = '<p>'.esc_html(sprintf(__('Hi %s,', 'sccc'), $first ?: Vendors::businessName($id))).'</p>'
-            .'<p>'.sprintf(
-                esc_html__('Thank you for applying to be a vendor at %s. Unfortunately we\'re not able to accept your application for this show.', 'sccc'),
-                '<strong>'.esc_html($show).'</strong>'
-            ).'</p>'
-            .($reason !== '' ? '<p>'.nl2br(esc_html($reason)).'</p>' : '')
-            .'<p>'.esc_html__('We appreciate your interest and hope to work with you at a future event.', 'sccc').'</p>';
+        $reason = trim((string) get_post_meta($id, Vendors::FIELD_REJECT_REASON, true));
 
         return Vendors::mail(
             Vendors::contactEmail($id),
-            sprintf(__('Your vendor application for %s', 'sccc'), html_entity_decode(get_the_title(Vendors::eventId($id)), ENT_QUOTES, 'UTF-8')),
-            $body
+            __('Your vendor application', 'sccc'),
+            Vendors::greeting($id)
+            .'<p>'.esc_html__('Thank you for applying to be a vendor with Space City Car Club. Unfortunately we\'re not able to accept your application at this time.', 'sccc').'</p>'
+            .($reason !== '' ? '<p><strong>'.esc_html__('Reason:', 'sccc').'</strong><br>'.nl2br(esc_html($reason)).'</p>' : '')
+            .'<p>'.esc_html__('We appreciate your interest and wish you all the best.', 'sccc').'</p>'
         );
     }
 
     /* -------------------------------------------------------------------------
-     * Resend button
+     * "Email sign-up / payment link" button
      * ---------------------------------------------------------------------- */
 
-    public static function handleResend(): void
+    public static function handleSendLink(): void
     {
         $id = isset($_GET['vendor']) ? absint($_GET['vendor']) : 0;
 
-        check_admin_referer(self::RESEND_ACTION.'_'.$id);
+        check_admin_referer(self::SEND_LINK_ACTION.'_'.$id);
 
         if (! $id || ! Vendors::isVendor($id) || ! current_user_can('edit_post', $id)) {
             wp_die(esc_html__('You are not allowed to do that.', 'sccc'), 403);
         }
 
-        if (Vendors::status($id) !== Vendors::STATUS_APPROVED) {
-            self::notice(__('Only approved applications have a payment link.', 'sccc'), 'error');
+        $payable = Vendors::payableShows($id);
+
+        if (! $payable) {
+            self::notice(__('There is nothing this vendor can sign up or pay for right now.', 'sccc'), 'error');
         } else {
-            self::notice(self::sendPaymentEmail($id)
-                ? __('Payment email sent again.', 'sccc')
-                : __('The payment email could not be sent.', 'sccc'), 'success');
+            self::notice(VendorReturning::sendLink($id, $payable)
+                ? __('Sign-up / payment link emailed.', 'sccc')
+                : __('The email could not be sent.', 'sccc'), 'success');
         }
 
         wp_safe_redirect((string) get_edit_post_link($id, 'raw'));
@@ -229,7 +278,7 @@ final class VendorApproval
     }
 
     /* -------------------------------------------------------------------------
-     * Admin notices (stored per user, shown after the redirect)
+     * Admin notices
      * ---------------------------------------------------------------------- */
 
     private static function notice(string $message, string $type = 'success'): void
@@ -247,7 +296,6 @@ final class VendorApproval
         }
 
         delete_transient($key);
-
         $type = in_array($notice['type'] ?? '', ['success', 'warning', 'error', 'info'], true) ? $notice['type'] : 'info';
 
         printf('<div class="notice notice-%s is-dismissible"><p>%s</p></div>', esc_attr($type), esc_html((string) $notice['message']));

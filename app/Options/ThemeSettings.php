@@ -133,6 +133,11 @@ if (! function_exists(__NAMESPACE__ . '\\themeSettingsPages')) {
                 'icon'  => 'dashicons-store',
             ],
             [
+                'slug'  => 'theme-settings-car-show-settings',
+                'label' => 'Car Show Settings',
+                'icon'  => 'dashicons-car',
+            ],
+            [
                 'slug'  => 'theme-settings-sponsor-single-cta',
                 'label' => 'Sponsor Single CTA',
                 'icon'  => 'dashicons-awards',
