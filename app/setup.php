@@ -617,6 +617,7 @@ require_once get_theme_file_path('app/Support/GravityForms/SponsorApcSync.php');
 
 require_once get_theme_file_path('app/Support/Woo/ShopNavigation.php');
 require_once get_theme_file_path('app/Support/Woo/ProductMarkup.php');
+require_once get_theme_file_path('app/Support/Woo/ProductSwatches.php');
 require_once get_theme_file_path('app/Support/Woo/ShopVariationAttributeFilters.php');
 require_once get_theme_file_path('app/Support/Woo/ProductAccess.php');
 require_once get_theme_file_path('app/Support/Woo/EventProductAccess.php');
