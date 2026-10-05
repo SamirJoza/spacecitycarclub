@@ -27,6 +27,8 @@ Cleanup pass after a full theme audit (dark mode, icon font, shared tokens). No 
 - **Blocks:** SCCC Accordion, Memberships Tiers Grid and Membership CTA print their styles once per page (`@once`) instead of once per block.
 - **Build:** `public/build` rebuilt. The previous build was missing about 40 utility classes used by templates (mostly the event signup pages).
 
+- **Shared surface styles:** new `resources/css/components/surfaces.css` with reusable classes lifted unchanged from the Member Directory: `.sccc-surface` (card, with `--panel`, `--accent`, `--lift`), `.sccc-control` and `.sccc-control-label` (fields), `.sccc-pill` (utility button, `--accent`), `.sccc-chip` and `.sccc-pager`. The Member Directory template and card partial now use these classes; about 190 lines of inline CSS are gone from the template and the page renders the same.
+
 ### Fixed
 
 - **Editor styles:** a stray comma in `resources/css/editor.css` made browsers drop the white-text rule for hero gradient backgrounds.

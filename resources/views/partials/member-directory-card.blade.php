@@ -138,7 +138,7 @@
   $hasBio = $bio !== '';
 @endphp
 
-<article class="sccc-member-card" data-sccc-member-card="{{ esc_attr((string) $memberId) }}">
+<article class="sccc-member-card sccc-surface sccc-surface--accent sccc-surface--lift" data-sccc-member-card="{{ esc_attr((string) $memberId) }}">
   {{--
     ========================================================================
     Card Header
@@ -179,7 +179,7 @@
 
   @if (! empty($serviceBadge['label']))
     <div class="sccc-member-card__badges" aria-label="{{ esc_attr__('Member badges', 'sccc') }}">
-      <span class="sccc-member-card__badge">
+      <span class="sccc-member-card__badge sccc-chip">
         {{ $serviceBadge['label'] }}
       </span>
     </div>
@@ -422,7 +422,7 @@
           </p>
 
           @if (! empty($serviceBadge['label']))
-            <span class="sccc-member-card__badge sccc-member-modal-content__badge">
+            <span class="sccc-member-card__badge sccc-chip sccc-member-modal-content__badge">
               {{ $serviceBadge['label'] }}
             </span>
           @endif
