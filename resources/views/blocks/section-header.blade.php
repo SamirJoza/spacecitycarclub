@@ -7,7 +7,7 @@
   - Keeps section intro markup consistent across pages.
   - Fixes wrapper alignment separately from text alignment.
   - Provides predictable bottom spacing so the next block does not sit too close.
-  - Keeps all visual CSS scoped to this one block instance.
+  - Shared look: resources/css/components/section-header.css (also used by <x-ui.section-header>).
 --}}
 @php
   $uid = 'sccc-section-header-' . uniqid();
@@ -79,96 +79,9 @@
 
   <style>
     /*
-     * Instance scope.
-     *
-     * All styles are attached to this generated ID so this block does not leak into
-     * other headings, Gutenberg blocks, WooCommerce templates, or plugin markup.
+     * Layout, type and spacing live in resources/css/components/section-header.css.
+     * Only the headline highlight stays here, scoped to this instance.
      */
-    #{{ $uid }} {
-    }
-
-    /*
-     * Default spacing after the block.
-     *
-     * These are intentionally margin-block-end values so Gutenberg's own top/bottom
-     * padding controls can still be used independently when needed.
-     */
-    #{{ $uid }}.sccc-section-header--space-none {
-      margin-block-end: 0;
-    }
-
-    #{{ $uid }}.sccc-section-header--space-small {
-      margin-block-end: clamp(1rem, 2vw, 1.5rem);
-    }
-
-    #{{ $uid }}.sccc-section-header--space-medium {
-      margin-block-end: clamp(1.5rem, 3vw, 3rem);
-    }
-
-    #{{ $uid }}.sccc-section-header--space-large {
-      margin-block-end: clamp(2.25rem, 4vw, 4.5rem);
-    }
-
-    #{{ $uid }}.sccc-section-header--space-xl {
-      margin-block-end: clamp(3rem, 6vw, 6rem);
-    }
-
-    /*
-     * Main header stack.
-     *
-     * display:flex enables the alignment classes from PHP/Tailwind to control both
-     * copy alignment and the accent rule position.
-     */
-    #{{ $uid }} .sccc-sh {
-      display: flex;
-      flex-direction: column;
-      gap: .5rem;
-    }
-
-    #{{ $uid }} .sccc-sh__eyebrow {
-      font-family: var(--font-headline, inherit);
-      font-size: .75rem;
-      font-weight: 700;
-      letter-spacing: .12em;
-      line-height: 1.2;
-      margin: 0;
-      text-transform: uppercase;
-      color: var(--color-primary-500, var(--primary));
-    }
-
-    #{{ $uid }} .sccc-sh__headline {
-      font-family: var(--font-headline, inherit);
-      font-weight: 800;
-      line-height: 1.05;
-      margin: 0;
-      font-size: clamp(1.75rem, 3.6vw, 3rem);
-      color: var(--color-text, var(--text, currentColor));
-    }
-
-    #{{ $uid }} .sccc-sh__desc {
-      font-family: var(--font-body, inherit);
-      font-size: 1rem;
-      line-height: 1.65;
-      margin: .25rem 0 0;
-      max-width: 72ch;
-      color: var(--color-muted, var(--muted, rgba(255, 255, 255, .72)));
-    }
-
-    /*
-     * Optional visual finish.
-     *
-     * The rule gives the header a clear bottom edge and helps visually separate it
-     * from the following block without forcing heavy padding.
-     */
-    #{{ $uid }} .sccc-sh__accent {
-      display: block;
-      width: min(9rem, 42vw);
-      height: 2px;
-      margin-block-start: .55rem;
-      border-radius: 999px;
-      background: var(--sccc-gradient-space-city);
-      box-shadow: 0 0 18px color-mix(in oklab, var(--sccc-color-club-blue) 42%, transparent);
-    }
 
     /* Highlight span wiring */
     #{{ $uid }} [data-sccc-highlight],

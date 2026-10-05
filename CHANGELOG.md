@@ -29,6 +29,11 @@ Cleanup pass after a full theme audit (dark mode, icon font, shared tokens). No 
 
 - **Shared surface styles:** new `resources/css/components/surfaces.css` with reusable classes lifted unchanged from the Member Directory: `.sccc-surface` (card, with `--panel`, `--accent`, `--lift`), `.sccc-control` and `.sccc-control-label` (fields), `.sccc-pill` (utility button, `--accent`), `.sccc-chip` and `.sccc-pager`. The Member Directory template and card partial now use these classes; about 190 lines of inline CSS are gone from the template and the page renders the same.
 
+- **Design tokens:** new `resources/css/tokens/scale.css` holds the shape, depth, motion and layout values (radius, hairline borders, shadows, durations, easing, text measure). `colors.css` and `typography.css` now declare the names that views already referenced but nothing defined: `--color-primary`, `--color-primary-hover`, `--color-accent-400`, `--color-signal-red`, `--background-dark`, `--color-field-bg`, status colors, and `--font-headline` / `--font-body`. Section headers and other elements that asked for the headline font now get the display face instead of falling back to the body face; elements that asked for `--color-primary` now get the brand blue instead of their own hardcoded fallback.
+- **Components on tokens:** `surfaces.css` and `cards.css` read radius, borders, shadows and motion from the tokens instead of repeating literal values.
+- **Section header:** layout and type moved from the Section Header block's per-instance inline CSS into `resources/css/components/section-header.css` (also loaded in the editor). The block keeps only its headline-highlight rules inline.
+- **Blade UI components:** `<x-ui.surface>`, `<x-ui.pill>`, `<x-ui.chip>`, `<x-ui.control-label>` and `<x-ui.section-header>` in `resources/views/components/ui/` wrap the shared classes for use in templates and blocks.
+
 ### Fixed
 
 - **Editor styles:** a stray comma in `resources/css/editor.css` made browsers drop the white-text rule for hero gradient backgrounds.

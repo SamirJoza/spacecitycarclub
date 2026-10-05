@@ -150,3 +150,25 @@
     color: var(--color-text);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Aliases and status colors
+   ---------------------------------------------------------------------------
+   Names that views and stylesheets already reference but that were never
+   declared (each use carried its own fallback). Declared once here so those
+   references resolve to the palette.
+   ------------------------------------------------------------------------ */
+:root {
+  --color-primary: var(--color-primary-500);
+  --color-primary-hover: var(--color-primary-600);
+  --color-accent-400: var(--color-accent-500);
+  --color-signal-red: var(--sccc-color-signal-red);
+  --background-dark: #101622;
+  --color-field-bg: rgba(255, 255, 255, 0.05);
+
+  /* Status */
+  --color-success: #15803d;
+  --color-success-500: #22c55e;
+  --color-warning: #b45309;
+  --color-danger: #dc2626;
+}

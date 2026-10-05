@@ -89,3 +89,11 @@
     font-weight: 600;
   }
 }
+
+/* Role aliases used across block views (previously undeclared, so each use
+   fell back to "inherit"). Headlines follow the display face, running text
+   the sans face. Change the families in @theme above; these follow. */
+:root {
+  --font-headline: var(--font-display);
+  --font-body: var(--font-sans);
+}
