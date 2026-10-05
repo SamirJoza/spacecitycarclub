@@ -268,29 +268,6 @@
       width: 100vw;
     }
 
-    .sccc-member-directory-panel {
-      position: relative;
-      overflow: hidden;
-      border-radius: 1.35rem;
-      border: 1px solid color-mix(in oklab, var(--color-primary-500) 18%, transparent);
-      background: var(--sccc-member-panel-bg);
-      box-shadow:
-        0 16px 34px rgba(0, 0, 0, 0.18),
-        inset 0 1px 0 color-mix(in oklab, white 5%, transparent);
-    }
-
-    .sccc-member-directory-panel::before,
-    .sccc-member-card::before {
-      content: "";
-      position: absolute;
-      inset-inline: 1.25rem;
-      top: 0;
-      height: 2px;
-      background: var(--sccc-member-gradient);
-      opacity: 0.76;
-      pointer-events: none;
-    }
-
     .sccc-member-directory__kicker {
       color: var(--sccc-member-blue);
       font-size: 0.72rem;
@@ -313,38 +290,6 @@
       }
     }
 
-    .sccc-member-directory-field label {
-      display: block;
-      margin-bottom: 0.45rem;
-      color: var(--color-muted);
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      line-height: 1.25;
-      text-transform: uppercase;
-    }
-
-    .sccc-member-directory-input,
-    .sccc-member-directory-select {
-      width: 100%;
-      min-height: 2.85rem;
-      border-radius: 0.9rem;
-      border: 1px solid color-mix(in oklab, var(--color-primary-500) 22%, transparent);
-      background:
-        linear-gradient(
-          180deg,
-          color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-canvas) 94%, transparent)
-        );
-      color: var(--color-text);
-      padding: 0.78rem 0.95rem;
-      box-shadow: inset 0 1px 0 color-mix(in oklab, white 5%, transparent);
-    }
-
-    .sccc-member-directory-select {
-      padding-right: 2.35rem;
-    }
-
     .sccc-member-directory-actions {
       display: flex;
       gap: 0.65rem;
@@ -356,53 +301,6 @@
       .sccc-member-directory-actions {
         justify-content: flex-end;
       }
-    }
-
-    .sccc-member-directory-button,
-    .sccc-member-directory-reset {
-      display: inline-flex;
-      min-height: 2.85rem;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      border-radius: 999px;
-      border: 1px solid color-mix(in oklab, var(--color-accent-500) 36%, transparent);
-      background:
-        linear-gradient(
-          180deg,
-          color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-canvas) 94%, transparent)
-        );
-      color: var(--color-text);
-      font-size: 0.9rem;
-      font-weight: 800;
-      line-height: 1;
-      padding: 0.72rem 1rem;
-      text-decoration: none;
-      box-shadow:
-        inset 0 1px 0 color-mix(in oklab, white 5%, transparent),
-        0 0 16px color-mix(in oklab, var(--color-accent-500) 8%, transparent);
-      transition:
-        transform 180ms ease,
-        border-color 180ms ease,
-        box-shadow 180ms ease,
-        color 180ms ease;
-      cursor: pointer;
-    }
-
-    .sccc-member-directory-button:hover,
-    .sccc-member-directory-reset:hover {
-      transform: translateY(-1px);
-      border-color: color-mix(in oklab, var(--color-accent-500) 56%, transparent);
-      color: var(--sccc-member-blue);
-      text-decoration: none;
-      box-shadow:
-        inset 0 1px 0 color-mix(in oklab, white 6%, transparent),
-        0 0 20px color-mix(in oklab, var(--color-accent-500) 13%, transparent);
-    }
-
-    .sccc-member-directory-button {
-      border-color: color-mix(in oklab, var(--sccc-member-blue) 42%, transparent);
     }
 
     .sccc-member-directory-meta {
@@ -423,30 +321,9 @@
     */
 
     .sccc-member-card {
-      position: relative;
-      overflow: hidden;
       display: flex;
       min-height: 100%;
       flex-direction: column;
-      border-radius: 1.35rem;
-      border: 1px solid color-mix(in oklab, var(--color-primary-500) 18%, transparent);
-      background: var(--sccc-member-card-bg);
-      box-shadow:
-        0 14px 32px rgba(0, 0, 0, 0.22),
-        inset 0 1px 0 color-mix(in oklab, white 5%, transparent);
-      transition:
-        transform 220ms ease,
-        border-color 220ms ease,
-        box-shadow 220ms ease;
-    }
-
-    .sccc-member-card:hover {
-      transform: translateY(-3px);
-      border-color: color-mix(in oklab, var(--color-accent-500) 42%, var(--color-primary-500));
-      box-shadow:
-        0 22px 46px rgba(0, 0, 0, 0.28),
-        0 0 24px color-mix(in oklab, var(--color-primary-500) 13%, transparent),
-        inset 0 1px 0 color-mix(in oklab, white 6%, transparent);
     }
 
     .sccc-member-card__head {
@@ -529,27 +406,6 @@
       flex-wrap: wrap;
       gap: 0.5rem;
       padding: 0 1.25rem 0.95rem;
-    }
-
-    .sccc-member-card__badge {
-      display: inline-flex;
-      align-items: center;
-      border-radius: 999px;
-      border: 1px solid color-mix(in oklab, var(--color-primary-500) 24%, transparent);
-      background:
-        linear-gradient(
-          180deg,
-          color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-canvas) 94%, transparent)
-        );
-      color: var(--color-text);
-      font-size: 0.72rem;
-      font-weight: 900;
-      line-height: 1;
-      padding: 0.48rem 0.7rem;
-      box-shadow:
-        inset 0 1px 0 color-mix(in oklab, white 5%, transparent),
-        0 0 16px color-mix(in oklab, var(--color-primary-500) 8%, transparent);
     }
 
     .sccc-member-card__bio {
@@ -838,43 +694,6 @@
     |--------------------------------------------------------------------------
     */
 
-    .sccc-member-directory-pagination .page-numbers {
-      display: inline-flex;
-      min-width: 2.5rem;
-      min-height: 2.5rem;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      border: 1px solid color-mix(in oklab, var(--color-primary-500) 22%, transparent);
-      background:
-        linear-gradient(
-          180deg,
-          color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-canvas) 94%, transparent)
-        );
-      color: var(--color-muted);
-      padding: 0.55rem 0.95rem;
-      text-decoration: none;
-      transition:
-        transform 180ms ease,
-        border-color 180ms ease,
-        color 180ms ease,
-        box-shadow 180ms ease;
-    }
-
-    .sccc-member-directory-pagination .page-numbers:hover {
-      transform: translateY(-1px);
-      border-color: color-mix(in oklab, var(--color-accent-500) 60%, transparent);
-      color: var(--color-text);
-      box-shadow: 0 0 18px color-mix(in oklab, var(--color-accent-500) 12%, transparent);
-    }
-
-    .sccc-member-directory-pagination .page-numbers.current {
-      border-color: transparent;
-      background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
-      color: #fff;
-      box-shadow: 0 0 22px color-mix(in oklab, var(--color-primary-500) 22%, transparent);
-    }
 
     /*
     |--------------------------------------------------------------------------
@@ -1266,17 +1085,11 @@
 
     @media (prefers-reduced-motion: reduce) {
       .sccc-member-card,
-      .sccc-member-card *,
-      .sccc-member-directory-button,
-      .sccc-member-directory-reset,
-      .sccc-member-directory-pagination .page-numbers {
+      .sccc-member-card * {
         transition: none;
       }
 
-      .sccc-member-card:hover,
-      .sccc-member-directory-button:hover,
-      .sccc-member-directory-reset:hover,
-      .sccc-member-directory-pagination .page-numbers:hover {
+      .sccc-member-card:hover {
         transform: none;
       }
     }
@@ -1291,7 +1104,7 @@
         Non-members do not see the Gutenberg page content or the directory.
       --}}
       <section class="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24" aria-labelledby="sccc-member-directory-locked-title">
-        <div class="sccc-member-directory-panel sccc-member-directory-empty">
+        <div class="sccc-member-directory-panel sccc-surface sccc-surface--panel sccc-surface--accent sccc-member-directory-empty">
           <p class="sccc-member-directory__kicker">
             {{ __('Private Club Area', 'sccc') }}
           </p>
@@ -1306,13 +1119,13 @@
 
           <div class="sccc-member-directory-empty__actions">
             @if (! empty($lockedState['login_url']))
-              <a class="sccc-member-directory-button" href="{{ esc_url($lockedState['login_url']) }}">
+              <a class="sccc-member-directory-button sccc-pill sccc-pill--accent" href="{{ esc_url($lockedState['login_url']) }}">
                 {{ __('Member Login', 'sccc') }}
               </a>
             @endif
 
             @if (! empty($lockedState['join_url']))
-              <a class="sccc-member-directory-reset" href="{{ esc_url($lockedState['join_url']) }}">
+              <a class="sccc-member-directory-reset sccc-pill" href="{{ esc_url($lockedState['join_url']) }}">
                 {{ __('Join the Club', 'sccc') }}
               </a>
             @endif
@@ -1347,15 +1160,15 @@
           Uses GET parameters so links can be copied/shared and pagination can
           preserve filters.
         --}}
-        <form class="sccc-member-directory-panel sccc-member-directory-toolbar" method="get" action="{{ esc_url(get_permalink()) }}">
+        <form class="sccc-member-directory-panel sccc-surface sccc-surface--panel sccc-surface--accent sccc-member-directory-toolbar" method="get" action="{{ esc_url(get_permalink()) }}">
           <div class="sccc-member-directory-field">
-            <label for="sccc_member_search">
+            <label class="sccc-control-label" for="sccc_member_search">
               {{ __('Search', 'sccc') }}
             </label>
 
             <input
               id="sccc_member_search"
-              class="sccc-member-directory-input"
+              class="sccc-member-directory-input sccc-control"
               type="search"
               name="{{ esc_attr($querySearch) }}"
               value="{{ esc_attr($searchValue) }}"
@@ -1364,11 +1177,11 @@
           </div>
 
           <div class="sccc-member-directory-field">
-            <label for="sccc_vehicle_make">
+            <label class="sccc-control-label" for="sccc_vehicle_make">
               {{ __('Vehicle Make', 'sccc') }}
             </label>
 
-            <select id="sccc_vehicle_make" class="sccc-member-directory-select" name="{{ esc_attr($queryMake) }}">
+            <select id="sccc_vehicle_make" class="sccc-member-directory-select sccc-control sccc-control--select" name="{{ esc_attr($queryMake) }}">
               <option value="">
                 {{ __('All makes', 'sccc') }}
               </option>
@@ -1382,11 +1195,11 @@
           </div>
 
           <div class="sccc-member-directory-field">
-            <label for="sccc_member_sort">
+            <label class="sccc-control-label" for="sccc_member_sort">
               {{ __('Sort', 'sccc') }}
             </label>
 
-            <select id="sccc_member_sort" class="sccc-member-directory-select" name="{{ esc_attr($querySort) }}">
+            <select id="sccc_member_sort" class="sccc-member-directory-select sccc-control sccc-control--select" name="{{ esc_attr($querySort) }}">
               <option value="name_asc" {!! selected($selectedSort, 'name_asc', false) !!}>
                 {{ __('Name A–Z', 'sccc') }}
               </option>
@@ -1400,11 +1213,11 @@
           </div>
 
           <div class="sccc-member-directory-actions">
-            <button type="submit" class="sccc-member-directory-button">
+            <button type="submit" class="sccc-member-directory-button sccc-pill sccc-pill--accent">
               {{ __('Filter', 'sccc') }}
             </button>
 
-            <a href="{{ esc_url($resetUrl) }}" class="sccc-member-directory-reset">
+            <a href="{{ esc_url($resetUrl) }}" class="sccc-member-directory-reset sccc-pill">
               {{ __('Reset', 'sccc') }}
             </a>
           </div>
@@ -1431,7 +1244,7 @@
 
           @if (! empty($paginationLinks))
             <nav
-              class="sccc-member-directory-pagination mt-10 flex flex-wrap items-center justify-center gap-3 text-sm font-bold"
+              class="sccc-member-directory-pagination sccc-pager mt-10 flex flex-wrap items-center justify-center gap-3 text-sm font-bold"
               aria-label="{{ esc_attr__('Member Directory pagination', 'sccc') }}"
             >
               @foreach ($paginationLinks as $paginationLink)
@@ -1440,7 +1253,7 @@
             </nav>
           @endif
         @else
-          <div class="sccc-member-directory-panel sccc-member-directory-empty mt-7">
+          <div class="sccc-member-directory-panel sccc-surface sccc-surface--panel sccc-surface--accent sccc-member-directory-empty mt-7">
             <p class="sccc-member-directory__kicker">
               {{ __('No Matches', 'sccc') }}
             </p>
@@ -1454,7 +1267,7 @@
             </p>
 
             <div class="sccc-member-directory-empty__actions">
-              <a href="{{ esc_url($resetUrl) }}" class="sccc-member-directory-button">
+              <a href="{{ esc_url($resetUrl) }}" class="sccc-member-directory-button sccc-pill sccc-pill--accent">
                 {{ __('Clear Filters', 'sccc') }}
               </a>
             </div>

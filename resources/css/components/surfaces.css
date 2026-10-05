@@ -1,0 +1,272 @@
+/* components/surfaces.css
+   ---------------------------------------------------------------------------
+   Shared "tinted surface" language: cards, panels, form controls, pill
+   buttons, chips and pagination.
+
+   Reference: the Member Directory (template-member-directory.blade.php).
+   These rules were lifted from that template unchanged, so any page can
+   reuse the same look by adding the classes below instead of redefining it.
+
+   Classes
+   - .sccc-surface              card shell (radius, tinted border, gradient fill, shadow)
+     .sccc-surface--panel       quieter fill + shadow for toolbars and notices
+     .sccc-surface--accent      2px gradient line along the top edge
+     .sccc-surface--lift        hover lift + glow for clickable cards
+   - .sccc-control              text input / select
+     .sccc-control--select      extra right padding for the select arrow
+     .sccc-control-label        small uppercase field label
+   - .sccc-pill                 secondary pill button or link
+     .sccc-pill--accent         blue-edged variant for the main action of a group
+   - .sccc-chip                 small status / tag chip
+   - .sccc-pager .page-numbers  pagination links (WordPress paginate_links markup)
+
+   Relation to buttons.css: .btn / .btn-primary etc. stay the call-to-action
+   buttons. .sccc-pill is the utility button that sits inside tinted surfaces
+   (filter, reset, pagination, secondary links).
+
+   Not wrapped in @layer on purpose: these replace rules that lived in an
+   unlayered inline <style>, and unlayered CSS from WordPress and plugins
+   (input, select, a, button) would otherwise outrank them.
+   ---------------------------------------------------------------------------
+*/
+
+:root {
+  --sccc-accent-blue: #2fb6ff;
+
+  --sccc-accent-line: var(
+    --sccc-header-underline-gradient,
+    linear-gradient(
+      90deg,
+      rgba(113, 215, 255, 0) 0%,
+      rgba(113, 215, 255, 0.96) 18%,
+      rgba(67, 190, 255, 0.98) 48%,
+      rgba(174, 113, 255, 0.92) 82%,
+      rgba(174, 113, 255, 0) 100%
+    )
+  );
+
+  --sccc-surface-card-bg:
+    radial-gradient(
+      520px 230px at 18% 0%,
+      color-mix(in oklab, var(--color-primary-500) 13%, transparent) 0%,
+      transparent 64%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-surface) 88%, transparent),
+      color-mix(in oklab, var(--color-primary-500) 10%, var(--color-canvas))
+    );
+
+  --sccc-surface-panel-bg:
+    radial-gradient(
+      520px 230px at 12% 0%,
+      color-mix(in oklab, var(--color-primary-500) 13%, transparent) 0%,
+      transparent 64%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-surface) 88%, transparent),
+      color-mix(in oklab, var(--color-canvas) 94%, transparent)
+    );
+
+  --sccc-control-bg:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-surface) 84%, transparent),
+      color-mix(in oklab, var(--color-canvas) 94%, transparent)
+    );
+}
+
+/* ---------------------------------------------------------------------------
+   Surfaces
+   ------------------------------------------------------------------------ */
+
+.sccc-surface {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.35rem;
+  border: 1px solid color-mix(in oklab, var(--color-primary-500) 18%, transparent);
+  background: var(--sccc-surface-card-bg);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 color-mix(in oklab, white 5%, transparent);
+}
+
+.sccc-surface--panel {
+  background: var(--sccc-surface-panel-bg);
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 color-mix(in oklab, white 5%, transparent);
+}
+
+.sccc-surface--accent::before {
+  content: "";
+  position: absolute;
+  inset-inline: 1.25rem;
+  top: 0;
+  height: 2px;
+  background: var(--sccc-accent-line);
+  opacity: 0.76;
+  pointer-events: none;
+}
+
+.sccc-surface--lift {
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.sccc-surface--lift:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in oklab, var(--color-accent-500) 42%, var(--color-primary-500));
+  box-shadow:
+    0 22px 46px rgba(0, 0, 0, 0.28),
+    0 0 24px color-mix(in oklab, var(--color-primary-500) 13%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 6%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   Form controls
+   ------------------------------------------------------------------------ */
+
+.sccc-control-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.sccc-control {
+  width: 100%;
+  min-height: 2.85rem;
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in oklab, var(--color-primary-500) 22%, transparent);
+  background: var(--sccc-control-bg);
+  color: var(--color-text);
+  padding: 0.78rem 0.95rem;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 5%, transparent);
+}
+
+.sccc-control--select {
+  padding-right: 2.35rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Pill buttons
+   ------------------------------------------------------------------------ */
+
+.sccc-pill {
+  display: inline-flex;
+  min-height: 2.85rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-accent-500) 36%, transparent);
+  background: var(--sccc-control-bg);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0.72rem 1rem;
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 5%, transparent),
+    0 0 16px color-mix(in oklab, var(--color-accent-500) 8%, transparent);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+  cursor: pointer;
+}
+
+.sccc-pill:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--color-accent-500) 56%, transparent);
+  color: var(--sccc-accent-blue);
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 6%, transparent),
+    0 0 20px color-mix(in oklab, var(--color-accent-500) 13%, transparent);
+}
+
+.sccc-pill--accent {
+  border-color: color-mix(in oklab, var(--sccc-accent-blue) 42%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   Chips
+   ------------------------------------------------------------------------ */
+
+.sccc-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-primary-500) 24%, transparent);
+  background: var(--sccc-control-bg);
+  color: var(--color-text);
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+  padding: 0.48rem 0.7rem;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 5%, transparent),
+    0 0 16px color-mix(in oklab, var(--color-primary-500) 8%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   Pagination
+   ------------------------------------------------------------------------ */
+
+.sccc-pager .page-numbers {
+  display: inline-flex;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-primary-500) 22%, transparent);
+  background: var(--sccc-control-bg);
+  color: var(--color-muted);
+  padding: 0.55rem 0.95rem;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.sccc-pager .page-numbers:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--color-accent-500) 60%, transparent);
+  color: var(--color-text);
+  box-shadow: 0 0 18px color-mix(in oklab, var(--color-accent-500) 12%, transparent);
+}
+
+.sccc-pager .page-numbers.current {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
+  color: #fff;
+  box-shadow: 0 0 22px color-mix(in oklab, var(--color-primary-500) 22%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sccc-surface--lift,
+  .sccc-pill,
+  .sccc-pager .page-numbers {
+    transition: none;
+  }
+
+  .sccc-surface--lift:hover,
+  .sccc-pill:hover,
+  .sccc-pager .page-numbers:hover {
+    transform: none;
+  }
+}
