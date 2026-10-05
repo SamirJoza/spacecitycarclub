@@ -47,3 +47,11 @@
    
    (Check Tailwind v4 docs for exact syntax)
 */
+
+/* Type scale utilities (tokens/typography.css)
+   ----------------------------------------------------------------------------
+   Editors can type these into a block's "Additional CSS class(es)" field, and
+   content stored in the database is never scanned by Tailwind. Keep the type
+   scale available even when no template happens to use a given size.
+*/
+@source inline("text-{h1,h2,h3,h4,h5,h6,body,body-sm,body-xs}");
