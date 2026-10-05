@@ -57,7 +57,7 @@ class SponsorApcSync
      * Turn on debug logging in wp-content/debug.log when WP_DEBUG is enabled.
      * Set to false once you've verified everything works.
      */
-    private const DEBUG = true;
+    private const DEBUG = false;
 
     /**
      * Gravity Forms field IDs

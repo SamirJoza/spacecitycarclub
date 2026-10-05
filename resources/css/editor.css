@@ -5,7 +5,9 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 
 /* Import all theme tokens for accurate editor preview */
+@import "material-symbols/outlined.css";
 @import "./tokens/colors.css";
+@import "./tokens/brand.css";
 @import "./tokens/typography.css";
 @import "./components/cards.css";
 @import "./components/buttons.css";
@@ -65,7 +67,7 @@
 
 .editor-styles-wrapper .wp-block[style*="--wp--preset--gradient--hero-corner-glow"] :where(p, h1, h2, h3, h4, h5, h6, li, a, span):not(.has-text-color),
 .editor-styles-wrapper .wp-block[style*="--wp--preset--gradient--hero-diagonal-sheen"] :where(p, h1, h2, h3, h4, h5, h6, li, a, span):not(.has-text-color),
-.editor-styles-wrapper .wp-block[style*="--wp--preset--gradient--hero-diagonal-sheen-blue"] :where(p, h1, h2, h3, h4, h5, h6, li, a, span):not(.has-text-color),{
+.editor-styles-wrapper .wp-block[style*="--wp--preset--gradient--hero-diagonal-sheen-blue"] :where(p, h1, h2, h3, h4, h5, h6, li, a, span):not(.has-text-color) {
   color: #fff;
 }
 

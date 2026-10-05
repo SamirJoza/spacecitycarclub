@@ -631,37 +631,14 @@ require_once get_theme_file_path('app/Support/Security/StrongPasswords.php');
 // require_once get_theme_file_path('app/Support/Security/PmproCheckoutNoAutoLogin.php');
 
 /* =============================================================================
- * ICON FONT ENQUEUES
+ * ICON FONT
  * =============================================================================
  *
- * Material Symbols are used in both frontend and editor contexts, so they are
- * enqueued separately on the matching WordPress hooks.
+ * Material Symbols (Outlined) is self-hosted: it is imported from the npm
+ * package in resources/css/app.css (frontend) and resources/css/editor.css
+ * (block editor). No Google Fonts request is made for icons.
  * =============================================================================
  */
-
-/**
- * Enqueue Material Symbols on the frontend.
- */
-add_action('wp_enqueue_scripts', function () {
-    wp_enqueue_style(
-        'sccc-material-symbols',
-        'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
-        [],
-        null
-    );
-}, 20);
-
-/**
- * Enqueue Material Symbols inside the editor.
- */
-add_action('enqueue_block_editor_assets', function () {
-    wp_enqueue_style(
-        'sccc-material-symbols',
-        'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
-        [],
-        null
-    );
-}, 20);
 
 /* =============================================================================
  * DEBUG / ONE-OFF ADMIN UTILITIES

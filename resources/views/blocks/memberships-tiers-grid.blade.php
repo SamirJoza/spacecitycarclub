@@ -45,6 +45,7 @@
         radial-gradient(900px 520px at 10% 110%, rgba(255,255,255,0.06) 0%, transparent 65%);"
        aria-hidden="true"></div>
 
+  @once
   <style>
     .sccc-membership-grid a { text-decoration: none; }
 
@@ -228,6 +229,7 @@
     }
     .sccc-membership-grid .sccc-tier__wysiwyg ol > li { margin: .35rem 0; }
   </style>
+  @endonce
 
   <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div class="mb-12 text-center md:mb-16">

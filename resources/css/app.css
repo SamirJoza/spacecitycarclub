@@ -1,15 +1,21 @@
-/* Import the Material Symbols variable font (outlined by default) */
-@import "material-symbols";
+/* Material Symbols: Outlined only, self-hosted from the npm package.
+   (The package index would also ship the Rounded and Sharp fonts.) */
+@import "material-symbols/outlined.css";
 
 /* resources/styles/app.css */
 @import "tailwindcss";          /* runtime variables (no theme(static)) */
 @source "../views/";
 @source "../../app/";
 
+/* Dark mode follows the theme switch (<html class="dark">), not the OS.
+   Without this, Tailwind v4 compiles dark:* to prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Single source of truth: Major Third (1.25) fluid type scale
    Root stays 16px (1rem = 16px); visual body base ≈ 18px (1.125rem). */
 
 @import "./tokens/colors.css";
+@import "./tokens/brand.css";
 /* @import "./tokens/fonts.css";         👈 self-hosted faces */
 @import "./tokens/typography.css";    /* maps to --font-sans / --font-display */
 @import "./utilities/gradients.css";

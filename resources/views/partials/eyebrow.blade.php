@@ -243,7 +243,6 @@
       border: 2px solid var(--eyebrow-cart-badge-ring);
       box-shadow: var(--eyebrow-cart-badge-shadow);
       pointer-events: none;
-      color: red;
     }
   </style>
 @endonce

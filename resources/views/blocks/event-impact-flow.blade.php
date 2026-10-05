@@ -118,10 +118,6 @@
        * These mirror the reusable Section Header block so this block's title
        * feels visually connected to the rest of the page.
        */
-      --sccc-gradient-club-blue: linear-gradient(90deg, #135bec 0%, #1f8fff 52%, #71d7ff 100%);
-      --sccc-gradient-signal-red: linear-gradient(90deg, #b31324 0%, #ff1744 50%, #ff7a59 100%);
-      --sccc-gradient-space-city: linear-gradient(90deg, #135bec 0%, #43beff 42%, #ae71ff 72%, #ff1744 100%);
-      --sccc-color-club-blue: #135bec;
 
       /**
        * Connector-specific defaults.
