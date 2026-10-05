@@ -174,7 +174,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 88%, transparent),
-          color-mix(in oklab, var(--color-primary-500) 10%, var(--color-bg))
+          color-mix(in oklab, var(--color-primary-500) 10%, var(--color-canvas))
         );
 
       --sccc-member-panel-bg:
@@ -186,7 +186,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 88%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
 
       position: relative;
@@ -204,7 +204,7 @@
           color-mix(in oklab, var(--color-accent-500) 8%, transparent) 0%,
           transparent 60%
         ),
-        var(--color-bg);
+        var(--color-canvas);
     }
 
     .sccc-member-directory::before {
@@ -334,7 +334,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-text);
       padding: 0.78rem 0.95rem;
@@ -371,7 +371,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-text);
       font-size: 0.9rem;
@@ -479,7 +479,7 @@
       height: 100%;
       border-radius: inherit;
       object-fit: cover;
-      background: var(--color-bg);
+      background: var(--color-canvas);
     }
 
     .sccc-member-card__avatar--fallback {
@@ -540,7 +540,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-text);
       font-size: 0.72rem;
@@ -654,7 +654,7 @@
           color-mix(in oklab, var(--color-primary-500) 18%, transparent) 0%,
           transparent 65%
         ),
-        color-mix(in oklab, var(--color-surface) 88%, var(--color-bg));
+        color-mix(in oklab, var(--color-surface) 88%, var(--color-canvas));
       box-shadow: inset 0 1px 0 color-mix(in oklab, white 5%, transparent);
       cursor: help;
     }
@@ -786,7 +786,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-text);
       font-size: 0.78rem;
@@ -850,7 +850,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-muted);
       padding: 0.55rem 0.95rem;
@@ -913,7 +913,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 88%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
 
       position: fixed;
@@ -983,7 +983,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 86%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-text);
       font-size: 0.82rem;
@@ -1028,7 +1028,7 @@
       height: 100%;
       border-radius: inherit;
       object-fit: cover;
-      background: var(--color-bg);
+      background: var(--color-canvas);
     }
 
     .sccc-member-modal-content__avatar--fallback {

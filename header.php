@@ -30,17 +30,16 @@ use Illuminate\Support\Facades\Vite;
 
     <?php wp_head(); ?>
 
-    <!-- No-FOUC theme boot (same as app.blade.php) -->
+    <!-- No-FOUC theme boot (same as partials/theme-boot.blade.php) -->
     <script>
       (function () {
+        var mode='dark';
         try {
-          var KEY='scc-theme';
-          var saved=localStorage.getItem(KEY);
-          var prefersDark=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var mode=saved ? saved : (prefersDark ? 'dark' : 'light');
-          if (mode==='dark') document.documentElement.classList.add('dark');
-          document.documentElement.setAttribute('data-theme', mode);
+          var saved=localStorage.getItem('scc-theme');
+          if (saved==='light' || saved==='dark') mode=saved;
         } catch(e){}
+        if (mode==='dark') document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', mode);
       })();
     </script>
 

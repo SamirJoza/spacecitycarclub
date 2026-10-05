@@ -45,6 +45,7 @@
   $hasSections = ! empty($sections);
 @endphp
 
+@once
 <style>
   .wp-block-acf-sccc-accordion,
   .wp-block-acf-s-c-c-c-accordion,
@@ -382,6 +383,7 @@
     color: var(--accordion-muted-dark);
   }
 </style>
+@endonce
 
 <section
   id="{!! esc_attr($blockId) !!}"

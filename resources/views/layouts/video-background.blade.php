@@ -13,18 +13,7 @@
     @php(wp_head())
 
     {{-- No-FOUC theme boot --}}
-    <script>
-      (function () {
-        try {
-          var KEY='scc-theme';
-          var saved=localStorage.getItem(KEY);
-          var prefersDark=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var mode=saved ? saved : (prefersDark ? 'dark' : 'light');
-          if (mode==='dark') document.documentElement.classList.add('dark');
-          document.documentElement.setAttribute('data-theme', mode);
-        } catch(e){}
-      })();
-    </script>
+    @include('partials.theme-boot')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
   </head>

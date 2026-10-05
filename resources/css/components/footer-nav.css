@@ -3,11 +3,11 @@
     @apply border-t pt-12 pb-10 shrink-0;
     background-color: var(--bg);
     color: var(--text);
-    font-family: var(--font-body);
+    font-family: var(--font-sans);
   }
 
   .site-footer h4 {
-    font-family: var(--font-headline);
+    font-family: var(--font-display);
     @apply text-sm font-semibold mb-3;
     color: var(--color-primary-500);
   }
@@ -38,11 +38,11 @@
   .site-footer .btn-primary:hover,
   .site-footer .btn-primary:focus-visible {
     @apply no-underline;
-    color: var(--secondary-contrast);
+    color: var(--color-on-primary);
   }
 
   .site-footer .brand span {
-    font-family: var(--font-headline);
+    font-family: var(--font-display);
   }
 
   .site-footer .bottom-bar {

@@ -488,7 +488,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 88%, transparent),
-          color-mix(in oklab, var(--color-primary-500) 12%, var(--color-bg))
+          color-mix(in oklab, var(--color-primary-500) 12%, var(--color-canvas))
         );
 
       --sccc-author-sidebar-bg:
@@ -500,7 +500,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 88%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
 
       background:
@@ -514,7 +514,7 @@
           color-mix(in oklab, var(--color-accent-500) 7%, transparent) 0%,
           transparent 60%
         ),
-        var(--color-bg);
+        var(--color-canvas);
     }
 
     .sccc-author-archive::before {
@@ -614,7 +614,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       box-shadow:
         inset 0 1px 0 color-mix(in oklab, white 5%, transparent),
@@ -663,7 +663,7 @@
           color-mix(in oklab, var(--color-primary-500) 15%, transparent) 0%,
           transparent 64%
         ),
-        var(--color-bg);
+        var(--color-canvas);
     }
 
     .sccc-author-post-card__media img {
@@ -785,7 +785,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-text);
       font-size: 0.82rem;
@@ -858,7 +858,7 @@
       align-items: center;
       justify-content: center;
       border-radius: 999px;
-      background: color-mix(in oklab, var(--color-bg) 80%, black 8%);
+      background: color-mix(in oklab, var(--color-canvas) 80%, black 8%);
       color: var(--color-text);
       font-size: 0.72rem;
       font-weight: 800;
@@ -943,7 +943,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-text);
       padding: 0.8rem 0.95rem;
@@ -962,7 +962,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-text);
       font-size: 0.9rem;
@@ -998,7 +998,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-text);
       font-size: 0.8rem !important;
@@ -1040,7 +1040,7 @@
         linear-gradient(
           180deg,
           color-mix(in oklab, var(--color-surface) 84%, transparent),
-          color-mix(in oklab, var(--color-bg) 94%, transparent)
+          color-mix(in oklab, var(--color-canvas) 94%, transparent)
         );
       color: var(--color-muted);
       padding: 0.55rem 0.95rem;
@@ -1235,7 +1235,7 @@
                 <article class="sccc-author-post-card group">
                   <a
                     href="{{ esc_url($postPermalink) }}"
-                    class="absolute inset-0 z-10 rounded-[1.4rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)]"
+                    class="absolute inset-0 z-10 rounded-[1.4rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-canvas)]"
                     aria-label="{{ esc_attr(sprintf(__('Read %s', 'sage'), $postTitle)) }}"
                   >
                     <span class="sr-only">
@@ -1269,7 +1269,7 @@
                               color-mix(in oklab, var(--color-accent-500) 12%, transparent) 0%,
                               transparent 60%
                             ),
-                            color-mix(in oklab, var(--color-surface) 88%, var(--color-bg));
+                            color-mix(in oklab, var(--color-surface) 88%, var(--color-canvas));
                         "
                       >
                         <span
@@ -1358,7 +1358,7 @@
           <section class="sccc-author-sidebar-card px-5 py-6">
             <div class="flex items-center gap-4">
               <div class="sccc-author-avatar shrink-0 rounded-full p-[2px]">
-                <div class="rounded-full bg-[var(--color-bg)] p-1">
+                <div class="rounded-full bg-[var(--color-canvas)] p-1">
                   @if ($authorAvatar)
                     <img
                       src="{{ esc_url($authorAvatar) }}"

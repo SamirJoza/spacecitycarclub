@@ -40,6 +40,7 @@
 --}}
 
 {{-- ─── SELF-CONTAINED STYLES ──────────────────────────────────────────────── --}}
+@once
 <style>
   /*
    * ── BASE (light theme) ────────────────────────────────────────────────────
@@ -180,6 +181,7 @@
     text-align: center;
   }
 </style>
+@endonce
 
 {{-- ─── LOGGED-IN + FRONTEND: render nothing ───────────────────────────────── --}}
 @if ($is_logged_in && ! $is_preview)

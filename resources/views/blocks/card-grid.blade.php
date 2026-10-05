@@ -255,12 +255,6 @@
       justify-self:stretch;
       align-self:stretch;
 
-      --sccc-gradient-club-blue: linear-gradient(90deg, #135bec 0%, #1f8fff 52%, #71d7ff 100%);
-      --sccc-gradient-signal-red: linear-gradient(90deg, #b31324 0%, #ff1744 50%, #ff7a59 100%);
-      --sccc-gradient-space-city: linear-gradient(90deg, #135bec 0%, #43beff 42%, #ae71ff 72%, #ff1744 100%);
-      --sccc-color-club-blue: #135bec;
-      --sccc-color-signal-red: #e53935;
-      --sccc-color-deep-purple: #ae71ff;
     }
 
     #{{ $uid }}:not(.alignwide):not(.alignfull){
