@@ -14,9 +14,9 @@
  * - Include this file from `app/setup.php` **before** dashboard widgets that rely
  *   on capabilities such as `sccc_use_dashboard_widgets`.
  *
- * Relationship to legacy `ManualRoleAssignment.php`
- * - That module exposed every role as a checkbox and could fight this flow.
- * - Keep it disabled while this bootstrap is active to avoid duplicate UIs.
+ * History
+ * - Replaces the old `ManualRoleAssignment.php` module (removed in 1.37), which
+ *   exposed every role as a checkbox and could fight this flow.
  */
 
 namespace App\Support\Admin\UserRoles;

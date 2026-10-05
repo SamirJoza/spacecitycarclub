@@ -37,6 +37,13 @@ Cleanup pass after a full theme audit (dark mode, icon font, shared tokens). No 
 ### Removed
 
 - Material Symbols Rounded and Sharp font files from `public/build` (about 8.5 MB, never used).
+- **Dead code:** `app/Support/Admin/Users/ManualRoleAssignment.php` (superseded by `UserRoles/SecondaryRoleAssignment`), `app/Support/Members/MemberRole.php` and `app/Support/CPT/LeadershipUserPicker.php`. None of them was loaded.
+- **Unused filter:** the `sccc_pmpro_club_level_ids` hook in `app/filters.php` (nothing ever applied it).
+- **Scaffold leftovers:** the `my-block` placeholder script and stylesheet, and the **Custom Template** and **Typography Test** page templates (no page used them).
+
+### Added
+
+- **Type scale safelist:** `resources/css/tailwind-safelist.css` keeps the `text-h1`–`text-h6` and `text-body*` utilities in the build, so they stay available to classes typed in the editor.
 
 - `style.css`: `Version` `1.36` → `1.37`.
 

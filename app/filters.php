@@ -38,7 +38,3 @@ add_filter('block_categories_all', function ($categories, $post) {
             );
         }, 10, 2);
 
-
-add_filter('sccc_pmpro_club_level_ids', function () {
-  return [2, 3, 4, 5]; // replace with your real level IDs
-});

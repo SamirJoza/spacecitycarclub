@@ -412,7 +412,7 @@ Each file in `app/Support/` is **self-booting**: it registers its own hooks at t
 | `Taxonomies/` | Business directory vocabularies (categories/services) |
 | `Woo/` | Product access, markup, shop nav and filters, event access, account extras |
 
-Several files are present but intentionally **not loaded**: `Members/MemberRole.php`, `Admin/Users/ManualRoleAssignment.php`, `Security/PmproCheckoutNoAutoLogin.php` and `CPT/LeadershipUserPicker.php`. The `setup.php` comments explain which ones were superseded.
+`Security/PmproCheckoutNoAutoLogin.php` and `Taxonomies/BusinessDirectoryTaxonomies.php` are present but intentionally **not loaded** (their `require_once` lines in `setup.php` are commented out).
 
 ### View composers
 
@@ -526,8 +526,6 @@ All blocks are ACF Composer classes in `app/Blocks/`, with Blade views in `resou
 | Event Membership Checkout | `page-event-membership-checkout.blade.php` | PMPro checkout in kiosk or normal layout |
 | Members Page | `page-members.blade.php` | Members layout |
 | Video Background Page | `template-video-background.blade.php` | Page with an ACF-selected background video |
-| Typography Test | `template-typography.blade.php` | Type scale preview |
-| Custom Template | `template-custom.blade.php` | Basic Sage template |
 
 ### Other key templates
 
@@ -827,7 +825,6 @@ All custom hooks use the `sccc_` prefix.
 | Filter | Purpose |
 |---|---|
 | `sccc_is_true_member` | Override the true-member check |
-| `sccc_pmpro_club_level_ids` | Club PMPro level IDs (`app/filters.php`) |
 | `sccc_event_signup_level_ids` | Levels offered in the kiosk flow (default `[2, 3, 4]`) |
 | `sccc_event_signup_entry_path` / `_complete_path` / `_checkout_path` | Kiosk URLs |
 | `sccc_pmpro_checkout_confirmation_url` / `sccc_pmpro_checkout_restart_url` | PMPro checkout redirects |

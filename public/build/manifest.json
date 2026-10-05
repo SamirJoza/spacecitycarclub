@@ -8,17 +8,12 @@
     "src": "node_modules/material-symbols/material-symbols-outlined.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-Bj4yLZpL.css",
+    "file": "assets/app-BOke8jnx.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
-  "resources/css/blocks/my-block.css": {
-    "file": "assets/my-block-DuGiIjSb.css",
-    "src": "resources/css/blocks/my-block.css",
-    "isEntry": true
-  },
   "resources/css/editor.css": {
-    "file": "assets/editor-BZGVvYuJ.css",
+    "file": "assets/editor-B9wFUpY2.css",
     "src": "resources/css/editor.css",
     "isEntry": true
   },
@@ -34,12 +29,6 @@
     "file": "assets/app-CbfNNJdU.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
-  },
-  "resources/js/blocks/my-block.js": {
-    "file": "assets/my-block-CvGua6-T.js",
-    "name": "my-block",
-    "src": "resources/js/blocks/my-block.js",
     "isEntry": true
   },
   "resources/js/editor.js": {

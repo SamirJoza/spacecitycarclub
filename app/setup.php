@@ -484,8 +484,6 @@ require_once get_theme_file_path('app/Support/Media/ForceHttpsMediaUrls.php');
 
 require_once get_theme_file_path('app/woocommerce/membership-checkout-fields.php');
 
-// Legacy / replaced role file kept commented for reference.
-// require_once get_theme_file_path('app/Support/Members/MemberRole.php');
 
 require_once get_theme_file_path('app/Support/Members/MemberRoleSync.php');
 require_once get_theme_file_path('app/Fields/EventSignupSettings.php');
@@ -526,8 +524,6 @@ require_once get_theme_file_path('app/Support/Admin/Dashboard/Reports/CarsReport
 require_once get_theme_file_path('app/Support/Admin/Dashboard/Reports/VeteransReport.php');
 require_once get_theme_file_path('app/Support/Admin/Dashboard/Reports/CarParkReport.php');
 require_once get_theme_file_path('app/Support/Admin/Dashboard/Reports/MembershipTrendsReport.php');
-// ManualRoleAssignment superseded by App\Support\Admin\UserRoles\SecondaryRoleAssignment (see bootstrap above).
-// require_once get_theme_file_path('app/Support/Admin/Users/ManualRoleAssignment.php');
 require_once get_theme_file_path('app/Support/Admin/Users/MemberColumns.php');
 require_once get_theme_file_path('app/Support/Admin/Users/BulkPasswordResetMail.php');
 
