@@ -14,6 +14,32 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 
 ---
 
+## [1.37] - 2026-10-05
+
+Cleanup pass after a full theme audit (dark mode, icon font, shared tokens). No new features.
+
+### Changed
+
+- **Dark mode:** Tailwind `dark:` classes now follow the site's theme switch (`<html class="dark">`) instead of the visitor's operating system (`@custom-variant dark` in `resources/css/app.css`).
+- **Theme boot script:** one shared partial, `resources/views/partials/theme-boot.blade.php`, included by all six layouts (plain-PHP copy in `header.php`). It now uses the same rule as `resources/js/components/theme.js`: saved choice, otherwise dark. Before, the boot script followed the OS while `theme.js` defaulted to dark.
+- **Material Symbols:** Outlined only, self-hosted from the npm package for both the frontend (`app.css`) and the block editor (`editor.css`). The Google Fonts icon requests in `app/setup.php` are gone.
+- **Brand tokens:** the headline gradients and accent colors (`--sccc-gradient-*`, `--sccc-color-*`) live in the new `resources/css/tokens/brand.css`. The copies inside the Benefits Proof, Card Grid, Event Impact Flow, Feature, Hero, Image Text Split, Masthead and Section Header blocks are removed.
+- **Blocks:** SCCC Accordion, Memberships Tiers Grid and Membership CTA print their styles once per page (`@once`) instead of once per block.
+- **Build:** `public/build` rebuilt. The previous build was missing about 40 utility classes used by templates (mostly the event signup pages).
+
+### Fixed
+
+- **Editor styles:** a stray comma in `resources/css/editor.css` made browsers drop the white-text rule for hero gradient backgrounds.
+- **Cart badge:** removed a leftover `color: red` in `resources/views/partials/eyebrow.blade.php`.
+- **Undefined CSS variables:** `footer-nav.css` now uses `--font-display`, `--font-sans` and `--color-on-primary`; the author page and member directory use `--color-canvas` where they referenced the non-existent `--color-bg`. Footer headings now render in the display font, and the background gradients on those two templates now apply.
+- **Sponsor sync:** `SponsorApcSync::DEBUG` is off.
+
+### Removed
+
+- Material Symbols Rounded and Sharp font files from `public/build` (about 8.5 MB, never used).
+
+- `style.css`: `Version` `1.36` → `1.37`.
+
 ## [1.36] - 2026-10-04
 
 ### Added

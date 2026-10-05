@@ -6,7 +6,7 @@ The theme powers the public site and much more: memberships, the member dashboar
 
 | | |
 |---|---|
-| **Theme version** | `1.36` (source of truth: `style.css` → `Version:`) |
+| **Theme version** | `1.37` (source of truth: `style.css` → `Version:`) |
 | **Built on** | [Sage 11.0.1](https://roots.io/sage/) by Roots |
 | **Author** | Samir Joza — [samirjoza.dev](https://samirjoza.dev) |
 | **Repository** | [github.com/SamirJoza/spacecitycarclub](https://github.com/SamirJoza/spacecitycarclub) |
