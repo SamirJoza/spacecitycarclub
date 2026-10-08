@@ -524,6 +524,7 @@ require_once get_theme_file_path('app/Support/Admin/Dashboard/Reports/CarsReport
 require_once get_theme_file_path('app/Support/Admin/Dashboard/Reports/VeteransReport.php');
 require_once get_theme_file_path('app/Support/Admin/Dashboard/Reports/CarParkReport.php');
 require_once get_theme_file_path('app/Support/Admin/Dashboard/Reports/MembershipTrendsReport.php');
+require_once get_theme_file_path('app/Support/Admin/Dashboard/Reports/MemberListReport.php');
 require_once get_theme_file_path('app/Support/Admin/Users/MemberColumns.php');
 require_once get_theme_file_path('app/Support/Admin/Users/BulkPasswordResetMail.php');
 

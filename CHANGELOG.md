@@ -14,6 +14,14 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 
 ---
 
+## [1.38] - 2026-10-08
+
+### Added
+
+- **Member List dashboard widget** (`app/Support/Admin/Dashboard/Reports/MemberListReport.php`): scrolling list of current members (Active and Grace, same scope as the other community reports) with name, membership level and member-since date, a per-level count, level and sort filters, and a "Print list" sheet for Print / Save as PDF. Member since comes from `membership_issued_at`, falling back to the first PMPro start date, then the account registration date.
+
+- `style.css`: `Version` `1.37` → `1.38`.
+
 ## [1.37] - 2026-10-05
 
 Cleanup pass after a full theme audit (dark mode, icon font, shared tokens). No new features.
