@@ -8,12 +8,12 @@
     "src": "node_modules/material-symbols/material-symbols-outlined.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BZFOht0Q.css",
+    "file": "assets/app-DjyFSMa3.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/css/editor.css": {
-    "file": "assets/editor-C6bSQQ1o.css",
+    "file": "assets/editor-DivpEzQh.css",
     "src": "resources/css/editor.css",
     "isEntry": true
   },

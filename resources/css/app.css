@@ -16,6 +16,7 @@
 
 @import "./tokens/colors.css";
 @import "./tokens/brand.css";
+@import "./tokens/scale.css";
 /* @import "./tokens/fonts.css";         👈 self-hosted faces */
 @import "./tokens/typography.css";    /* maps to --font-sans / --font-display */
 @import "./utilities/gradients.css";
@@ -23,6 +24,7 @@
 @import "./components/buttons.css";
 @import "./components/cards.css";
 @import "./components/surfaces.css";
+@import "./components/section-header.css";
 @import "./components/header-nav.css";
 @import "./components/footer-nav.css";
 @import "./components/woocommerce-account-address.css";

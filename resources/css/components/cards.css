@@ -1,5 +1,6 @@
 /* Card & Container Styles - Space City Car Club */
-/* Matches mockup: rounded-xl, borders, shadows, proper backgrounds */
+/* Matches mockup: rounded-xl, borders, shadows, proper backgrounds.
+   Shadows and motion come from tokens/scale.css (the dark shadow values switch there). */
 
 @layer components {
   /* Base card style matching mockup */
@@ -9,8 +10,8 @@
     background: var(--color-surface);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-xl, 0.75rem); /* rounded-xl */
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
+    box-shadow: var(--shadow-card);
+    transition: all var(--duration-base) var(--ease-standard);
   }
 
   .dark .card,
@@ -18,7 +19,6 @@
   .dark .wp-block-columns.has-background {
     background: var(--color-surface);
     border-color: var(--color-slate-800, rgba(30, 41, 59, 1));
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
   }
 
   /* Card with hover effect (like event cards in mockup) */
@@ -26,14 +26,13 @@
     background: var(--color-surface);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-xl, 0.75rem);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
+    box-shadow: var(--shadow-card);
+    transition: all var(--duration-base) var(--ease-standard);
   }
 
   .dark .card-hover {
     background: var(--color-surface);
     border-color: var(--color-slate-800, rgba(30, 41, 59, 1));
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
   }
 
   .card-hover:hover {
@@ -46,18 +45,13 @@
     background: var(--color-surface);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-xl, 0.75rem);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
+    box-shadow: var(--shadow-card-raised);
+    transition: all var(--duration-base) var(--ease-standard);
   }
 
   .dark .card-elevated {
     background: var(--color-surface);
     border-color: var(--color-slate-800, rgba(30, 41, 59, 1));
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-  }
-
-  .dark .card-elevated {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
   }
 
   /* Container padding utilities */
