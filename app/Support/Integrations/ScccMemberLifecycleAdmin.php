@@ -498,24 +498,45 @@ class ScccMemberLifecycleAdmin
      * PMPro MEMBERS LIST: EXCLUDE ABANDONED
      * ======================================================================= */
 
+    /**
+     * Hide members marked "abandoned" from PMPro's Members list.
+     *
+     * PMPro passes the finished query (… WHERE … GROUP BY … ORDER BY … LIMIT …)
+     * through `pmpro_members_list_sql`. The condition has to go inside the
+     * WHERE clause, before GROUP BY / ORDER BY / LIMIT. Appending it to the
+     * end of the string (as this method used to) produced invalid SQL, so the
+     * list showed "No members found" while the item count still worked.
+     */
     public function excludeAbandonedFromPmproMembersListSql(string $sql): string
     {
         global $wpdb;
-
-        $clause = $wpdb->prepare("
-            AND u.ID NOT IN (
-                SELECT user_id
-                FROM {$wpdb->usermeta}
-                WHERE meta_key = %s
-                  AND meta_value = 'abandoned'
-            )
-        ", $this->metaStatus);
 
         if (strpos($sql, "meta_value = 'abandoned'") !== false) {
             return $sql;
         }
 
-        return $sql . ' ' . $clause;
+        $condition = $wpdb->prepare(
+            "u.ID NOT IN (SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value = 'abandoned')",
+            $this->metaStatus
+        );
+
+        // Main WHERE = the last one in the statement (any earlier ones belong to joins/subqueries).
+        $wherePos = strripos($sql, ' WHERE ');
+        $searchFrom = $wherePos === false ? 0 : $wherePos;
+
+        // First tail clause after the main WHERE.
+        $tailPos = null;
+        if (preg_match('/\s(GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT)\s/i', $sql, $m, PREG_OFFSET_CAPTURE, $searchFrom)) {
+            $tailPos = (int) $m[0][1];
+        }
+
+        $insert = ($wherePos === false ? ' WHERE ' : ' AND ') . $condition . ' ';
+
+        if ($tailPos === null) {
+            return rtrim($sql) . $insert;
+        }
+
+        return substr($sql, 0, $tailPos) . $insert . substr($sql, $tailPos);
     }
 }
 
