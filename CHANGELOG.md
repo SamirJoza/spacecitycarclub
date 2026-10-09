@@ -19,7 +19,6 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 ### Added
 
 - **Member List dashboard widget** (`app/Support/Admin/Dashboard/Reports/MemberListReport.php`): scrolling list of current members (Active and Grace, same scope as the other community reports) with name, membership level and member-since date, a per-level count, level and sort filters, and a "Print list" sheet for Print / Save as PDF. Member since comes from `membership_issued_at`, falling back to the first PMPro start date, then the account registration date.
-
 - **Member List: member number and expiration.** The widget shows each member's number under their name and a new Expires column; the print sheet uses the member number in place of the row number and adds Expires. Members without an end date show "Lifetime" when their PMPro level never expires (no expiration and no recurring billing), otherwise "No end date", counted in a warning line. Rows within 60 days of the end date and members in grace are highlighted. New sort: expiration (soonest first).
 
 - **Member List: edit links.** Member names in the widget link to their user profile (for staff allowed to edit that user).
