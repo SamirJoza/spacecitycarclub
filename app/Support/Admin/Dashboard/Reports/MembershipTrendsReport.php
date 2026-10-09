@@ -29,12 +29,20 @@ use WP_User_Query;
  *   Uses startdate + enddate + status
  *
  * ACTIVE (as-of a bucket end time)
- * - status='active'
- * - startdate is NULL/0000 or startdate <= bucketEnd
- * - enddate   is NULL/0000 or enddate   >= bucketEnd
+ * - A membership row covers time T when its startdate is NULL/0000 or <= T and
+ *   its enddate is NULL/0000 (current 'active' rows only) or >= T.
+ * - Past rows count too: when a level or end date is changed PMPro closes the
+ *   old row (status 'changed' / 'admin_changed', enddate = time of change) and
+ *   opens a new one, so the old row is what shows the member was active before.
  *
  * EXPIRATIONS (per bucket)
- * - DISTINCT users whose enddate falls inside the bucket window
+ * - DISTINCT users with a row whose enddate falls inside the bucket, where the
+ *   membership really ended: rows closed by a level/date change are ignored,
+ *   and so is any end that another row of the same member continues
+ *   (renewal or replacement starting within a day).
+ *
+ * Before 2026-10-08 every enddate counted, so editing a member's level or end
+ * date in wp-admin showed up as an "expiration".
  */
 
 if (!defined('ABSPATH')) {
@@ -56,10 +64,10 @@ final class MembershipTrendsReport
   /**
    * Cache keys.
    */
-  private const TRANSIENT_MEMBER_IDS     = 'sccc_trends_member_ids_v2';
+  private const TRANSIENT_MEMBER_IDS     = 'sccc_trends_member_ids_v3';
   private const TRANSIENT_MEMBER_IDS_TTL = 6 * HOUR_IN_SECONDS;
 
-  private const TRANSIENT_SERIES_PREFIX  = 'sccc_trends_series_v3_';
+  private const TRANSIENT_SERIES_PREFIX  = 'sccc_trends_series_v4_';
   private const TRANSIENT_SERIES_TTL     = 30 * MINUTE_IN_SECONDS;
 
   /**
@@ -595,39 +603,7 @@ final class MembershipTrendsReport
     $count = 0;
 
     foreach ($periodsByUser as $periods) {
-      if (!is_array($periods) || empty($periods)) {
-        continue;
-      }
-
-      $isActive = false;
-
-      foreach ($periods as $p) {
-        if (($p['status'] ?? '') !== 'active') {
-          continue;
-        }
-
-        $start = $p['start'] ?? null;
-        $end   = $p['end'] ?? null;
-
-        // Startdate in future => not active yet
-        if ($start !== null && $start > $t) {
-          continue;
-        }
-
-        // No enddate => active
-        if ($end === null) {
-          $isActive = true;
-          break;
-        }
-
-        // Enddate after time => active
-        if ($end >= $t) {
-          $isActive = true;
-          break;
-        }
-      }
-
-      if ($isActive) {
+      if (is_array($periods) && self::isCoveredAt($periods, $t)) {
         $count++;
       }
     }
@@ -635,8 +611,52 @@ final class MembershipTrendsReport
     return $count;
   }
 
+  /** Statuses PMPro uses for a row that was replaced, not ended. */
+  private const REPLACED_STATUSES = ['changed', 'admin_changed'];
+
+  /** Statuses whose rows describe a period the member really held. */
+  private const HELD_STATUSES = ['active', 'changed', 'admin_changed', 'expired', 'cancelled', 'admin_cancelled', 'inactive'];
+
   /**
-   * Count DISTINCT users who expire in a bucket.
+   * Was the member covered by any of their rows at time T?
+   * Open-ended rows only count while still 'active'.
+   */
+  private static function isCoveredAt(array $periods, int $t, ?int $skipIndex = null): bool
+  {
+    foreach ($periods as $i => $p) {
+      if ($skipIndex !== null && $i === $skipIndex) {
+        continue;
+      }
+
+      $status = $p['status'] ?? '';
+      if (!in_array($status, self::HELD_STATUSES, true)) {
+        continue;
+      }
+
+      $start = $p['start'] ?? null;
+      $end   = $p['end'] ?? null;
+
+      if ($start !== null && $start > $t) {
+        continue;
+      }
+
+      if ($end === null) {
+        if ($status === 'active') {
+          return true;
+        }
+        continue;
+      }
+
+      if ($end >= $t) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Count DISTINCT users whose membership really ended in a bucket.
    */
   private static function countExpirationsDistinctUsers(array $periodsByUser, int $start, int $end): int
   {
@@ -647,14 +667,24 @@ final class MembershipTrendsReport
         continue;
       }
 
-      foreach ($periods as $p) {
+      foreach ($periods as $i => $p) {
         $e = $p['end'] ?? null;
-        if ($e === null) continue;
-
-        if ($e >= $start && $e < $end) {
-          $expiringUsers[(int) $uid] = true;
-          break;
+        if ($e === null || $e < $start || $e >= $end) {
+          continue;
         }
+
+        // Closed because the level or end date was changed: not an expiration.
+        if (in_array($p['status'] ?? '', self::REPLACED_STATUSES, true)) {
+          continue;
+        }
+
+        // Continued by another row (renewal / replacement) within a day.
+        if (self::isCoveredAt($periods, $e + DAY_IN_SECONDS, $i)) {
+          continue;
+        }
+
+        $expiringUsers[(int) $uid] = true;
+        break;
       }
     }
 

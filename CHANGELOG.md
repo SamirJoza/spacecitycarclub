@@ -27,6 +27,7 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 ### Fixed
 
 - **Members Overview renewal count** counted every PMPro membership row with a past end date, including old rows PMPro keeps when a level or end date is changed, so members with current memberships running for months showed as "up for renewal". It now looks only at each member's current membership row. The line also links to the Member List sorted by expiration.
+- **Membership Trends expirations** counted every PMPro end date, including rows PMPro closes when a level or end date is edited, so admin edits showed as expirations. Rows closed by a change (`changed` / `admin_changed`) and ends continued by another row within a day no longer count. The active/inactive history also uses those closed rows, so members are no longer shown as inactive before their latest edit. Cache keys bumped so old cached numbers are not served.
 - **PMPro Members list showed "No members found"** while reporting the correct item count. The filter that hides abandoned members (`ScccMemberLifecycleAdmin::excludeAbandonedFromPmproMembersListSql`) appended its condition after PMPro's `GROUP BY` / `ORDER BY` / `LIMIT`, which made the query invalid. It now inserts the condition into the `WHERE` clause.
 
 - `style.css`: `Version` `1.37` → `1.38`.
