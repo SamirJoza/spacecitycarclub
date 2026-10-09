@@ -31,6 +31,8 @@
  *
  * FILTERS
  * - Level: all levels or one level
+ * - Names in the widget link to the member's user profile (Users → Edit) for
+ *   anyone allowed to edit that user; the print sheet stays plain text.
  * - Sort: last name (default), member since (oldest first), level,
  *   expiration (soonest first, missing end dates next, lifetime last)
  *
@@ -188,7 +190,11 @@ final class MemberListReport
 
         foreach ($rows as $r) {
             echo '<tr>';
-            echo '<td>' . esc_html($r['name']);
+            $editUrl = current_user_can('edit_user', $r['id']) ? get_edit_user_link($r['id']) : '';
+            echo '<td>';
+            echo $editUrl
+                ? '<a href="' . esc_url($editUrl) . '" title="' . esc_attr__('Edit member', 'sage') . '">' . esc_html($r['name']) . '</a>'
+                : esc_html($r['name']);
             if ($r['number'] !== '') {
                 echo '<br><span style="color:#646970; font-size:11px; font-variant-numeric:tabular-nums; white-space:nowrap;">' . esc_html($r['number']) . '</span>';
             }

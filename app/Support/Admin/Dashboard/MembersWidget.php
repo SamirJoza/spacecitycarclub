@@ -107,7 +107,13 @@ function sccc_render_members_overview_widget(): void
    * - includes users whose membership enddate is in the past (overdue)
    * - plus users expiring between month_start and next_month (this month)
    *
-   * We count membership rows where:
+   * Only each member's CURRENT membership row counts (latest by modified, then
+   * id — the same rule the report widgets use). PMPro keeps old rows when a
+   * level is changed or an end date edited ("changed", "inactive", "expired"
+   * rows with past end dates); counting those made members whose current
+   * membership runs for months still show up as due for renewal.
+   *
+   * We count current membership rows where:
    * - enddate is a real date (not NULL / not 0000...)
    * - enddate < next_month (everything due up through end of current month)
    * - status is NOT cancelled/admin_cancelled
@@ -119,7 +125,14 @@ function sccc_render_members_overview_widget(): void
       ON um.user_id = mu.user_id
      AND um.meta_key = %s
      AND um.meta_value LIKE %s
-    WHERE mu.enddate IS NOT NULL
+    WHERE mu.id = (
+        SELECT mu2.id
+        FROM {$mu_table} mu2
+        WHERE mu2.user_id = mu.user_id
+        ORDER BY mu2.modified DESC, mu2.id DESC
+        LIMIT 1
+      )
+      AND mu.enddate IS NOT NULL
       AND mu.enddate <> '0000-00-00 00:00:00'
       AND mu.enddate < %s
       AND mu.status NOT IN ('cancelled', 'admin_cancelled')
@@ -164,6 +177,7 @@ function sccc_render_members_overview_widget(): void
     . '<strong>' . esc_html($month_label) . '</strong> '
     . number_format_i18n($needs_renewal_cumulative)
     . ' Members are up for renewal'
+    . ' <a href="' . esc_url(add_query_arg('sccc_ml_sort', 'expires', admin_url('index.php'))) . '#sccc_member_list_report">View by expiration</a>'
     . '</p>';
 
   echo '<hr style="margin: .75rem 0 1rem;" />';

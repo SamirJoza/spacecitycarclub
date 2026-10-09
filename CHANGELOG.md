@@ -22,8 +22,11 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 
 - **Member List: member number and expiration.** The widget shows each member's number under their name and a new Expires column; the print sheet uses the member number in place of the row number and adds Expires. Members without an end date show "Lifetime" when their PMPro level never expires (no expiration and no recurring billing), otherwise "No end date", counted in a warning line. Rows within 60 days of the end date and members in grace are highlighted. New sort: expiration (soonest first).
 
+- **Member List: edit links.** Member names in the widget link to their user profile (for staff allowed to edit that user).
+
 ### Fixed
 
+- **Members Overview renewal count** counted every PMPro membership row with a past end date, including old rows PMPro keeps when a level or end date is changed, so members with current memberships running for months showed as "up for renewal". It now looks only at each member's current membership row. The line also links to the Member List sorted by expiration.
 - **PMPro Members list showed "No members found"** while reporting the correct item count. The filter that hides abandoned members (`ScccMemberLifecycleAdmin::excludeAbandonedFromPmproMembersListSql`) appended its condition after PMPro's `GROUP BY` / `ORDER BY` / `LIMIT`, which made the query invalid. It now inserts the condition into the `WHERE` clause.
 
 - `style.css`: `Version` `1.37` → `1.38`.
