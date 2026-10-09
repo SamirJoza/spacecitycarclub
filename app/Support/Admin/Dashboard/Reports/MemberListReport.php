@@ -18,14 +18,21 @@
  *
  * DATA SOURCES
  * - Name: first_name + last_name user meta, falling back to display_name
+ * - Member #: `membership_number` user meta
  * - Level: membership level of the member's latest PMPro membership row
+ * - Expires: end date of that PMPro row. Without an end date the member shows
+ *   "Lifetime" when the level itself never expires (no expiration and no
+ *   recurring billing in its PMPro settings), otherwise "No end date", which
+ *   flags a record that needs fixing. Within 60 days of the end date the row
+ *   is marked as expiring soon; ended 0–29 days ago it shows as Grace.
  * - Member since: `membership_issued_at` user meta (the date the membership
  *   number was issued; also drives the Anniversaries report), falling back to
  *   the earliest PMPro start date, then the account registration date
  *
  * FILTERS
  * - Level: all levels or one level
- * - Sort: last name (default), member since (oldest first), level
+ * - Sort: last name (default), member since (oldest first), level,
+ *   expiration (soonest first, missing end dates next, lifetime last)
  *
  * Loaded from app/setup.php next to the other report widgets.
  */
@@ -41,7 +48,8 @@ final class MemberListReport
     private const WIDGET_ID    = 'sccc_member_list_report';
     private const PRINT_ACTION = 'sccc_print_member_list';
     private const MEMBER_ROLE  = 'sccc_member';
-    private const SORTS        = ['name', 'since', 'level'];
+    private const SORTS        = ['name', 'since', 'level', 'expires'];
+    private const SOON_DAYS    = 60;
 
     public static function register(): void
     {
@@ -89,6 +97,7 @@ final class MemberListReport
         return match ($sort) {
             'since' => 'Member since (oldest first)',
             'level' => 'Membership level',
+            'expires' => 'Expiration (soonest first)',
             default => 'Last name',
         };
     }
@@ -157,6 +166,11 @@ final class MemberListReport
         echo '<span style="color:#646970;">' . esc_html(self::summary($rows)) . '</span>';
         echo '</p>';
 
+        $alerts = self::alerts($rows);
+        if ($alerts !== '') {
+            echo '<p style="margin:0 0 12px; color:#b32d2e; font-weight:600;">' . esc_html($alerts) . '</p>';
+        }
+
         if (empty($rows)) {
             echo '<p style="margin:0;">No members found for this report.</p>';
             return;
@@ -165,16 +179,23 @@ final class MemberListReport
         echo '<div style="max-height:360px; overflow:auto; border:1px solid #dcdcde; border-radius:6px;">';
         echo '<table class="widefat striped" style="margin:0;">';
         echo '<thead><tr>';
-        echo '<th style="position:sticky; top:0; background:#fff; z-index:1;">Name</th>';
-        echo '<th style="position:sticky; top:0; background:#fff; z-index:1; width:34%;">Level</th>';
-        echo '<th style="position:sticky; top:0; background:#fff; z-index:1; width:26%;">Member since</th>';
+        $th = 'position:sticky; top:0; background:#fff; z-index:1;';
+        echo '<th style="' . $th . '">Name</th>';
+        echo '<th style="' . $th . ' width:24%;">Level</th>';
+        echo '<th style="' . $th . ' width:21%;">Member since</th>';
+        echo '<th style="' . $th . ' width:22%;">Expires</th>';
         echo '</tr></thead><tbody>';
 
         foreach ($rows as $r) {
             echo '<tr>';
-            echo '<td>' . esc_html($r['name']) . '</td>';
+            echo '<td>' . esc_html($r['name']);
+            if ($r['number'] !== '') {
+                echo '<br><span style="color:#646970; font-size:11px; font-variant-numeric:tabular-nums; white-space:nowrap;">' . esc_html($r['number']) . '</span>';
+            }
+            echo '</td>';
             echo '<td>' . esc_html($r['level']) . '</td>';
             echo '<td style="white-space:nowrap;">' . esc_html($r['since_label']) . '</td>';
+            echo '<td style="white-space:nowrap;' . self::expiresStyle($r['expires_state']) . '">' . esc_html($r['expires_label']) . '</td>';
             echo '</tr>';
         }
 
@@ -238,9 +259,13 @@ final class MemberListReport
               thead th { text-align:left; border-bottom:2px solid var(--border); padding:10px 8px; font-weight:700; }
               tbody td { border-bottom:1px solid var(--border); padding:9px 8px; vertical-align:top; }
               tbody tr { break-inside: avoid; }
-              .col-num { width: 44px; color: var(--muted); font-variant-numeric: tabular-nums; }
-              .col-level { width: 220px; }
-              .col-since { width: 150px; font-variant-numeric: tabular-nums; }
+              .col-num { width: 150px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+              .col-level { width: 200px; }
+              .col-since, .col-exp { width: 130px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+              .exp-soon, .exp-grace { font-weight: 700; }
+              .exp-missing { font-style: italic; }
+              .exp-lifetime { color: var(--muted); }
+              .alerts { font-weight: 700; }
               .empty { padding: 12px 0; color: var(--muted); }
               @media print {
                 body { padding: 0; }
@@ -258,6 +283,7 @@ final class MemberListReport
                 <p class="meta">
                   Level: <?php echo esc_html($levelLabel); ?> · Sorted by: <?php echo esc_html(self::sortLabel($filters['sort'])); ?><br>
                   <?php echo esc_html(self::summary($rows)); ?> (Active and Grace)<br>
+                  <?php if (self::alerts($rows) !== '') : ?><span class="alerts"><?php echo esc_html(self::alerts($rows)); ?></span><br><?php endif; ?>
                   Generated: <?php echo esc_html($generated); ?><br>
                   Generated by: <?php echo esc_html($by); ?>
                 </p>
@@ -274,19 +300,21 @@ final class MemberListReport
               <table>
                 <thead>
                   <tr>
-                    <th class="col-num">#</th>
+                    <th class="col-num">Member #</th>
                     <th>Name</th>
                     <th class="col-level">Level</th>
                     <th class="col-since">Member since</th>
+                    <th class="col-exp">Expires</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <?php foreach ($rows as $i => $r) : ?>
+                  <?php foreach ($rows as $r) : ?>
                     <tr>
-                      <td class="col-num"><?php echo esc_html((string) ($i + 1)); ?></td>
+                      <td class="col-num"><?php echo esc_html($r['number'] !== '' ? $r['number'] : '—'); ?></td>
                       <td><?php echo esc_html($r['name']); ?></td>
                       <td class="col-level"><?php echo esc_html($r['level']); ?></td>
                       <td class="col-since"><?php echo esc_html($r['since_label']); ?></td>
+                      <td class="col-exp exp-<?php echo esc_attr($r['expires_state']); ?>"><?php echo esc_html($r['expires_label']); ?></td>
                     </tr>
                   <?php endforeach; ?>
                 </tbody>
@@ -329,9 +357,80 @@ final class MemberListReport
     }
 
     /**
+     * PMPro levels that are meant to end: a set expiration or recurring billing.
+     * A member on one of these without an end date is a data problem; on any
+     * other level no end date means lifetime.
+     *
+     * @return array<int,bool>
+     */
+    private static function expiringLevels(): array
+    {
+        static $ids = null;
+
+        if ($ids !== null) {
+            return $ids;
+        }
+
+        $ids = [];
+
+        if (function_exists('pmpro_getAllLevels')) {
+            foreach ((array) pmpro_getAllLevels(true, true) as $level) {
+                if (! is_object($level) || ! isset($level->id)) {
+                    continue;
+                }
+
+                $expires   = (int) ($level->expiration_number ?? 0) > 0;
+                $recurring = (int) ($level->cycle_number ?? 0) > 0 && (float) ($level->billing_amount ?? 0) > 0;
+
+                if ($expires || $recurring) {
+                    $ids[(int) $level->id] = true;
+                }
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Label and state for the Expires column.
+     *
+     * @return array{0:string, 1:string} [label, state] state: soon|grace|ok|missing|lifetime
+     */
+    private static function expiry(?int $endTs, int $levelId, int $now): array
+    {
+        if ($endTs === null) {
+            return isset(self::expiringLevels()[$levelId])
+                ? ['No end date', 'missing']
+                : ['Lifetime', 'lifetime'];
+        }
+
+        $label = wp_date('M j, Y', $endTs);
+
+        if ($endTs <= $now) {
+            return ['Ended ' . $label . ' (grace)', 'grace'];
+        }
+
+        if ($endTs - $now <= self::SOON_DAYS * DAY_IN_SECONDS) {
+            return [$label, 'soon'];
+        }
+
+        return [$label, 'ok'];
+    }
+
+    private static function expiresStyle(string $state): string
+    {
+        return match ($state) {
+            'soon', 'grace' => ' color:#b32d2e; font-weight:600;',
+            'missing'       => ' color:#996800; font-style:italic;',
+            'lifetime'      => ' color:#646970;',
+            default         => '',
+        };
+    }
+
+    /**
      * Current members (Active + Grace, not paused), already filtered and sorted.
      *
-     * @return list<array{id:int, name:string, last:string, first:string, level:string, level_id:int, since_ts:int, since_label:string}>
+     * @return list<array{id:int, name:string, last:string, first:string, level:string, level_id:int, since_ts:int, since_label:string, number:string, expires_label:string, expires_state:string, expires_key:int}>
      */
     private static function rows(int $levelFilter, string $sort): array
     {
@@ -375,6 +474,9 @@ final class MemberListReport
                 $name = (string) $u->display_name;
             }
 
+            $endTs                  = self::parseDate((string) ($m['latest']['enddate'] ?? ''));
+            [$expLabel, $expState]  = self::expiry($endTs, $levelId, $now);
+
             $sinceTs = self::parseDate((string) get_user_meta($id, 'membership_issued_at', true))
                 ?? $m['first_start']
                 ?? self::parseDate((string) $u->user_registered);
@@ -388,6 +490,14 @@ final class MemberListReport
                 'level_id'    => $levelId,
                 'since_ts'    => (int) ($sinceTs ?? 0),
                 'since_label' => $sinceTs ? wp_date('M j, Y', $sinceTs) : '—',
+                'number'        => trim((string) get_user_meta($id, 'membership_number', true)),
+                'expires_label' => $expLabel,
+                'expires_state' => $expState,
+                'expires_key'   => match ($expState) {
+                    'missing'  => PHP_INT_MAX - 1,
+                    'lifetime' => PHP_INT_MAX,
+                    default    => (int) $endTs,
+                },
             ];
         }
 
@@ -397,6 +507,7 @@ final class MemberListReport
             return match ($sort) {
                 'since' => (($a['since_ts'] ?: PHP_INT_MAX) <=> ($b['since_ts'] ?: PHP_INT_MAX)) ?: $byName,
                 'level' => strcasecmp($a['level'], $b['level']) ?: $byName,
+                'expires' => ($a['expires_key'] <=> $b['expires_key']) ?: $byName,
                 default => $byName,
             };
         });
@@ -486,6 +597,30 @@ final class MemberListReport
         $ts = strtotime($raw);
 
         return $ts ? (int) $ts : null;
+    }
+
+    /** e.g. "2 expiring within 60 days · 1 in grace · 6 annual members without an end date" */
+    private static function alerts(array $rows): string
+    {
+        $count = ['soon' => 0, 'grace' => 0, 'missing' => 0];
+        foreach ($rows as $r) {
+            if (isset($count[$r['expires_state']])) {
+                $count[$r['expires_state']]++;
+            }
+        }
+
+        $parts = [];
+        if ($count['soon'] > 0) {
+            $parts[] = sprintf('%d expiring within %d days', $count['soon'], self::SOON_DAYS);
+        }
+        if ($count['grace'] > 0) {
+            $parts[] = sprintf('%d in grace (expired)', $count['grace']);
+        }
+        if ($count['missing'] > 0) {
+            $parts[] = sprintf(_n('%d member on an expiring level has no end date', '%d members on expiring levels have no end date', $count['missing'], 'sage'), $count['missing']);
+        }
+
+        return implode(' · ', $parts);
     }
 
     /** e.g. "42 members: 20 Member, 12 Founding Member, 10 Veteran / First Responder" */
