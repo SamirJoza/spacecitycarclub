@@ -225,16 +225,6 @@
           "name": "7xl",
           "slug": "7xl",
           "size": "4.5rem"
-        },
-        {
-          "name": "8xl",
-          "slug": "8xl",
-          "size": "6rem"
-        },
-        {
-          "name": "9xl",
-          "slug": "9xl",
-          "size": "8rem"
         }
       ]
     }

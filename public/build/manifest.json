@@ -8,12 +8,12 @@
     "src": "node_modules/material-symbols/material-symbols-outlined.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DjyFSMa3.css",
+    "file": "assets/app-aEuh6qlj.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/css/editor.css": {
-    "file": "assets/editor-DivpEzQh.css",
+    "file": "assets/editor-DsfDiX78.css",
     "src": "resources/css/editor.css",
     "isEntry": true
   },
@@ -26,7 +26,7 @@
     "src": "resources/images/logo.svg"
   },
   "resources/js/app.js": {
-    "file": "assets/app-CbfNNJdU.js",
+    "file": "assets/app-C2bVN4Dw.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
