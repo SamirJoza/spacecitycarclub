@@ -34,6 +34,7 @@
 @import "./layouts/mage-event-grid.css";
 @import "./layouts/mage-event-single.css";
 @import "./layouts/woo-checkout.css";
+@import "./components/woocommerce-stripe-payment.css"; /* after woo-checkout: uses its --sccc-wc-* tokens */
 @import "./layouts/woocommerce-order-received.css";
 @import "./layouts/membership-confirmation.css";
 @import "./layouts/thank-you.css";

@@ -1,0 +1,168 @@
+/**
+ * resources/css/components/woocommerce-stripe-payment.css
+ *
+ * WooCommerce Checkout Block: payment method panel (Stripe Payment Element)
+ * -----------------------------------------------------------------------------
+ * Styles the page markup AROUND the Stripe card fields:
+ *   - the payment method row (radio + "Payment methods" label)
+ *   - the white "checked" outline Woo draws around the selected method
+ *   - the accordion content area that holds the Stripe iframe
+ *   - the "Save payment information…" checkbox
+ *
+ * The card number / expiry / CVC inputs themselves are inside an iframe from
+ * js.stripe.com, which page CSS cannot reach. Those are styled through the
+ * Stripe Appearance API in:
+ *   app/Support/Integrations/StripePaymentElementAppearance.php
+ * Keep the two visually in sync.
+ *
+ * Tokens: uses the --sccc-wc-* values declared in layouts/woo-checkout.css
+ * (light and dark), so this file must be imported after it.
+ */
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout,
+body.woocommerce-checkout .wc-block-checkout {
+  --sccc-pay-radius: 16px;
+  --sccc-pay-panel: color-mix(in srgb, var(--sccc-wc-field-solid-bg) 55%, transparent);
+  --sccc-pay-border: var(--sccc-wc-field-border);
+  --sccc-pay-border-active: var(--sccc-wc-field-focus-border);
+  --sccc-pay-ring: var(--sccc-wc-field-focus-ring);
+}
+
+/* ---------------------------------------------------------------------------
+   Panel: replace Woo's white 1.5px "checked" outline with a token border
+   ------------------------------------------------------------------------ */
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control--highlight-checked,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control--highlight-checked {
+  border-radius: var(--sccc-pay-radius);
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control--highlight-checked::after,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control--highlight-checked::after {
+  border-color: var(--sccc-pay-border) !important;
+  border-radius: var(--sccc-pay-radius) !important;
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control-accordion-option,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control-accordion-option {
+  border-radius: var(--sccc-pay-radius);
+  background: var(--sccc-pay-panel);
+  transition: box-shadow var(--sccc-wc-ease, 180ms ease);
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control-accordion-option--checked-option-highlighted,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control-accordion-option--checked-option-highlighted {
+  box-shadow:
+    inset 0 0 0 1px var(--sccc-pay-border-active),
+    0 0 0 4px var(--sccc-pay-ring) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Method row: radio + "Payment methods"
+   ------------------------------------------------------------------------ */
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control-accordion-option .wc-block-components-radio-control__option,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control-accordion-option .wc-block-components-radio-control__option {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control-accordion-option .wc-block-components-radio-control__label,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control-accordion-option .wc-block-components-radio-control__label {
+  color: var(--sccc-wc-text) !important;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control__input,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control__input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+  min-width: 1.15rem;
+  border: 1px solid var(--sccc-pay-border) !important;
+  border-radius: 999px !important;
+  background: var(--sccc-wc-field-solid-bg) !important;
+  box-shadow: inset 0 1px 0 var(--sccc-wc-field-shine);
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control__input:checked,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control__input:checked {
+  border-color: var(--sccc-wc-primary) !important;
+  background: var(--sccc-wc-field-solid-bg) !important;
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control__input:checked::before,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control__input:checked::before {
+  width: 0.55rem !important;
+  height: 0.55rem !important;
+  border-radius: 999px;
+  background: var(--sccc-wc-primary) !important;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--sccc-wc-primary) 55%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   Accordion content: room around the Stripe iframe
+   ------------------------------------------------------------------------ */
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-radio-control-accordion-content,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-radio-control-accordion-content {
+  padding: 0 1rem 1rem !important;
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wcstripe-payment-element,
+body.woocommerce-checkout .wc-block-checkout .wcstripe-payment-element {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   "Save payment information to my account…"
+   ------------------------------------------------------------------------ */
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-payment-methods__save-card-info,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-payment-methods__save-card-info {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--sccc-wc-line);
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-payment-methods__save-card-info .wc-block-components-checkbox__input,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-payment-methods__save-card-info .wc-block-components-checkbox__input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+  border: 1px solid var(--sccc-pay-border) !important;
+  border-radius: 6px !important;
+  background: var(--sccc-wc-field-solid-bg) !important;
+  box-shadow: inset 0 1px 0 var(--sccc-wc-field-shine);
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-payment-methods__save-card-info .wc-block-components-checkbox__input:checked,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-payment-methods__save-card-info .wc-block-components-checkbox__input:checked {
+  border-color: var(--sccc-wc-primary) !important;
+  background: var(--sccc-wc-primary) !important;
+}
+
+/* Woo's tick sits on top of the box; make it visible on the primary fill. */
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-payment-methods__save-card-info .wc-block-components-checkbox__mark,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-payment-methods__save-card-info .wc-block-components-checkbox__mark {
+  fill: var(--color-on-primary, #fff);
+}
+
+body.woocommerce-checkout .wp-block-woocommerce-checkout .wc-block-components-payment-methods__save-card-info .wc-block-components-checkbox__label,
+body.woocommerce-checkout .wc-block-checkout .wc-block-components-payment-methods__save-card-info .wc-block-components-checkbox__label {
+  color: var(--sccc-wc-muted) !important;
+  font-size: 0.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.woocommerce-checkout .wc-block-components-radio-control-accordion-option {
+    transition: none;
+  }
+}

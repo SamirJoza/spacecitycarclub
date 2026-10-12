@@ -14,6 +14,17 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 
 ---
 
+## [1.39] - 2026-10-11
+
+### Added
+
+- **Stripe card fields match the checkout** (`app/Support/Integrations/StripePaymentElementAppearance.php`): the WooCommerce Stripe Payment Element (card number, expiry, security code) is an iframe from js.stripe.com that page CSS cannot reach, so it is styled through Stripe's Appearance API via the `wc_stripe_upe_params` filter (`blocksAppearance` for the Checkout Block, `appearance` for classic checkout). Field background, border, focus ring, radius, text, placeholder and label colours copy the `--sccc-wc-field-*` tokens; the white "Card" box is replaced with the checkout panel colour. Light or dark is chosen from the `scc-theme` cookie (dark by default). WooCommerce Stripe's cached appearance transients are cleared once on the next admin page load.
+- **`resources/css/components/woocommerce-stripe-payment.css`**: styles the page markup around the Stripe iframe on the Checkout Block (payment method panel border and focus glow in place of Woo's white outline, radio, label, spacing, "Save payment information" checkbox). Imported after `layouts/woo-checkout.css`, whose tokens it uses.
+
+### Changed
+
+- **Theme toggle** (`resources/js/components/theme.js`) also stores the visitor's light/dark choice in an `scc-theme` cookie so PHP can match server-rendered pieces such as the Stripe card fields. Existing saved choices are synced on page load.
+
 ## [1.38] - 2026-10-08
 
 ### Added

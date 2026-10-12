@@ -546,6 +546,7 @@ require_once get_theme_file_path('app/Support/Integrations/WooMyAccountPmproMemb
 require_once get_theme_file_path('app/Support/Integrations/PmproAccountProfileLinksToWoo.php');
 require_once get_theme_file_path('app/Support/Integrations/PmproRenewLinkWindow.php');
 require_once get_theme_file_path('app/Support/Integrations/ScccMemberLifecycleAdmin.php');
+require_once get_theme_file_path('app/Support/Integrations/StripePaymentElementAppearance.php');
 
 /* -----------------------------------------------------------------------------
  * Woo account / event booking presentation helpers

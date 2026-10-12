@@ -13,6 +13,17 @@
  */
 
 const STORAGE_KEY = 'scc-theme';
+
+/**
+ * Mirror the saved choice into a cookie so PHP can read it.
+ * Used by app/Support/Integrations/StripePaymentElementAppearance.php to pick
+ * light or dark styling for the Stripe card fields (an iframe CSS can't reach).
+ */
+function rememberForServer(mode) {
+  try {
+    document.cookie = `${STORAGE_KEY}=${mode}; path=/; max-age=31536000; SameSite=Lax`;
+  } catch (e) { /* cookies blocked: server falls back to dark */ }
+}
 const DEFAULT_THEME = 'dark';
 
 /**
@@ -88,6 +99,11 @@ export function initTheme() {
   const saved = localStorage.getItem(STORAGE_KEY);
   applyTheme(saved || null);
 
+  // Existing visitors chose a theme before the cookie existed; sync it once.
+  if (saved === 'light' || saved === 'dark') {
+    rememberForServer(saved);
+  }
+
   /**
    * Delegated click handler.
    *
@@ -104,6 +120,7 @@ export function initTheme() {
     const next = isDark ? 'light' : 'dark';
 
     localStorage.setItem(STORAGE_KEY, next);
+    rememberForServer(next);
     applyTheme(next);
   });
 
