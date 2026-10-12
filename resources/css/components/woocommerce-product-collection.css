@@ -1,0 +1,371 @@
+/* File path + filename: resources/css/components/woocommerce-product-collection.css */
+/*
+|--------------------------------------------------------------------------
+| WooCommerce Product Collection block (e.g. "Newest Products")
+|--------------------------------------------------------------------------
+|
+| Purpose:
+| - Give the core WooCommerce Product Collection block the same card look as
+|   the custom shop archive cards (.sccc-product-card).
+| - Keep the add-to-cart / select-options button pinned to the bottom of
+|   every card, whatever the title or price length.
+|
+| Important:
+| - CSS only. The plugin markup and behaviour are untouched: button text,
+|   AJAX add to cart, "View cart" link, variable/simple/grouped/external
+|   products all keep working exactly as WooCommerce outputs them.
+| - Colours, shadows and button gradients come from the --sccc-shop-*
+|   variables declared in woocommerce-shop-archive.css (shared selector).
+| - Unlayered on purpose: WooCommerce's block CSS is unlayered, so rules
+|   inside @layer components would always lose to it. Specificity is kept
+|   above WooCommerce's selectors; !important is used only where WordPress
+|   itself uses it (preset font-size classes) or inline styles must be beaten.
+|
+*/
+
+.wp-block-woocommerce-product-collection {
+  container-type: inline-size;
+  container-name: sccc-product-collection;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Grid
+|--------------------------------------------------------------------------
+| WooCommerce sets the column count (columns-N) and a responsive grid.
+| We only widen the gap and add container-based breakpoints so cards never
+| get too narrow for the button.
+*/
+.wp-block-woocommerce-product-collection .wc-block-product-template {
+  gap: 2rem 1.5rem;
+  align-items: stretch;
+}
+
+@container sccc-product-collection (max-width: 1040px) {
+  .wp-block-woocommerce-product-collection .wc-block-product-template__responsive:is(.columns-4, .columns-5, .columns-6) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container sccc-product-collection (max-width: 720px) {
+  .wp-block-woocommerce-product-collection .wc-block-product-template__responsive:is(.columns-3, .columns-4, .columns-5, .columns-6) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wp-block-woocommerce-product-collection .wc-block-product-template {
+    gap: 1.25rem;
+  }
+}
+
+@container sccc-product-collection (max-width: 440px) {
+  .wp-block-woocommerce-product-collection .wc-block-product-template__responsive[class*="columns-"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Card
+|--------------------------------------------------------------------------
+*/
+.wp-block-woocommerce-product-collection .wc-block-product-template > .wc-block-product {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--sccc-shop-card-border);
+  border-radius: 1.25rem;
+  background: var(--sccc-shop-card-bg);
+  box-shadow: var(--sccc-shop-card-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+  text-align: start;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+/* Hover wash */
+.wp-block-woocommerce-product-collection .wc-block-product-template > .wc-block-product::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-primary-500) 14%, transparent),
+    transparent 34%,
+    color-mix(in oklab, var(--color-accent-500) 10%, transparent)
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Accent line along the top edge */
+.wp-block-woocommerce-product-collection .wc-block-product-template > .wc-block-product::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 1rem;
+  right: 1rem;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--sccc-shop-card-accent-gradient);
+  opacity: var(--sccc-shop-card-accent-opacity);
+  box-shadow:
+    0 0 14px color-mix(in oklab, var(--color-primary-500) 18%, transparent),
+    0 0 18px color-mix(in oklab, var(--color-accent-500) 10%, transparent);
+  pointer-events: none;
+}
+
+/* Keep card content above the wash */
+.wp-block-woocommerce-product-collection .wc-block-product > * {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product:is(:hover, :focus-within) {
+  border-color: var(--sccc-shop-card-border-hover);
+  background: var(--sccc-shop-card-bg-hover);
+  box-shadow: var(--sccc-shop-card-shadow-hover);
+  transform: translateY(-3px);
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product:is(:hover, :focus-within)::before {
+  opacity: 1;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Image
+|--------------------------------------------------------------------------
+*/
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-image {
+  margin: 0 0 0.95rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--sccc-shop-media-bg);
+  box-shadow:
+    0 12px 28px rgb(0 0 0 / 0.16),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+html[data-theme="light"] .wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-image {
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, 0.11),
+    0 0 18px color-mix(in oklab, var(--color-primary-500) 7%, transparent),
+    0 0 0 1px rgba(255, 255, 255, 0.82) inset;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-image > a {
+  display: block;
+  color: inherit;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-image img {
+  display: block;
+  width: 100%;
+  margin: 0;
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product:hover .wc-block-components-product-image img {
+  transform: scale(1.035);
+  filter: saturate(1.06) contrast(1.03);
+}
+
+/* Sale badge (only shows if enabled in the block settings) */
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-sale-badge {
+  z-index: 3;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.42rem 0.68rem;
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-accent-500) 88%, #ffffff 0%),
+    color-mix(in oklab, var(--color-primary-500) 76%, #000000 0%)
+  );
+  box-shadow:
+    0 12px 26px color-mix(in oklab, var(--color-accent-500) 24%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.16);
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Title (2 lines max, reserves 2 lines so prices line up)
+|--------------------------------------------------------------------------
+| !important beats the block's inline style and the .has-medium-font-size
+| preset class (which WordPress itself marks !important).
+*/
+.wp-block-woocommerce-product-collection .wc-block-product .wp-block-post-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.6em;
+  margin: 0 0 0.45rem !important;
+  padding: 0;
+  color: var(--color-text);
+  font-size: 1rem !important;
+  line-height: 1.3 !important;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-align: start;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wp-block-post-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wp-block-post-title a:is(:hover, :focus-visible) {
+  color: var(--color-accent-500);
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product :is(.wp-block-post-title a, .wc-block-components-product-image > a):focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 3px;
+  border-radius: 0.35rem;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Price
+|--------------------------------------------------------------------------
+*/
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem;
+  min-height: 1.45rem;
+  margin: 0;
+  color: var(--color-accent-500);
+  font-size: 0.98rem !important;
+  line-height: 1.2;
+  font-weight: 900;
+  text-align: start;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-price del {
+  color: var(--color-muted);
+  opacity: 0.72;
+  font-weight: 600;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-price ins {
+  text-decoration: none;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Button — pinned to the bottom of the card
+|--------------------------------------------------------------------------
+| margin-top: auto pushes the button block to the bottom of the flex card.
+| Selectors cover every element WooCommerce can render here: the <a> link
+| (variable, grouped, external, out of stock) and the <button> used for
+| simple products, plus the "View cart" link after adding.
+*/
+.wp-block-woocommerce-product-collection .wc-block-product .wp-block-button.wc-block-components-product-button {
+  margin-top: auto;
+  padding-top: 1rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  font-size: 0.84rem !important;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-button :is(.wc-block-components-product-button__button, .wp-block-button__link, .added_to_cart):not(.wc-block-components-product-button__button--placeholder) {
+  box-sizing: border-box;
+  width: auto;
+  max-width: 100%;
+  min-height: 2.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.72rem 1.08rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--color-text);
+  background:
+    linear-gradient(var(--sccc-shop-button-bg), var(--sccc-shop-button-bg)) padding-box,
+    var(--sccc-shop-button-border-gradient) border-box;
+  box-shadow: var(--sccc-shop-button-shadow);
+  font-family: inherit;
+  font-size: 0.84rem !important;
+  line-height: 1;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    color 0.18s ease,
+    filter 0.18s ease,
+    background 0.18s ease;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-button :is(.wc-block-components-product-button__button, .wp-block-button__link, .added_to_cart):not(.wc-block-components-product-button__button--placeholder):is(:hover, :focus-visible),
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-button :is(.wc-block-components-product-button__button, .wp-block-button__link).added {
+  color: #fff;
+  background: var(--sccc-shop-button-bg-hover);
+  border-color: color-mix(in oklab, var(--color-primary-500) 52%, transparent);
+  box-shadow: var(--sccc-shop-button-shadow-hover);
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-button :is(.wc-block-components-product-button__button, .wp-block-button__link, .added_to_cart):focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 3px;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-button :is(.wc-block-components-product-button__button, .wp-block-button__link).loading {
+  opacity: 0.72;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Reduced motion
+|--------------------------------------------------------------------------
+*/
+@media (prefers-reduced-motion: reduce) {
+  .wp-block-woocommerce-product-collection .wc-block-product,
+  .wp-block-woocommerce-product-collection .wc-block-product *,
+  .wp-block-woocommerce-product-collection .wc-block-product::before {
+    transition: none !important;
+  }
+
+  .wp-block-woocommerce-product-collection .wc-block-product:is(:hover, :focus-within),
+  .wp-block-woocommerce-product-collection .wc-block-product:hover .wc-block-components-product-image img,
+  .wp-block-woocommerce-product-collection .wc-block-product .wc-block-components-product-button :is(.wc-block-components-product-button__button, .wp-block-button__link, .added_to_cart):hover {
+    transform: none;
+  }
+}

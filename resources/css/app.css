@@ -29,6 +29,7 @@
 @import "./components/footer-nav.css";
 @import "./components/woocommerce-account-address.css";
 @import "./components/woocommerce-shop-archive.css";
+@import "./components/woocommerce-product-collection.css"; /* after shop-archive: uses its --sccc-shop-* variables */
 @import "./components/comments.css";
 @import "./layouts/minutes-archive.css";
 @import "./layouts/mage-event-grid.css";
