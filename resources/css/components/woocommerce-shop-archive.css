@@ -35,7 +35,13 @@
     |   without disrupting the dark-mode look that is already working well.
     |
     */
-    .sccc-shop-archive {
+    /*
+    | Shared card variables
+    | - Also read by the WooCommerce Product Collection block
+    |   (see woocommerce-product-collection.css) so both card styles stay in sync.
+    */
+    .sccc-shop-archive,
+    .wp-block-woocommerce-product-collection {
       --sccc-shop-archive-container: 80rem;
       --sccc-shop-archive-bg: transparent;
       --sccc-shop-stage-opacity: 0;
@@ -120,7 +126,9 @@
         0 18px 38px color-mix(in oklab, var(--color-primary-500) 26%, transparent),
         0 0 24px color-mix(in oklab, var(--color-accent-500) 18%, transparent),
         inset 0 1px 0 rgb(255 255 255 / 0.16);
-  
+    }
+
+    .sccc-shop-archive {
       position: relative;
       isolation: isolate;
       padding: 1rem 0 4rem;
@@ -139,7 +147,7 @@
     |   plain white WooCommerce cards on a plain white page.
     |
     */
-    html[data-theme="light"] .sccc-shop-archive {
+    html[data-theme="light"] :is(.sccc-shop-archive, .wp-block-woocommerce-product-collection) {
       --sccc-shop-stage-opacity: 1;
   
       --sccc-shop-archive-bg:

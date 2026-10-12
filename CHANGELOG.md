@@ -14,6 +14,14 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 
 ---
 
+## [1.40] - 2026-10-12
+
+### Changed
+
+- **Product Collection block cards match the shop** (`resources/css/components/woocommerce-product-collection.css`, new): the core WooCommerce Product Collection block (e.g. "Newest Products" on the home page) now uses the shop archive card look: glass card with accent line and hover lift, framed image, title capped at two lines, accent price, and the gradient-border pill button. The button is pinned to the bottom of every card so buttons line up across a row whatever the title length. Columns step down by the block's own width (5/4 → 3 → 2 → 1). Visible focus rings; motion off for reduced-motion visitors. CSS only: WooCommerce markup, button text and add-to-cart behaviour for all product types are unchanged. Title, price and button are now left-aligned like the shop cards (were centred). Unlayered on purpose, since WooCommerce's block CSS is unlayered.
+- **Shop card variables shared** (`resources/css/components/woocommerce-shop-archive.css`): the `--sccc-shop-*` card, media and button variables (and their light-mode values) are now declared on both `.sccc-shop-archive` and `.wp-block-woocommerce-product-collection`, so the two card styles stay in sync. No visual change to the shop archive.
+- Rebuilt assets. The lockfile's Tailwind adds `--default-font-family` / `--default-mono-font-family` theme variables to the compiled CSS (no visual change).
+
 ## [1.39] - 2026-10-11
 
 ### Added
