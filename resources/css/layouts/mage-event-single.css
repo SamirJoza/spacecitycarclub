@@ -2629,3 +2629,333 @@
       0 0 6px rgba(0, 160, 255, 0.1),
       0 0 7px rgba(140, 70, 255, 0.08);
   }
+
+  /* ==========================================================================
+     20) Plugin 5.7 "--default" sidebar widgets + quick-fact cards
+     --------------------------------------------------------------------------
+     Event Manager 5.7 ships its own light-theme styles for the organizer,
+     schedule, location, share and calendar widgets (white/lavender tiles,
+     purple text, a pale address box). This section maps them back onto the
+     SCCC neon-glass language: --btn-neon-* gradient borders and
+     --btn-glass-fill from components/buttons.css, --sccc-control-bg from
+     components/surfaces.css. The plugin uses !important on several of
+     these, so the overrides below need it too.
+     ========================================================================== */
+
+  #mage-container.mage .default_theme {
+    /* Gradient ring shared by icon tiles, the address field and buttons */
+    --mep-neon-ring: linear-gradient(
+      135deg,
+      var(--btn-neon-from, rgba(0, 210, 255, 0.5)),
+      var(--btn-neon-mid, rgba(19, 100, 236, 0.45)),
+      var(--btn-neon-to, rgba(160, 92, 255, 0.5))
+    );
+    --mep-neon-ring-hover: linear-gradient(
+      135deg,
+      var(--btn-neon-from-hover, rgba(0, 210, 255, 0.85)),
+      var(--btn-neon-mid-hover, rgba(19, 100, 236, 0.8)),
+      var(--btn-neon-to-hover, rgba(160, 92, 255, 0.85))
+    );
+    --mep-glass-fill: var(--btn-glass-fill, rgba(10, 18, 30, 0.68));
+    --mep-glass-fill-hover: var(--btn-glass-fill-hover, rgba(10, 18, 30, 0.82));
+    --mep-icon-color: var(--sccc-accent-blue, #2fb6ff);
+
+    /* Quick-fact accents */
+    --mep-fact-date: #22e58a;
+    --mep-fact-time: #ff9a1f;
+    --mep-fact-place: #ff2d55;
+  }
+
+  /* ---- Organizer: drop the plugin's icon-width indent so the name fits ---- */
+
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer_item {
+    padding-left: 0 !important;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar .df-sidebar-part .mpwem_organizer_item a {
+    max-width: 100%;
+    margin-bottom: 0;
+    padding: 0.32rem 0.8rem;
+    font-size: 0.9rem;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  /* ---- Schedule: make room for the plugin's absolutely-placed dot + chevron ---- */
+
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item a {
+    padding: 0.55rem 1.6rem 0.55rem 1.65rem !important;
+    font-size: 0.8rem !important;
+    letter-spacing: -0.01em;
+    white-space: normal !important;
+    text-wrap: balance;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item a::before {
+    left: 0.65rem;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar .event_date_list_area .date_item a::after {
+    right: 0.75rem;
+    border-color: var(--mep-icon-color) !important;
+  }
+
+  /* ---- Location / Share / Calendar sections ---- */
+
+  #mage-container.mage .default_theme .mep-default-sidebar :is(
+    .mpwem_location_sidebar,
+    .share_widgets,
+    .mpwem_calender_area
+  ) {
+    padding: 1rem 0 0 !important;
+    margin-top: 1rem;
+    border-top: 1px solid var(--mep-glass-border) !important;
+    color: var(--mep-text) !important;
+    background: transparent !important;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar :is(
+    .mpwem_location_sidebar .widgets_title,
+    .share_widgets .share_widgets_title
+  ) {
+    gap: 0.65rem !important;
+    margin: 0 0 0.85rem !important;
+    color: var(--mep-heading) !important;
+    font-family: var(--font-display, inherit) !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+  }
+
+  /* Icon tiles: glass fill inside a neon gradient ring */
+  #mage-container.mage .default_theme .mep-default-sidebar :is(
+    .mpwem_location_sidebar .widgets_title > span,
+    .share_widgets .share_widgets_title > span
+  ) {
+    width: 2.1rem !important;
+    height: 2.1rem !important;
+    margin: 0 !important;
+    border-radius: 0.7rem !important;
+    border: 1.5px solid transparent !important;
+    background:
+      linear-gradient(var(--mep-glass-fill), var(--mep-glass-fill)) padding-box,
+      var(--mep-neon-ring) border-box !important;
+    color: var(--mep-icon-color) !important;
+    font-size: 0.85rem !important;
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--mep-icon-color) 22%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  }
+
+  /* Address reads as a field (same treatment as .sccc-control) */
+  #mage-container.mage .default_theme .mep-default-sidebar .mpwem_location_sidebar .mpwem_location_address {
+    margin: 0 0 0.75rem !important;
+    padding: 0.7rem 0.9rem !important;
+    border-radius: var(--radius-control, 0.9rem) !important;
+    border: 1px solid transparent !important;
+    background:
+      var(--sccc-control-bg, linear-gradient(var(--mep-glass-fill), var(--mep-glass-fill))) padding-box,
+      var(--mep-neon-ring) border-box !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar .mpwem_location_sidebar .mpwem_location_address p {
+    color: var(--mep-text) !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    line-height: 1.45 !important;
+  }
+
+  /* Find In Map + Add Calendar: same neon-glass pill as .btn */
+  #mage-container.mage .default_theme .mep-default-sidebar :is(
+    .mpwem_location_sidebar button.mpwem_location_map_btn,
+    .mpwem_calender_area > button
+  ) {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    width: 100% !important;
+    min-height: 2.75rem !important;
+    margin: 0 !important;
+    padding: 0.6rem 1rem !important;
+    border-radius: var(--radius-pill, 999px) !important;
+    border: 1.5px solid transparent !important;
+    background:
+      linear-gradient(var(--mep-glass-fill), var(--mep-glass-fill)) padding-box,
+      var(--mep-neon-ring) border-box !important;
+    color: var(--mep-heading) !important;
+    font-family: var(--font-sans, inherit);
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0;
+    box-shadow: var(--btn-bloom-default, 0 0 14px rgba(0, 210, 255, 0.12)) !important;
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      background 180ms ease !important;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar :is(
+    .mpwem_location_sidebar button.mpwem_location_map_btn,
+    .mpwem_calender_area > button
+  ) :is(i, span) {
+    color: inherit !important;
+    background: transparent !important;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar :is(
+    .mpwem_location_sidebar button.mpwem_location_map_btn,
+    .mpwem_calender_area > button
+  ) i {
+    color: var(--mep-icon-color) !important;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar :is(
+    .mpwem_location_sidebar button.mpwem_location_map_btn,
+    .mpwem_calender_area > button
+  ):is(:hover, :focus-visible) {
+    transform: translateY(-1px);
+    outline: none;
+    border-color: transparent !important;
+    background:
+      linear-gradient(var(--mep-glass-fill-hover), var(--mep-glass-fill-hover)) padding-box,
+      var(--mep-neon-ring-hover) border-box !important;
+    color: #fff !important;
+    box-shadow: var(--btn-bloom-hover, 0 0 22px rgba(0, 210, 255, 0.28)) !important;
+  }
+
+  /* Share icons: white glyphs in the neon ring; plugin brand colors were
+     unreadable on dark (X rendered black on black) */
+  #mage-container.mage .default_theme .mep-default-sidebar .share_widgets .share_widgets_list {
+    gap: 0.6rem !important;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar .share_widgets .share_widgets_list a {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    border-radius: 0.8rem !important;
+    border: 1.5px solid transparent !important;
+    background:
+      linear-gradient(var(--mep-glass-fill), var(--mep-glass-fill)) padding-box,
+      var(--mep-neon-ring) border-box !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar .share_widgets .share_widgets_list a i {
+    color: var(--mep-heading) !important;
+    font-size: 1rem !important;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar .share_widgets .share_widgets_list a:is(:hover, :focus-visible) {
+    transform: translateY(-2px);
+    background:
+      linear-gradient(var(--mep-glass-fill-hover), var(--mep-glass-fill-hover)) padding-box,
+      var(--mep-neon-ring-hover) border-box !important;
+    box-shadow: var(--btn-bloom-hover, 0 0 22px rgba(0, 210, 255, 0.28)) !important;
+  }
+
+  #mage-container.mage .default_theme .mep-default-sidebar .share_widgets .share_widgets_list a:is(:hover, :focus-visible) i {
+    color: var(--mep-icon-color) !important;
+  }
+
+  /* ---- Quick facts (date / time / location): color-coded neon top edge ---- */
+
+  #mage-container.mage .default_theme .date_time_location_short .short_item {
+    --mep-fact: var(--mep-icon-color);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  #mage-container.mage .default_theme .date_time_location_short .short_item:has(.fa-calendar-alt) {
+    --mep-fact: var(--mep-fact-date);
+  }
+
+  #mage-container.mage .default_theme .date_time_location_short .short_item:has(.fa-clock) {
+    --mep-fact: var(--mep-fact-time);
+  }
+
+  #mage-container.mage .default_theme .date_time_location_short .short_item:has(.mi-marker) {
+    --mep-fact: var(--mep-fact-place);
+  }
+
+  /* The neon line: full strength at the left, fading out to the right */
+  #mage-container.mage .default_theme .date_time_location_short .short_item::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--mep-fact) 0%,
+      color-mix(in srgb, var(--mep-fact) 60%, transparent) 45%,
+      transparent 100%
+    );
+    box-shadow: 0 0 12px color-mix(in srgb, var(--mep-fact) 70%, transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Soft glow spilling down from the line */
+  #mage-container.mage .default_theme .date_time_location_short .short_item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      120% 70% at 0% 0%,
+      color-mix(in srgb, var(--mep-fact) 14%, transparent),
+      transparent 65%
+    );
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  #mage-container.mage .default_theme .date_time_location_short .short_item:hover {
+    border-color: color-mix(in srgb, var(--mep-fact) 35%, var(--mep-glass-border)) !important;
+  }
+
+  #mage-container.mage .default_theme .date_time_location_short .short_item h4.__icon_circle_mr {
+    border: 1px solid color-mix(in srgb, var(--mep-fact) 45%, transparent) !important;
+    background: color-mix(in srgb, var(--mep-fact) 12%, var(--mep-glass-fill)) !important;
+    box-shadow: 0 0 16px color-mix(in srgb, var(--mep-fact) 22%, transparent) !important;
+  }
+
+  #mage-container.mage .default_theme .date_time_location_short .short_item h4.__icon_circle_mr span {
+    color: var(--mep-fact) !important;
+    font-size: 1.05rem;
+  }
+
+  /* Label: small caps eyebrow, same as .sccc-control-label */
+  #mage-container.mage .default_theme .date_time_location_short .short_item h6 {
+    color: var(--color-muted, var(--mep-muted)) !important;
+    font-family: var(--font-display, inherit);
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.14em;
+  }
+
+  /* Value: bright and larger so it reads at a glance */
+  #mage-container.mage .default_theme .date_time_location_short .short_item p {
+    color: var(--mep-heading) !important;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    word-break: normal;
+  }
+
+  html[data-theme="light"] #mage-container.mage .default_theme .date_time_location_short .short_item p {
+    color: var(--mep-heading) !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #mage-container.mage .default_theme .mep-default-sidebar :is(
+      .mpwem_location_sidebar button.mpwem_location_map_btn,
+      .mpwem_calender_area > button,
+      .share_widgets .share_widgets_list a
+    ):hover {
+      transform: none;
+    }
+  }
