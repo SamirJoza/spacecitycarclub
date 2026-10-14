@@ -14,6 +14,12 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 
 ---
 
+## [1.41] - 2026-10-13
+
+### Changed
+
+- **Printify products start as drafts** (`app/Support/Woo/ProductPublishStatus.php`, new): products created through the WooCommerce REST API (Printify's sync) are saved as drafts instead of published, so categories and other assignments can be done before they go live. Later republishes from Printify keep the product's current WordPress status (draft, pending, private or published) instead of forcing it to published. Saving products in wp-admin and variation enabled/disabled status are unchanged. Can be switched off with the `sccc/printify/control_product_status` filter.
+
 ## [1.40] - 2026-10-12
 
 ### Changed
