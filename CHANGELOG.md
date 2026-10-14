@@ -14,6 +14,12 @@ Format below is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1
 
 ---
 
+## [1.42] - 2026-10-14
+
+### Changed
+
+- **Products no longer auto-share to social** (`app/Support/Woo/ProductSocialSharing.php`, new): Jetpack Social no longer posts WooCommerce products to Facebook or other connected networks automatically. In the product editor the Jetpack Social connection boxes now start unticked; tick one before publishing (or scheduling) to share that product. Products published any other way (REST API/Printify, quick or bulk edit) are never shared. Blog posts still auto-share as before. Uses Jetpack's `publicize_checkbox_default` and `publicize_should_publicize_published_post` filters; the choice is stored in `_sccc_social_share_opt_in` so scheduled products keep it.
+
 ## [1.41] - 2026-10-13
 
 ### Changed
